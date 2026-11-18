@@ -190,7 +190,7 @@ function moTongKet(th) {
   nen.querySelector('.hop').classList.add('hop-bc');
 }
 async function luuAnhBaoCao() {
-  if (!window.modernScreenshot) await new Promise((ok, loi) => { const s = document.createElement('script'); s.src = 'vendor/modern-screenshot.js?v=4.5'; s.onload = ok; s.onerror = loi; document.head.appendChild(s); });
+  if (!window.modernScreenshot) await new Promise((ok, loi) => { const s = document.createElement('script'); s.src = 'vendor/modern-screenshot.js?v=4.6'; s.onload = ok; s.onerror = loi; document.head.appendChild(s); });
   const el = $('#bao-cao'); await document.fonts.ready;
   const opt = { scale: 2.5, backgroundColor: '#FBF6EA' };
   if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) await modernScreenshot.domToBlob(el, opt);

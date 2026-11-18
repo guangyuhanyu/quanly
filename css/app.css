@@ -807,3 +807,56 @@ body.an-menu.menu-toi .thanh-ben { background: linear-gradient(170deg, #56707A, 
 .ct-goi { margin-top: 10px; }
 @media (max-width: 900px) { .ct-luoi { grid-template-columns: 1fr; } .ct-may { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .ct-mat { grid-template-columns: 1fr; } }
+
+/* ---------- 4.6 LÁ SỐ ---------- */
+:root { --mau-lua: #B5452F; --mau-dat: #7A6A2E; --mau-khi: #3C6E9E; --mau-nuoc: #2E7A72; }
+.ct-tong-quan { margin-bottom: 16px; }
+.ct-ba { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.ct-ba > div { background: var(--kinh); backdrop-filter: var(--mo-kinh); -webkit-backdrop-filter: var(--mo-kinh); border: 1px solid var(--vien); border-radius: 14px; padding: 12px 16px; display: flex; flex-direction: column; gap: 2px; box-shadow: var(--bong); }
+.ct-ba small { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+.ct-ba b { font-family: var(--f-tieu-de); font-size: 20px; color: var(--maroon-deep); }
+.ct-ba span { font-family: var(--f-zh); color: var(--ink-soft); }
+.ct-tong-quan .ct-tinh { max-width: none; margin: 10px 2px 0; }
+.ct-luoi { grid-template-columns: minmax(300px, .9fr) 1.3fr; }
+.ct-cung { text-align: left; align-items: stretch; }
+.ban-do-sao { width: 100%; max-width: 340px; margin: 4px auto; display: block; }
+.bd-vien { fill: none; stroke: color-mix(in srgb, var(--nhan) 45%, transparent); stroke-width: 1.2; }
+.bd-trong { fill: color-mix(in srgb, var(--nhan) 5%, transparent); stroke: color-mix(in srgb, var(--nhan) 25%, transparent); }
+.bd-ke line { stroke: color-mix(in srgb, var(--nhan) 30%, transparent); }
+.bd-cung { font-size: 15px; text-anchor: middle; dominant-baseline: central; font-family: 'Apple Symbols', 'Segoe UI Symbol', serif; }
+.bd-nha { font-size: 8.5px; fill: var(--ink-faint); text-anchor: middle; dominant-baseline: central; }
+.bd-goc { font-size: 14px; fill: var(--maroon-deep); text-anchor: middle; dominant-baseline: central; font-family: 'Apple Symbols', 'Segoe UI Symbol', serif; }
+.bd-nay { font-size: 11px; fill: #D19A2A; text-anchor: middle; dominant-baseline: central; font-family: 'Apple Symbols', 'Segoe UI Symbol', serif; font-weight: 700; }
+.bd-gach { stroke: color-mix(in srgb, var(--ink) 18%, transparent); stroke-width: .6; }
+.bd-truc { stroke: var(--maroon-deep); stroke-width: 1; stroke-dasharray: 3 3; opacity: .6; }
+.bd-ac { font-size: 9px; fill: var(--maroon-deep); font-weight: 700; text-anchor: end; }
+.bd-chieu { stroke-width: 1.1; opacity: .75; } .bd-chieu.tot { stroke: #3F8A5A; } .bd-chieu.xau { stroke: #B5452F; stroke-dasharray: 4 3; }
+.bd-goc-m { color: var(--maroon-deep); } .bd-nay-m { color: #D19A2A; }
+.ct-chu-thich { text-align: center; margin: 0 0 10px; }
+.ct-bang td { padding: 5px 6px; font-size: 13px; } .ky-ht { display: inline-block; width: 20px; text-align: center; font-family: 'Apple Symbols', 'Segoe UI Symbol', serif; color: var(--nhan); font-weight: 700; }
+.ct-ly { display: block; margin-top: 4px; color: var(--ink-faint); font-family: 'Apple Symbols', 'Segoe UI Symbol', var(--f-zh), serif; }
+.ct-su-kien { display: flex; flex-direction: column; gap: 8px; margin: 0 0 14px; }
+.ct-su-kien > div { display: flex; gap: 10px; align-items: flex-start; border-left: 3px solid #D19A2A; background: rgba(255,248,230,.7); border-radius: 0 10px 10px 0; padding: 8px 12px; }
+.ct-su-kien i { font-style: normal; font-size: 18px; color: var(--nhan); font-family: 'Apple Symbols', 'Segoe UI Symbol', serif; }
+.ct-su-kien b { display: block; font-size: 14px; } .ct-su-kien small { color: var(--ink-soft); line-height: 1.45; }
+.ct-gio { font-size: 12.5px !important; line-height: 1.35; display: block !important; }
+.ct-vi-sao { display: block; font-style: normal; font-weight: 400; font-size: 12.5px; color: var(--ink-soft); margin-top: 6px; }
+.ct-chi-tiet { margin-top: 12px; border: 1px solid var(--vien); border-radius: 10px; padding: 8px 12px; background: rgba(255,255,255,.5); }
+.ct-chi-tiet summary { cursor: pointer; font-weight: 600; color: var(--ink-soft); }
+.ct-chi-tiet p { margin: 6px 0; font-size: 13px; line-height: 1.5; } .ct-chi-tiet p.tot b { color: #3F8A5A; } .ct-chi-tiet p.xau b { color: #B5452F; }
+.ct-chi-tiet b { font-family: 'Apple Symbols', 'Segoe UI Symbol', var(--f-zh), serif; margin-right: 4px; }
+.ct-form-ls { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; text-align: left; margin: 14px 0 6px; align-items: end; }
+.ct-mini-sk { color: var(--nhan) !important; font-weight: 600; }
+.canh-bao.nho { font-size: 12.5px; margin-top: 8px; }
+@media (max-width: 900px) { .ct-ba { grid-template-columns: 1fr; } }
+.ct-bang { width: 100%; min-width: 0; table-layout: auto; } .ct-bang td:last-child { white-space: nowrap; text-align: right; } .ct-bang td small { margin-left: 4px; }
+.bd-ac { text-anchor: middle; dominant-baseline: central; }
+@media (max-width: 900px) { .ct-luoi { grid-template-columns: 1fr; } .ct-may { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .ct-mat { grid-template-columns: 1fr; } .ct-bang td small { display: none; } .ct-bang td { font-size: 12.5px; padding: 4px; } }
+.ct-bang { display: flex; flex-direction: column; margin: 4px 0 10px; }
+.ct-bang > div { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr) auto; gap: 8px; align-items: center; padding: 7px 4px; border-bottom: 1px solid var(--vien-nhat); font-size: 13.5px; }
+.ct-bang i.ky-ht { font-style: normal; margin-right: 4px; }
+.ct-bang small { color: var(--ink-faint); font-family: var(--f-zh); font-size: 11.5px; }
+.ct-bang > div > span:last-child { color: var(--ink-soft); white-space: nowrap; font-size: 12.5px; }
+.ct-r { font-size: 10px; color: #B5452F; border: 1px solid currentColor; border-radius: 4px; padding: 0 3px; }
+@media (max-width: 560px) { .ct-bang small { display: none; } .ct-bang > div { font-size: 12.5px; gap: 6px; } }

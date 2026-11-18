@@ -231,7 +231,12 @@ alter table hoc_vien add column if not exists diem_yeu text;
 -- ===================== CẤP QUYỀN CHO TÀI KHOẢN ĐĂNG NHẬP =====================
 grant usage on schema public to authenticated;
 grant select, insert, update, delete on all tables in schema public to authenticated;
-grant usage, select on all sequences in schema public to authenticated;
+grant usage, select, update on all sequences in schema public to authenticated;
 grant execute on all functions in schema public to authenticated;
 alter default privileges in schema public grant select, insert, update, delete on tables to authenticated;
-alter default privileges in schema public grant usage, select on sequences to authenticated;
+alter default privileges in schema public grant usage, select, update on sequences to authenticated;
+grant usage on schema public to service_role;
+grant all on all tables in schema public to service_role;
+grant all on all sequences in schema public to service_role;
+alter default privileges in schema public grant all on tables to service_role;
+alter default privileges in schema public grant all on sequences to service_role;

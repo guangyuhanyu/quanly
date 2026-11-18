@@ -27,8 +27,9 @@ function utc(ngay: string, phut: number) {
 
 Deno.serve(async (req) => {
   const token = new URL(req.url).searchParams.get("token");
-  const { data: cai } = await db.from("cai_dat").select("gia_tri").eq("khoa", "ics_token").maybeSingle();
-  if (!token || !cai || cai.gia_tri !== token) return new Response("Sai mã lịch", { status: 403 });
+  const { data: cai, error: loi } = await db.from("cai_dat").select("gia_tri").eq("khoa", "ics_token").maybeSingle();
+  if (loi) return new Response("Lỗi đọc dữ liệu: " + loi.message + " (chạy file supabase/5-cap-quyen.sql)", { status: 500 });
+  if (!token || !cai || String(cai.gia_tri) !== token) return new Response("Sai mã lịch", { status: 403 });
 
   const tu = new Date(Date.now() - 45 * 864e5).toISOString().slice(0, 10);
   const [{ data: buoi }, { data: lop }] = await Promise.all([

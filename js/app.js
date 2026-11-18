@@ -63,11 +63,10 @@ const HD = {
   'rt-cd': el => { RT.cd = el.dataset.v; ve(); },
   'rut-tham': () => rutTham(),
   'rt-tab': el => { RT.tab = el.dataset.v; ve(); },
-  'ct-dat': async el => { await luuCaiDat('cung_hoang_dao', Number(el.dataset.i)); RT.xemCung = null; RT.doiCung = false; ve(); },
-  'ct-doi': () => { RT.xemCung = null; RT.doiCung = true; ve(); },
-  'ct-ve': () => { RT.xemCung = null; ve(); },
+  'ct-doi': () => { RT.doiCung = true; ve(); },
+  'ct-huy': () => { RT.doiCung = false; ve(); },
   'ct-ngay': el => { const d = Number(el.dataset.d); RT.ngayCT = d === 0 ? null : congNgay(RT.ngayCT || homNay(), d); ve(); },
-  'ct-thanh-viec': async () => { const ci = cungThay(); if (ci == null) return; const ls = laSoNgay(ci, homNay()); await luu('cong_viec', { tieu_de: ls.khuyen, nhom: 'Cá nhân', han: homNay(), uu_tien: 2, xong: false, ghi_chu: `${ls.c.vi} · ${ls.c.zh}` }); toast('Đã thêm vào việc hôm nay ✓'); },
+  'ct-thanh-viec': async () => { const ci = cungThay(); if (ci == null) return; const ls = laSoNgay(ci, homNay()); await luu('cong_viec', { tieu_de: ls.khuyen, nhom: 'Cá nhân', han: homNay(), uu_tien: 2, xong: false, ghi_chu: `Chiêm tinh · ${CUNG[ls.ls.mt].vi}` }); toast('Đã thêm vào việc hôm nay ✓'); },
   'di-chiem-tinh': () => { location.hash = '#/chiem-tinh'; },
   'di-rut-tham': () => { location.hash = '#/rut-tham'; setTimeout(rutTham, 300); },
   'them-la': () => moThemLa(),
@@ -137,7 +136,6 @@ document.addEventListener('change', e => {
   if (el.dataset.actChange === 'chon-khoa') { CHON_KHOA[Number(el.dataset.lop)] = Number(el.value); ve(); }
   if (el.dataset.change === 'khoi-phuc' && el.files[0]) khoiPhuc(el.files[0]);
   if (el.dataset.actChange === 'tq-chon') { TQ.chon = Number(el.value); ve(); }
-  if (el.dataset.actChange === 'ct-xem') { const v = Number(el.value); RT.xemCung = v === cungThay() ? null : v; ve(); }
 });
 document.addEventListener('submit', async e => {
   const f = e.target;
@@ -146,9 +144,11 @@ document.addEventListener('submit', async e => {
     await luu('chi_tieu', { ngay: d.ngay || homNay(), so_tien: d.so_tien, loai: CT.loai, danh_muc: d.danh_muc, ghi_chu: d.ghi_chu });
     toast(`Đã ghi ${CT.loai === 'chi' ? 'chi' : 'thu'} ${tien(d.so_tien)} ✓`); ve(); const o = $('[data-form=chi-tieu] [name=so_tien]'); o && o.focus(); return;
   }
-  if (f.dataset.form === 'ct-ns') {
-    e.preventDefault(); const ci = cungTuNgaySinh(docForm(f).ns); if (ci == null) return;
-    await luuCaiDat('cung_hoang_dao', ci); RT.xemCung = null; toast(`Thầy thuộc cung ${CUNG[ci].vi} ${CUNG[ci].zh} ✓`); ve(); return;
+  if (f.dataset.form === 'ct-ls') {
+    e.preventDefault(); const d = docForm(f); if (!d.ngay) return;
+    if (d.gio_den && !d.gio_tu) { d.gio_tu = d.gio_den; d.gio_den = ''; }
+    await luuCaiDat('la_so_goc', { ngay: d.ngay, gio_tu: d.gio_tu || '', gio_den: d.gio_den || '', noi_sinh: d.noi_sinh, noi_o: d.noi_o });
+    RT.doiCung = false; RT.ngayCT = null; toast('Đã lập lá số ✓'); ve(); return;
   }
   if (f.dataset.form !== 'viec-nhanh') return; e.preventDefault();
   const d = docForm(f); if (!d.tieu_de) return;
@@ -224,7 +224,7 @@ function moXuatPNG(lopId, mau) {
         $$('[data-xp=lang]', n).forEach(b => b.classList.toggle('on', b.dataset.v === st.lang));
         $('[data-chi="02"]', n).style.display = st.mau === '02' ? '' : 'none';
         $('[data-khoa-sau]', n).style.display = st.khoaSau ? '' : 'none';
-        const src = `templates/png${st.mau}.html?v=4.5`;
+        const src = `templates/png${st.mau}.html?v=4.6`;
         const dien = () => { const w = khung.contentWindow; if (!w.dien) return setTimeout(dien, 60); w.dien(duLieuPNG(L, khoaTheoId(st.khoa), st.mau, st), st.lang); setTimeout(() => { khung.style.height = w.document.documentElement.scrollHeight + 'px'; }, 120); };
         if (!khung.src.endsWith(src)) { khung.onload = dien; khung.src = src; } else dien();
       };

@@ -172,7 +172,7 @@ function vThoiQuen() {
     <div class="o-so-the"><i class="o-so-icon">${ICON['thoi-quen']}</i><span>Hoàn thành ${n === hn ? 'hôm nay' : ngayNgan(n)}</span><b>${xong}<small>/${ds.length}</small></b><div class="tien-do"><div class="tien-do-cot"><i style="width:${ds.length ? xong / ds.length * 100 : 0}%"></i></div></div></div>
     <div class="o-so-the"><i class="o-so-icon">${ICON.lua}</i><span>Chuỗi dài nhất hiện tại</span><b>${chuoiMax}<small> ngày</small></b><small>giữ lửa mỗi ngày nhé</small></div>
     <div class="o-so-the"><i class="o-so-icon">${ICON['tai-chinh']}</i><span>Đã tiết kiệm tháng ${Number(thang.slice(5))}</span><b>${tienGon(tienTK)}</b><small>${tien(tienTK)}</small></div>
-    <div class="o-so-the"><i class="o-so-icon">${ICON['chiem-tinh']}</i><span>Chiêm tinh hôm nay</span>${cungThay() != null ? `<small class="lt-mini">${esc(laSoNgay(cungThay(), homNay()).khuyen)}</small>` : `<a href="#/chiem-tinh">Chọn cung →</a>`}</div>
+    <div class="o-so-the"><i class="o-so-icon">${ICON['chiem-tinh']}</i><span>Chiêm tinh hôm nay</span>${cungThay() != null ? `<small class="lt-mini">${esc(laSoNgay(cungThay(), homNay()).khuyen)}</small>` : `<a href="#/chiem-tinh">Lập lá số →</a>`}</div>
   </div>
   <div class="luoi-tq">${ds.map(h => theTQ(h, n)).join('')}</div>
   ${h0 ? `<section class="the-giay"><div class="dau-muc"><h2>Lịch sử: ${esc(h0.ten)}</h2><select data-act-change="tq-chon">${ds.map(h => `<option value="${h.id}" ${h.id === h0.id ? 'selected' : ''}>${esc(h.ten)}</option>`).join('')}</select></div>${banDoTQ(h0)}</section>` : ''}`
@@ -332,7 +332,7 @@ function khoiCaNhanHomNay() {
         : `<p class="mo">Chưa có thói quen. <a href="#/thoi-quen">Tạo ngay →</a></p>`}
     </section>
     <section class="the-giay"><div class="dau-muc"><h2 class="co-icon">${ICON['chiem-tinh']}Chiêm tinh hôm nay</h2><a href="#/chiem-tinh">Mở →</a></div>
-      ${cungThay() != null ? theCTHomNay() : `<p class="mo">Thầy chưa chọn cung hoàng đạo.</p><a class="nut" href="#/chiem-tinh">Chọn cung</a>`}
+      ${cungThay() != null ? theCTHomNay() : `<p class="mo">Thầy chưa lập lá số.</p><a class="nut" href="#/chiem-tinh">Lập lá số</a>`}
     </section>
   </div>`;
 }
