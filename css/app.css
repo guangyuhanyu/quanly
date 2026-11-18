@@ -757,3 +757,8 @@ body.an-menu.menu-toi .thanh-ben { background: linear-gradient(170deg, #56707A, 
 .menu-nhom:empty { margin: 12px 12px 10px; }
 .tb-chan p.tb-phim { display: block; line-height: 1.5; }
 .tb-ban { white-space: nowrap; }
+/* bản 4.3: chữ tự đổi màu theo độ sáng của màu lớp */
+.ev-da_day, .su-kien.st-da_day, .chip-ev.st-da_day { color: var(--chu, #fff); }
+.su-kien.st-da_day small { color: var(--chu, #fff); opacity: .85; }
+.ev-du_kien b { color: color-mix(in srgb, var(--mau) 55%, #2B2013); }
+.ev-du_kien { border-left-color: color-mix(in srgb, var(--mau) 80%, #2B2013); }

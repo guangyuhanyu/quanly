@@ -110,7 +110,7 @@ function vHomNay() {
 function theBuoiHomNay(b) {
   const L = lopTheoId(b.lop_id); const k = khoaTheoId(b.khoa_id);
   const truoc = S.buoi_hoc.filter(x => x.lop_id === b.lop_id && x.trang_thai === 'da_day' && soBuoi(x, b) < 0).sort(soBuoi).pop();
-  return `<li class="buoi-the st-${b.trang_thai}" style="--mau:${esc(L ? L.mau : '')}">
+  return `<li class="buoi-the st-${b.trang_thai}" style="--chu:${mauChu(L ? L.mau : '')};--mau:${esc(L ? L.mau : '')}">
     <div class="buoi-gio"><b>${b.gio_bat_dau || '—'}</b><small>${thoiLuongChu(b.thoi_luong_phut)}</small></div>
     <div class="buoi-noi">
       <div>${L ? tenLop(L) : ''} ${the(TRANG_THAI[b.trang_thai].chu, 'st-' + b.trang_thai)} ${k ? `<small class="mo">Buổi ${thuTuBuoi(b)} · ${k.ma}</small>` : ''}</div>
@@ -163,7 +163,7 @@ function theHan(c) {
 }
 function chipBuoi(b, coGio = true) {
   const L = lopTheoId(b.lop_id);
-  return `<div class="ev ev-${b.trang_thai}" draggable="true" data-act="mo-buoi" data-id="${b.id}" style="--mau:${esc(L ? L.mau : '#56707A')}" title="${esc((L ? L.ten : '') + (b.noi_dung ? ' — ' + b.noi_dung : ''))}">${coGio && b.gio_bat_dau ? `<b>${b.gio_bat_dau}</b> ` : ''}${esc(L ? L.ten : '')}${b.trang_thai === 'nghi' ? ' · nghỉ' : ''}</div>`;
+  return `<div class="ev ev-${b.trang_thai}" draggable="true" data-act="mo-buoi" data-id="${b.id}" style="--chu:${mauChu(L ? L.mau : '')};--mau:${esc(L ? L.mau : '#56707A')}" title="${esc((L ? L.ten : '') + (b.noi_dung ? ' — ' + b.noi_dung : ''))}">${coGio && b.gio_bat_dau ? `<b>${b.gio_bat_dau}</b> ` : ''}${esc(L ? L.ten : '')}${b.trang_thai === 'nghi' ? ' · nghỉ' : ''}</div>`;
 }
 
 /* ---------- Bảng bên trái của lịch ---------- */
@@ -213,7 +213,7 @@ function xepLan(bs) {
 function suKien(b, top, h, lan = 0, soLan = 1) {
   const L = lopTheoId(b.lop_id); const k = khoaTheoId(b.khoa_id);
   return `<div class="su-kien st-${b.trang_thai}" draggable="true" data-act="mo-buoi" data-id="${b.id}" title="${esc(L ? L.ten : '')}${b.noi_dung ? ' — ' + esc(b.noi_dung) : ''}"
-    style="--mau:${esc(L ? L.mau : '#777')};top:${top}px;height:${h}px;left:calc(${lan * 100 / soLan}% + 2px);width:calc(${100 / soLan}% - 4px)">
+    style="--chu:${mauChu(L ? L.mau : '')};--mau:${esc(L ? L.mau : '#777')};top:${top}px;height:${h}px;left:calc(${lan * 100 / soLan}% + 2px);width:calc(${100 / soLan}% - 4px)">
     <b>${b.gio_bat_dau} ${esc(L ? L.ten : '')}</b>${h > 30 ? `<small>${k ? 'Buổi ' + thuTuBuoi(b) : ''}${b.noi_dung ? ' · ' + esc(b.noi_dung) : ''}</small>` : ''}</div>`;
 }
 function lichTuan() {

@@ -27,6 +27,12 @@ const gio2phut = g => { if (!g) return null; const [h, m] = g.split(':').map(Num
 const thoiLuongChu = p => !p ? '' : p % 60 === 0 ? `${p / 60} tiếng` : p > 60 ? `${Math.floor(p / 60)}h${pad(p % 60)}` : `${p} phút`;
 const caiDat = (k, mac) => { const r = S.cai_dat.find(x => x.khoa === k); return r ? r.gia_tri : mac; };
 
+/* màu chữ tự động: nền sáng → chữ mực, nền đậm → chữ trắng */
+function mauChu(hex) {
+  const m = String(hex || '').replace('#', ''); if (m.length < 6) return '#fff';
+  const [r, g, b] = [0, 2, 4].map(i => parseInt(m.slice(i, i + 2), 16) / 255).map(c => c <= .03928 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4);
+  return .2126 * r + .7152 * g + .0722 * b > .4 ? '#2B2013' : '#fff';
+}
 /* ---------- tra cứu ---------- */
 const lopTheoId = id => S.lop.find(x => x.id === id);
 const khoaTheoId = id => S.khoa_hoc.find(x => x.id === id);
