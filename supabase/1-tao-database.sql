@@ -227,3 +227,11 @@ grant execute on function dong_bo_ma() to authenticated;
 alter table hoc_vien add column if not exists ngay_sinh date;
 alter table hoc_vien add column if not exists muc_tieu text;
 alter table hoc_vien add column if not exists diem_yeu text;
+
+-- ===================== CẤP QUYỀN CHO TÀI KHOẢN ĐĂNG NHẬP =====================
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+grant usage, select on all sequences in schema public to authenticated;
+grant execute on all functions in schema public to authenticated;
+alter default privileges in schema public grant select, insert, update, delete on tables to authenticated;
+alter default privileges in schema public grant usage, select on sequences to authenticated;

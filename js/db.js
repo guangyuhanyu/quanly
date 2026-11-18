@@ -106,6 +106,7 @@ const LocalDB = {
     this._save();
   },
   async replaceAll(b) {
+    b = lamSachSaoLuu(b);
     BANG.forEach(t => {
       if (!Array.isArray(b[t])) return;   // file sao lưu cũ không có bảng này → giữ nguyên
       this._d[t] = (b[t] || []).map(r => { const x = { ...r }; if (MA[t] && x.id) x.ma = MA[t](x.id); return x; });
@@ -113,6 +114,29 @@ const LocalDB = {
     this._save();
   },
 };
+
+
+/* Dọn dữ liệu mồ côi trong file sao lưu (khoá/buổi của lớp đã xoá…) trước khi khôi phục */
+function lamSachSaoLuu(b) {
+  const b2 = { ...b }, bo = {};
+  const ids = t => new Set((b2[t] || []).map(r => r.id));
+  const loc = (t, f) => { if (!Array.isArray(b2[t])) return; const n = b2[t].length; b2[t] = b2[t].filter(f); if (n - b2[t].length) bo[t] = n - b2[t].length; };
+  const nul = (t, k, set) => { if (Array.isArray(b2[t])) b2[t] = b2[t].map(r => (r[k] != null && !set.has(r[k])) ? { ...r, [k]: null } : r); };
+  const L = ids('lop'), HV = ids('hoc_vien'), BG = ids('bang_gia');
+  if (Array.isArray(b2.lop) && Array.isArray(b2.bang_gia)) nul('lop', 'bang_gia_id', BG);
+  if (Array.isArray(b2.lop)) {
+    loc('khoa_hoc', r => L.has(r.lop_id));
+    loc('lop_hoc_vien', r => L.has(r.lop_id) && (!Array.isArray(b2.hoc_vien) || HV.has(r.hoc_vien_id)));
+    loc('buoi_hoc', r => L.has(r.lop_id));
+    loc('thanh_toan', r => r.lop_id == null || L.has(r.lop_id));
+    nul('cong_viec', 'lop_id', L);
+  }
+  const K = ids('khoa_hoc');
+  if (Array.isArray(b2.khoa_hoc)) { nul('khoa_hoc', 'khoa_truoc_id', K); nul('buoi_hoc', 'khoa_id', K); nul('thanh_toan', 'khoa_id', K); }
+  if (Array.isArray(b2.thoi_quen)) { const TQ = ids('thoi_quen'); loc('thoi_quen_nhat_ky', r => TQ.has(r.thoi_quen_id)); }
+  b2._boQua = bo;
+  return b2;
+}
 
 /* ---------------- Supabase ---------------- */
 const SupaDB = {
@@ -170,6 +194,7 @@ const SupaDB = {
     const { error } = await this.sb.from('cai_dat').upsert({ khoa, gia_tri }); if (error) throw new Error(error.message);
   },
   async replaceAll(b) {
+    b = lamSachSaoLuu(b);
     const xoa = ['thoi_quen_nhat_ky', 'thoi_quen', 'chi_tieu', 'cong_viec', 'thanh_toan', 'buoi_hoc', 'lop_hoc_vien', 'khoa_hoc', 'lop', 'hoc_vien', 'cai_dat', 'bang_gia']
       .filter(t => Array.isArray(b[t]) && !(this.thieuBang || []).includes(t));   // chỉ thay bảng có trong file
     for (const t of xoa) {

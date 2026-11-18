@@ -4,7 +4,7 @@
 const MENU = [
   ['hom-nay', 'Hôm nay', '今日'], ['lich', 'Lịch dạy', '课表'], ['lop', 'Lớp học', '班级'], ['hoc-vien', 'Học viên', '学员'],
   ['tai-chinh', 'Tài chính', '财务'], ['cong-viec', 'Công việc', '事务'],
-  ['-', 'Cá nhân'], ['rut-tham', 'Rút thăm', '灵签'], ['thoi-quen', 'Thói quen', '习惯'], ['chi-tieu', 'Chi tiêu', '记账'],
+  ['-', 'Cá nhân'], ['chiem-tinh', 'Chiêm tinh', '星座'], ['thoi-quen', 'Thói quen', '习惯'], ['chi-tieu', 'Chi tiêu', '记账'],
   ['-', ''], ['cai-dat', 'Cài đặt', '设置'],
 ];
 const NAV_DUOI = ['hom-nay', 'lich', 'lop', 'thoi-quen'];
@@ -21,7 +21,7 @@ function ve() {
     case 'tai-chinh': html = vTaiChinh(); break;
     case 'cong-viec': html = vCongViec(); break;
     case 'cai-dat': html = vCaiDat(); break;
-    case 'rut-tham': html = vRutTham(); break;
+    case 'chiem-tinh': case 'rut-tham': html = vRutTham(); break;
     case 'thoi-quen': html = vThoiQuen(); break;
     case 'chi-tieu': html = vChiTieu(); break;
     default: html = vHomNay();
@@ -62,6 +62,13 @@ const HD = {
   'mo-menu': () => moMenu(),
   'rt-cd': el => { RT.cd = el.dataset.v; ve(); },
   'rut-tham': () => rutTham(),
+  'rt-tab': el => { RT.tab = el.dataset.v; ve(); },
+  'ct-dat': async el => { await luuCaiDat('cung_hoang_dao', Number(el.dataset.i)); RT.xemCung = null; RT.doiCung = false; ve(); },
+  'ct-doi': () => { RT.xemCung = null; RT.doiCung = true; ve(); },
+  'ct-ve': () => { RT.xemCung = null; ve(); },
+  'ct-ngay': el => { const d = Number(el.dataset.d); RT.ngayCT = d === 0 ? null : congNgay(RT.ngayCT || homNay(), d); ve(); },
+  'ct-thanh-viec': async () => { const ci = cungThay(); if (ci == null) return; const ls = laSoNgay(ci, homNay()); await luu('cong_viec', { tieu_de: ls.khuyen, nhom: 'Cá nhân', han: homNay(), uu_tien: 2, xong: false, ghi_chu: `${ls.c.vi} · ${ls.c.zh}` }); toast('Đã thêm vào việc hôm nay ✓'); },
+  'di-chiem-tinh': () => { location.hash = '#/chiem-tinh'; },
   'di-rut-tham': () => { location.hash = '#/rut-tham'; setTimeout(rutTham, 300); },
   'them-la': () => moThemLa(),
   'xoa-la': async el => { const ds = laRieng().slice(); ds.splice(Number(el.dataset.i), 1); await luuCaiDat('la_tham_rieng', ds); ve(); },
@@ -130,6 +137,7 @@ document.addEventListener('change', e => {
   if (el.dataset.actChange === 'chon-khoa') { CHON_KHOA[Number(el.dataset.lop)] = Number(el.value); ve(); }
   if (el.dataset.change === 'khoi-phuc' && el.files[0]) khoiPhuc(el.files[0]);
   if (el.dataset.actChange === 'tq-chon') { TQ.chon = Number(el.value); ve(); }
+  if (el.dataset.actChange === 'ct-xem') { const v = Number(el.value); RT.xemCung = v === cungThay() ? null : v; ve(); }
 });
 document.addEventListener('submit', async e => {
   const f = e.target;
@@ -137,6 +145,10 @@ document.addEventListener('submit', async e => {
     e.preventDefault(); const d = docForm(f); if (!d.so_tien) { toast('Thầy nhập số tiền giúp em', 'loi'); return; }
     await luu('chi_tieu', { ngay: d.ngay || homNay(), so_tien: d.so_tien, loai: CT.loai, danh_muc: d.danh_muc, ghi_chu: d.ghi_chu });
     toast(`Đã ghi ${CT.loai === 'chi' ? 'chi' : 'thu'} ${tien(d.so_tien)} ✓`); ve(); const o = $('[data-form=chi-tieu] [name=so_tien]'); o && o.focus(); return;
+  }
+  if (f.dataset.form === 'ct-ns') {
+    e.preventDefault(); const ci = cungTuNgaySinh(docForm(f).ns); if (ci == null) return;
+    await luuCaiDat('cung_hoang_dao', ci); RT.xemCung = null; toast(`Thầy thuộc cung ${CUNG[ci].vi} ${CUNG[ci].zh} ✓`); ve(); return;
   }
   if (f.dataset.form !== 'viec-nhanh') return; e.preventDefault();
   const d = docForm(f); if (!d.tieu_de) return;
@@ -212,7 +224,7 @@ function moXuatPNG(lopId, mau) {
         $$('[data-xp=lang]', n).forEach(b => b.classList.toggle('on', b.dataset.v === st.lang));
         $('[data-chi="02"]', n).style.display = st.mau === '02' ? '' : 'none';
         $('[data-khoa-sau]', n).style.display = st.khoaSau ? '' : 'none';
-        const src = `templates/png${st.mau}.html?v=4.3`;
+        const src = `templates/png${st.mau}.html?v=4.5`;
         const dien = () => { const w = khung.contentWindow; if (!w.dien) return setTimeout(dien, 60); w.dien(duLieuPNG(L, khoaTheoId(st.khoa), st.mau, st), st.lang); setTimeout(() => { khung.style.height = w.document.documentElement.scrollHeight + 'px'; }, 120); };
         if (!khung.src.endsWith(src)) { khung.onload = dien; khung.src = src; } else dien();
       };
@@ -346,7 +358,7 @@ async function vaoApp() {
     if (!caiDat('ngay_dung_web', null)) await luuCaiDat('ngay_dung_web', homNay());
     if (!S.lop.length && !location.hash) location.hash = '#/cai-dat';
     if (DBX.thieuBang && DBX.thieuBang.length) toast('Có mục mới (Thói quen, Chi tiêu): Thầy chạy file SQL số 3 trên Supabase để dùng nhé', 'canh');
-  } catch (e) { manHinhDau('Không tải được dữ liệu: ' + e.message + ' – Thầy kiểm tra đã chạy file SQL chưa nhé.'); }
+  } catch (e) { manHinhDau('Không tải được dữ liệu: ' + e.message + (/permission denied/i.test(e.message) ? ' – Thầy chạy file supabase/5-cap-quyen.sql trong SQL Editor rồi đăng nhập lại nhé.' : ' – Thầy kiểm tra đã chạy file SQL chưa nhé.')); }
   finally { $('#man-cho').classList.remove('hien'); }
   setInterval(() => { if (!$('.hop-nen') && document.visibilityState === 'visible' && !document.activeElement.matches('input,textarea,select')) ve(); }, 60000);
 }

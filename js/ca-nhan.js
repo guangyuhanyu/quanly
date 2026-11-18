@@ -68,7 +68,7 @@ function moNgay(n) {
 
 /* ================= RÚT THĂM ================= */
 const CHU_DE_THAM = ['Tất cả', 'Dạy học', 'Học tập', 'Sức khoẻ', 'Tài chính', 'Tâm an', 'Của Thầy'];
-const RT = { cd: 'Tất cả', dangLac: false };
+const RT = { cd: 'Tất cả', dangLac: false, tab: 'la', xemCung: null, ngayCT: null, doiCung: false };
 const laRieng = () => caiDat('la_tham_rieng', []) || [];
 const tatCaLa = () => [...LA_THAM.map((x, i) => ({ ...x, so: i + 1 })), ...laRieng().map((x, i) => ({ ...x, cd: 'Của Thầy', so: LA_THAM.length + i + 1, rieng: i }))];
 function laHomNay() { const r = caiDat('la_tham_hom_nay', null); return r && r.ngay === homNay() ? tatCaLa().find(x => x.so === r.so) : null; }
@@ -96,22 +96,9 @@ function ongTham() {
   </svg>`;
 }
 function vRutTham() {
-  const la = laHomNay(); const rieng = laRieng();
   return `
-  <header class="dau-trang gon"><div><p class="mat-tren">Mỗi ngày một lá</p><h1>${ICON['rut-tham']} Rút thăm lời khuyên</h1></div></header>
-  <div class="luoi-2 rut-tham">
-    <section class="the-giay khung-ong">
-      <div class="phan-doan chip-loc">${CHU_DE_THAM.map(c => `<button data-act="rt-cd" data-v="${c}" class="${RT.cd === c ? 'on' : ''}">${c}</button>`).join('')}</div>
-      <div class="ong-wrap">${ongTham()}</div>
-      <button class="nut chinh lon" data-act="rut-tham">${la ? 'Rút thêm một lá' : 'Lắc ống thăm'}</button>
-      <p class="mo nho">${tatCaLa().length} lá thăm · ${rieng.length} lá do Thầy tự thêm</p>
-    </section>
-    <section class="the-giay khung-la" id="khung-la">${la ? theLaTham(la) + `<div class="nhom-nut giua"><button class="nut" data-act="tham-thanh-viec">${ICON['cong-viec']} Thêm lời khuyên vào việc hôm nay</button></div>` : oTrong('Thầy bấm "Lắc ống thăm" để rút lá thăm của hôm nay.')}</section>
-  </div>
-  <section class="the-giay"><div class="dau-muc"><h2>Lá thăm của Thầy</h2><button class="nut nho" data-act="them-la">${ICON.cong} Thêm lá thăm</button></div>
-    ${rieng.length ? `<table class="bang gon"><tbody>${rieng.map((x, i) => `<tr><td class="zh-to">${esc(x.zh)}</td><td>${esc(x.nghia || '')}</td><td><small class="mo">${esc(x.kh)}</small></td><td class="phai"><button class="nut-x" data-act="xoa-la" data-i="${i}">×</button></td></tr>`).join('')}</tbody></table>`
-      : '<p class="mo nho">Thầy có câu nào tâm đắc (câu của học trò cũ, thầy cô, sách hay…) thì thêm vào đây, ống thăm sẽ trộn chung.</p>'}
-  </section>`;
+  <header class="dau-trang gon"><div><p class="mat-tren">Mỗi ngày một lời khuyên</p><h1>${ICON['chiem-tinh']} Chiêm tinh 星座</h1></div></header>
+  ${RT.doiCung ? chonCungHTML() : vChiemTinh()}`;
 }
 async function rutTham() {
   if (RT.dangLac) return;
@@ -185,7 +172,7 @@ function vThoiQuen() {
     <div class="o-so-the"><i class="o-so-icon">${ICON['thoi-quen']}</i><span>Hoàn thành ${n === hn ? 'hôm nay' : ngayNgan(n)}</span><b>${xong}<small>/${ds.length}</small></b><div class="tien-do"><div class="tien-do-cot"><i style="width:${ds.length ? xong / ds.length * 100 : 0}%"></i></div></div></div>
     <div class="o-so-the"><i class="o-so-icon">${ICON.lua}</i><span>Chuỗi dài nhất hiện tại</span><b>${chuoiMax}<small> ngày</small></b><small>giữ lửa mỗi ngày nhé</small></div>
     <div class="o-so-the"><i class="o-so-icon">${ICON['tai-chinh']}</i><span>Đã tiết kiệm tháng ${Number(thang.slice(5))}</span><b>${tienGon(tienTK)}</b><small>${tien(tienTK)}</small></div>
-    <div class="o-so-the"><i class="o-so-icon">${ICON['rut-tham']}</i><span>Lá thăm hôm nay</span>${laHomNay() ? `<small class="lt-mini">${esc(laHomNay().kh)}</small>` : `<a href="#/rut-tham">Rút một lá →</a>`}</div>
+    <div class="o-so-the"><i class="o-so-icon">${ICON['chiem-tinh']}</i><span>Chiêm tinh hôm nay</span>${cungThay() != null ? `<small class="lt-mini">${esc(laSoNgay(cungThay(), homNay()).khuyen)}</small>` : `<a href="#/chiem-tinh">Chọn cung →</a>`}</div>
   </div>
   <div class="luoi-tq">${ds.map(h => theTQ(h, n)).join('')}</div>
   ${h0 ? `<section class="the-giay"><div class="dau-muc"><h2>Lịch sử: ${esc(h0.ten)}</h2><select data-act-change="tq-chon">${ds.map(h => `<option value="${h.id}" ${h.id === h0.id ? 'selected' : ''}>${esc(h.ten)}</option>`).join('')}</select></div>${banDoTQ(h0)}</section>` : ''}`
@@ -338,14 +325,14 @@ function moCaiCT() {
 /* ================= KHỐI NHỎ TRÊN TRANG CHỦ ================= */
 function khoiCaNhanHomNay() {
   const hs = S.thoi_quen.filter(h => h.dang_dung !== false).sort((a, b) => (a.thu_tu || 0) - (b.thu_tu || 0) || a.id - b.id);
-  const la = laHomNay(); const hn = homNay();
+  const hn = homNay();
   return `<div class="luoi-2">
     <section class="the-giay"><div class="dau-muc"><h2 class="co-icon">${ICON['thoi-quen']}Thói quen hôm nay</h2><a href="#/thoi-quen">Mở →</a></div>
       ${hs.length ? `<div class="tq-nhanh">${hs.map(h => { const v = giaTriTQ(h.id, hn); const dat = datTQ(h, v); return `<button class="tq-chip ${dat ? 'on' : ''}" style="--mau:${esc(h.mau)}" data-act="${h.loai === 'tich' ? 'tq-tich' : 'tq-nhap'}" data-id="${h.id}" data-nhanh="1"><span>${ICON[h.icon] || ICON['thoi-quen']}</span>${esc(h.ten)}${h.loai === 'so' ? `<small>${v ? soTQ(h, v) : '—'}</small>` : dat ? '<small>✓</small>' : ''}</button>`; }).join('')}</div>`
         : `<p class="mo">Chưa có thói quen. <a href="#/thoi-quen">Tạo ngay →</a></p>`}
     </section>
-    <section class="the-giay"><div class="dau-muc"><h2 class="co-icon">${ICON['rut-tham']}Lá thăm hôm nay</h2><a href="#/rut-tham">Mở →</a></div>
-      ${la ? `<p class="lt-zh nho">${esc(la.zh)}</p><p class="mo nho">${esc(la.nghia || '')}</p><p class="lt-kh-nho">${esc(la.kh)}</p>` : `<p class="mo">Hôm nay Thầy chưa rút thăm.</p><button class="nut" data-act="di-rut-tham">Rút một lá</button>`}
+    <section class="the-giay"><div class="dau-muc"><h2 class="co-icon">${ICON['chiem-tinh']}Chiêm tinh hôm nay</h2><a href="#/chiem-tinh">Mở →</a></div>
+      ${cungThay() != null ? theCTHomNay() : `<p class="mo">Thầy chưa chọn cung hoàng đạo.</p><a class="nut" href="#/chiem-tinh">Chọn cung</a>`}
     </section>
   </div>`;
 }

@@ -25,6 +25,8 @@ const ICON = {
   'hac': _i('<path d="M3 9.5c3.5-3 7-3.3 9.5-.8 2.6-3 6.2-3.6 8.5-1.7-2.6.3-4.7 1.6-6.2 3.8l-1.8 3.2-2.5-2.3C8.6 10 6 9.4 3 9.5z"/><path d="M13 14l1.6 5.5M12 13.6l-.4 5.9"/>'),
   // Rút thăm: ống thăm tre
   'rut-tham': _i('<path d="M6.5 10.5h11l-1.2 9.2a1.5 1.5 0 0 1-1.5 1.3H9.2a1.5 1.5 0 0 1-1.5-1.3z"/><path d="M6.5 13h11"/><path d="M9 10.5 8.2 3.6M11.4 10.5V2.8M13.8 10.5l.9-6.6M16 10.5l2-5"/><rect x="13.6" y="2.2" width="2.2" height="4" rx=".6" transform="rotate(8 14.7 4.2)" fill="currentColor" stroke="none" opacity=".8"/>'),
+  // Chiêm tinh: trăng khuyết + sao
+  'chiem-tinh': _i('<path d="M14.5 3.5a8.5 8.5 0 1 0 6 13.6A7 7 0 0 1 14.5 3.5z"/><path d="M18 3.2l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z" fill="currentColor" stroke="none"/><circle cx="10.5" cy="10" r=".8" fill="currentColor" stroke="none"/><circle cx="8.5" cy="14.5" r=".6" fill="currentColor" stroke="none"/>'),
   // Thói quen: đốt trúc
   'thoi-quen': _i('<path d="M9 2.5v19M9 8h0M9 14h0"/><path d="M7.4 7.6h3.2M7.4 13.6h3.2"/><path d="M9 6c2.4-.4 4.2-1.6 5.6-3.6M9 12c2.8-.2 5.2-1.2 7.4-3.4M9 18c2.2.1 4.2-.6 6-2.2"/><path d="M14.6 2.4c.9 1.1 1 2.4.4 3.6M16.4 8.6c1 1 1.4 2.3 1 3.6"/>'),
   // Chi tiêu: nén bạc
