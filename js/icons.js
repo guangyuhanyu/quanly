@@ -49,3 +49,20 @@ const ICON = {
   'png': _i('<rect x="3.5" y="4" width="17" height="16" rx="2"/><circle cx="9" cy="9.5" r="1.8"/><path d="M3.5 17l5-4.5 3.5 3 3-2.5 5.5 4.5"/>'),
   'chuong': _i('<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0M12 3v2"/>'),
 };
+
+/* ===== Bộ icon pastel (bản 4.8) — ảnh màu thay cho icon nét ===== */
+const _a = n => `<img class="ic ic-anh" src="assets/icons/${n}.webp?v=4.8" alt="" aria-hidden="true" draggable="false">`;
+Object.assign(ICON, {
+  'hom-nay': _a('positive'), 'lich': _a('schedule'), 'lop': _a('study'), 'hoc-vien': _a('mood'),
+  'tai-chinh': _a('progress'), 'cong-viec': _a('todo'), 'cai-dat': _a('notes'), 'den-long': _a('ideas'),
+  'ban-tinh': _a('goals'), 'tui-gam': _a('milestone'), 'rut-tham': _a('event'), 'chiem-tinh': _a('important'),
+  'thoi-quen': _a('growth'), 'chi-tieu': _a('shopping'), 'giao-dien': _a('inspiration'), 'lua': _a('energy'),
+  'nuoc': _a('hydrate'), 'sach': _a('journal'), 'chay': _a('exercise'), 'trang': _a('rest'), 'tra': _a('focus'),
+  'chuong': _a('reminder'), 'png': _a('memories'),
+  // thêm cho mục Thói quen
+  'pomodoro': _a('pomodoro'), 'healthy': _a('healthy'), 'breathe': _a('breathe'), 'selflove': _a('selflove'),
+  'deepwork': _a('deepwork'), 'break': _a('break'), 'time': _a('time'), 'messages': _a('messages'),
+  'travel': _a('travel'), 'gratitude': _a('gratitude'), 'celebrate': _a('celebrate'), 'refresh': _a('refresh'),
+  'mindset': _a('mindset'), 'work': _a('work'), 'plan': _a('plan'), 'ideas': _a('ideas'), 'youtime': _a('youtime'),
+  'priorities': _a('priorities'), 'study': _a('study'), 'notes': _a('notes'),
+});

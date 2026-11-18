@@ -85,6 +85,14 @@ function vHomNay() {
     ${theCauNgay()}
     <div class="nhom-nut"><button class="nut" data-act="them-viec">＋ Việc</button><button class="nut chinh" data-act="them-buoi" data-ngay="${hn}">＋ Đặt buổi học</button></div>
   </header>
+    <section class="the-giay lich-hom-nay">
+      <div class="dau-muc"><h2 class="co-icon">${ICON.lich}Lịch dạy hôm nay</h2><a href="#/lich">Mở lịch →</a></div>
+      <div class="lhn-luoi"><div>
+      ${buoiNay.length ? `<ul class="ds-buoi">${buoiNay.map(theBuoiHomNay).join('')}</ul>` : oTrong('Hôm nay chưa có buổi nào trên lịch.', `<button class="nut" data-act="them-buoi" data-ngay="${hn}">＋ Đặt buổi</button>`)}
+      </div><div class="lhn-toi">
+      ${toi.length ? `<div class="dau-muc nho"><h3>7 ngày tới</h3></div><ul class="ds-toi">${toi.map(([n, bs]) => `<li><span class="ngay-toi">${THU_NGAN[s2d(n).getDay()]} ${ngayNgan(n)}</span><span>${bs.map(b => { const L = lopTheoId(b.lop_id); return `<button class="chip" data-act="mo-buoi" data-id="${b.id}">${b.gio_bat_dau || '—'} ${chamMau(L)}${esc(L ? L.ten : '')}</button>`; }).join('')}</span></li>`).join('')}</ul>` : '<p class="mo nho">7 ngày tới chưa có buổi nào.</p>'}
+      </div></div>
+    </section>
   ${theTongKetHomNay()}
   <div class="o-so">
     <div class="o-so-the bam" data-act="chi-tiet-so" data-loai="buoi_tuan" data-tu="${tuan}" data-den="${congNgay(tuan, 6)}"><i class="o-so-icon">${ICON['den-long']}</i><span>Buổi dạy tuần này</span><b>${soTuan}</b><small>${ngayNgan(tuan)} – ${ngayNgan(congNgay(tuan, 6))}</small></div>
@@ -94,18 +102,13 @@ function vHomNay() {
   </div>
   <div class="luoi-2">
     <section class="the-giay">
-      <div class="dau-muc"><h2 class="co-icon">${ICON.lich}Lịch dạy hôm nay</h2><a href="#/lich">Mở lịch →</a></div>
-      ${buoiNay.length ? `<ul class="ds-buoi">${buoiNay.map(theBuoiHomNay).join('')}</ul>` : oTrong('Hôm nay chưa có buổi nào trên lịch.', `<button class="nut" data-act="them-buoi" data-ngay="${hn}">＋ Đặt buổi</button>`)}
-      ${toi.length ? `<div class="dau-muc nho"><h3>7 ngày tới</h3></div><ul class="ds-toi">${toi.map(([n, bs]) => `<li><span class="ngay-toi">${THU_NGAN[s2d(n).getDay()]} ${ngayNgan(n)}</span><span>${bs.map(b => { const L = lopTheoId(b.lop_id); return `<button class="chip" data-act="mo-buoi" data-id="${b.id}">${b.gio_bat_dau || '—'} ${chamMau(L)}${esc(L ? L.ten : '')}</button>`; }).join('')}</span></li>`).join('')}</ul>` : ''}
-    </section>
-    <section class="the-giay">
       <div class="dau-muc"><h2 class="co-icon">${ICON['cong-viec']}Việc cần làm</h2><a href="#/cong-viec">Tất cả →</a></div>
       <form class="them-nhanh" data-form="viec-nhanh"><input name="tieu_de" placeholder="Thêm việc nhanh… (Enter)" autocomplete="off"><input type="date" name="han" value="${hn}"></form>
       <ul class="ds-viec">${tuNhac.slice(0, 12).map(dongViecTuNhac).join('')}${viec.slice(0, 10).map(dongViec).join('')}</ul>
       ${!tuNhac.length && !viec.length ? oTrong('Không còn việc nào. Thầy nghỉ ngơi nhé!') : ''}
     </section>
-  </div>
-  ${khoiCaNhanHomNay()}`;
+    ${khoiCaNhanHomNay(true)}
+  </div>`;
 }
 function theBuoiHomNay(b) {
   const L = lopTheoId(b.lop_id); const k = khoaTheoId(b.khoa_id);

@@ -149,7 +149,7 @@ const SupaDB = {
   },
   async login(email, password) {
     const { error } = await this.sb.auth.signInWithPassword({ email, password });
-    if (error) throw new Error(error.message === 'Invalid login credentials' ? 'Sai email hoặc mật khẩu' : error.message);
+    if (error) { if (/invalid api key/i.test(error.message)) { localStorage.removeItem('gyq_ket_noi'); localStorage.removeItem('gyq_che_do'); throw new Error('Key kết nối bị gõ sai. Web đã tự đặt lại key đúng, Thầy tải lại trang rồi đăng nhập lại nhé.'); } throw new Error(error.message === 'Invalid login credentials' ? 'Sai email hoặc mật khẩu' : error.message); }
   },
   async logout() { await this.sb.auth.signOut(); },
   async _all(t) {

@@ -128,7 +128,7 @@ function moThemLa() {
 
 /* ================= THÓI QUEN ================= */
 const TQ = { ngay: homNay(), chon: null };
-const ICON_TQ = ['tai-chinh', 'chay', 'sach', 'nuoc', 'trang', 'tra', 'cong-viec', 'thoi-quen', 'den-long', 'hac', 'lua', 'hoc-vien'];
+const ICON_TQ = ['tai-chinh', 'chay', 'sach', 'nuoc', 'trang', 'tra', 'cong-viec', 'thoi-quen', 'den-long', 'lua', 'hoc-vien', 'pomodoro', 'healthy', 'breathe', 'selflove', 'deepwork', 'break', 'time', 'messages', 'travel', 'gratitude', 'refresh', 'mindset', 'work', 'plan', 'youtime', 'priorities', 'notes', 'chi-tieu'];
 const MAU_TQ = ['#7C2C20', '#B08A3E', '#3F6B4F', '#2F5D86', '#6A4C93', '#A3445C', '#2F7A73', '#9A5B1F'];
 const TQ_GOI_Y = [
   { ten: 'Tiết kiệm', loai: 'so', don_vi: 'đ', muc_tieu: 50000, icon: 'tai-chinh', mau: '#B08A3E' },
@@ -323,10 +323,10 @@ function moCaiCT() {
 }
 
 /* ================= KHỐI NHỎ TRÊN TRANG CHỦ ================= */
-function khoiCaNhanHomNay() {
+function khoiCaNhanHomNay(trong) {
   const hs = S.thoi_quen.filter(h => h.dang_dung !== false).sort((a, b) => (a.thu_tu || 0) - (b.thu_tu || 0) || a.id - b.id);
   const hn = homNay();
-  return `<div class="luoi-2">
+  return `<div class="${trong ? 'cot-phai' : 'luoi-2'}">
     <section class="the-giay"><div class="dau-muc"><h2 class="co-icon">${ICON['thoi-quen']}Thói quen hôm nay</h2><a href="#/thoi-quen">Mở →</a></div>
       ${hs.length ? `<div class="tq-nhanh">${hs.map(h => { const v = giaTriTQ(h.id, hn); const dat = datTQ(h, v); return `<button class="tq-chip ${dat ? 'on' : ''}" style="--mau:${esc(h.mau)}" data-act="${h.loai === 'tich' ? 'tq-tich' : 'tq-nhap'}" data-id="${h.id}" data-nhanh="1"><span>${ICON[h.icon] || ICON['thoi-quen']}</span>${esc(h.ten)}${h.loai === 'so' ? `<small>${v ? soTQ(h, v) : '—'}</small>` : dat ? '<small>✓</small>' : ''}</button>`; }).join('')}</div>`
         : `<p class="mo">Chưa có thói quen. <a href="#/thoi-quen">Tạo ngay →</a></p>`}

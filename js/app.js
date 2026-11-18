@@ -224,7 +224,7 @@ function moXuatPNG(lopId, mau) {
         $$('[data-xp=lang]', n).forEach(b => b.classList.toggle('on', b.dataset.v === st.lang));
         $('[data-chi="02"]', n).style.display = st.mau === '02' ? '' : 'none';
         $('[data-khoa-sau]', n).style.display = st.khoaSau ? '' : 'none';
-        const src = `templates/png${st.mau}.html?v=4.6`;
+        const src = `templates/png${st.mau}.html?v=4.8`;
         const dien = () => { const w = khung.contentWindow; if (!w.dien) return setTimeout(dien, 60); w.dien(duLieuPNG(L, khoaTheoId(st.khoa), st.mau, st), st.lang); setTimeout(() => { khung.style.height = w.document.documentElement.scrollHeight + 'px'; }, 120); };
         if (!khung.src.endsWith(src)) { khung.onload = dien; khung.src = src; } else dien();
       };
@@ -339,7 +339,7 @@ function manHinhDau(loi) {
       <div class="hoac"><span>hoặc</span></div>
       <button class="nut rong" id="dung-thu">Dùng thử trên máy này (chưa cần Supabase)</button>`}
   </div>`;
-  const fk = $('#f-ket-noi'); if (fk) fk.onsubmit = e => { e.preventDefault(); const f = docForm(fk); let url = f.url.trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, ''); if (!/^https?:\/\//.test(url)) url = 'https://' + url; localStorage.setItem('gyq_ket_noi', JSON.stringify({ url, key: f.key.trim() })); localStorage.setItem('gyq_che_do', 'supabase'); location.reload(); };
+  const fk = $('#f-ket-noi'); if (fk) fk.onsubmit = e => { e.preventDefault(); const f = docForm(fk); let url = f.url.trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, ''); if (!/^https?:\/\//.test(url)) url = 'https://' + url; localStorage.setItem('gyq_ket_noi', JSON.stringify({ url, key: f.key.replace(/\s/g, '') })); localStorage.setItem('gyq_che_do', 'supabase'); location.reload(); };
   const dt = $('#dung-thu'); if (dt) dt.onclick = () => { localStorage.setItem('gyq_che_do', 'local'); location.reload(); };
   const dk = $('#doi-kn'); if (dk) dk.onclick = () => { localStorage.removeItem('gyq_che_do'); manHinhDau(); };
   const fd = $('#f-dang-nhap'); if (fd) fd.onsubmit = async e => {
@@ -362,9 +362,15 @@ async function vaoApp() {
   finally { $('#man-cho').classList.remove('hien'); }
   setInterval(() => { if (!$('.hop-nen') && document.visibilityState === 'visible' && !document.activeElement.matches('input,textarea,select')) ve(); }, 60000);
 }
+/* Kết nối Supabase của Thầy (publishable key là khoá công khai, an toàn khi để trong web) */
+const KET_NOI_MAC_DINH = { url: 'https://tifzrefqfygavobfjysi.supabase.co', key: 'sb_publishable_PS5aOpMFzG8tC25KC5yFMg_XZFV1uli' };
 async function khoiDong() {
-  const che = localStorage.getItem('gyq_che_do');
-  const conn = JSON.parse(localStorage.getItem('gyq_ket_noi') || 'null');
+  let che = localStorage.getItem('gyq_che_do');
+  let conn = JSON.parse(localStorage.getItem('gyq_ket_noi') || 'null');
+  if (!che || (che === 'supabase' && !conn)) {   // máy mới / app mới trên màn hình chính → vào thẳng màn hình đăng nhập
+    conn = KET_NOI_MAC_DINH; che = 'supabase';
+    localStorage.setItem('gyq_ket_noi', JSON.stringify(conn)); localStorage.setItem('gyq_che_do', che);
+  }
   if (che === 'local') { DBX = LocalDB; await DBX.init(); return vaoApp(); }
   if (che === 'supabase' && conn) {
     DBX = SupaDB;
