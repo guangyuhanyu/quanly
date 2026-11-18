@@ -45,6 +45,7 @@ const LocalDB = {
     }
     // nâng cấp: thêm bảng mới, KHÔNG xoá dữ liệu cũ
     let doi = false; BANG.forEach(t => { if (!Array.isArray(this._d[t])) { this._d[t] = []; doi = true; } });
+    if (this._donDep()) doi = true;
     if (doi) this._save();
     return true;
   },
@@ -60,7 +61,42 @@ const LocalDB = {
     const r = this._d[t].find(x => x.id === id); if (!r) throw new Error('Không tìm thấy dòng ' + id);
     Object.assign(r, patch); this._save(); return JSON.parse(JSON.stringify(r));
   },
-  async remove(t, id) { this._d[t] = this._d[t].filter(x => x.id !== id); this._save(); },
+  async remove(t, id) {
+    this._d[t] = this._d[t].filter(x => x.id !== id);
+    this._xoaLienQuan(t, id); this._save();
+  },
+  /* làm giống ràng buộc của Supabase: xoá lớp thì xoá luôn khoá, buổi, thanh toán của lớp… */
+  _xoaLienQuan(t, id) {
+    const d = this._d;
+    if (t === 'lop') {
+      d.lop_hoc_vien = d.lop_hoc_vien.filter(x => x.lop_id !== id);
+      const ks = d.khoa_hoc.filter(x => x.lop_id === id).map(x => x.id);
+      d.khoa_hoc = d.khoa_hoc.filter(x => x.lop_id !== id);
+      d.buoi_hoc = d.buoi_hoc.filter(x => x.lop_id !== id);
+      d.thanh_toan = d.thanh_toan.filter(x => x.lop_id !== id);
+      d.cong_viec.forEach(x => { if (x.lop_id === id) x.lop_id = null; });
+      ks.forEach(k => this._xoaLienQuan('khoa_hoc', k));
+    }
+    if (t === 'khoa_hoc') {
+      d.buoi_hoc.forEach(x => { if (x.khoa_id === id) x.khoa_id = null; });
+      d.thanh_toan.forEach(x => { if (x.khoa_id === id) x.khoa_id = null; });
+      d.khoa_hoc.forEach(x => { if (x.khoa_truoc_id === id) x.khoa_truoc_id = null; });
+    }
+    if (t === 'hoc_vien') d.lop_hoc_vien = d.lop_hoc_vien.filter(x => x.hoc_vien_id !== id);
+    if (t === 'thoi_quen') d.thoi_quen_nhat_ky = d.thoi_quen_nhat_ky.filter(x => x.thoi_quen_id !== id);
+  },
+  /* dọn dữ liệu mồ côi còn sót từ bản cũ */
+  _donDep() {
+    const d = this._d; const lop = new Set(d.lop.map(x => x.id)); const khoa = new Set(); let doi = false;
+    const loc = (t, f) => { const n = d[t].length; d[t] = d[t].filter(f); if (d[t].length !== n) doi = true; };
+    loc('khoa_hoc', x => lop.has(x.lop_id)); d.khoa_hoc.forEach(x => khoa.add(x.id));
+    loc('buoi_hoc', x => lop.has(x.lop_id)); loc('thanh_toan', x => !x.lop_id || lop.has(x.lop_id));
+    loc('lop_hoc_vien', x => lop.has(x.lop_id) && d.hoc_vien.some(h => h.id === x.hoc_vien_id));
+    d.buoi_hoc.forEach(x => { if (x.khoa_id && !khoa.has(x.khoa_id)) { x.khoa_id = null; doi = true; } });
+    d.thanh_toan.forEach(x => { if (x.khoa_id && !khoa.has(x.khoa_id)) { x.khoa_id = null; doi = true; } });
+    const tq = new Set(d.thoi_quen.map(x => x.id)); loc('thoi_quen_nhat_ky', x => tq.has(x.thoi_quen_id));
+    return doi;
+  },
   async removeWhere(t, match) {
     this._d[t] = this._d[t].filter(x => !Object.entries(match).every(([k, v]) => x[k] === v)); this._save();
   },

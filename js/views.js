@@ -40,7 +40,7 @@ function viecTuNhac() {
     if (t.conLai <= 0) ds.push({ muc: 1, icon: '◆', chu: `${esc(L.ten)}: hết buổi – gợi ý khoá tiếp theo`, lop: L, act: `data-act="tin-gia-han" data-lop="${L.id}"`, nut: 'Soạn tin' });
     else if (t.conLai <= nguongGiaHan()) ds.push({ muc: 2, icon: '◇', chu: `${esc(L.ten)}: còn ${t.conLai} buổi – gợi ý khoá tiếp theo`, lop: L, act: `data-act="tin-gia-han" data-lop="${L.id}"`, nut: 'Soạn tin' });
   });
-  S.khoa_hoc.filter(k => !k.ket_thuc).forEach(k => {
+  S.khoa_hoc.filter(k => !k.ket_thuc && lopTheoId(k.lop_id)).forEach(k => {
     const t = tk(k); const L = lopTheoId(k.lop_id); if (!L || t.conNo <= 0) return;
     ds.push({ muc: 2, icon: '₫', chu: `${esc(L.ten)}: chưa thu ${tien(t.conNo)} (khoá ${k.ma})`, lop: L, act: `data-act="thanh-toan" data-lop="${L.id}" data-khoa="${k.id}"`, nut: 'Ghi đã thu' });
     if (!k.khoa_truoc_id && !k.da_gui_thong_tin && (k.created_at || '').slice(0, 10) >= batDau)
@@ -725,7 +725,7 @@ function vTaiChinh() {
   const theoLop = {};
   k.buoi.forEach(b => { const o = theoLop[b.lop_id] = theoLop[b.lop_id] || { buoi: 0, dt: 0, tn: 0 }; o.buoi++; o.dt += doanhThuBuoi(b); });
   k.tt.forEach(t => { const o = theoLop[t.lop_id] = theoLop[t.lop_id] || { buoi: 0, dt: 0, tn: 0 }; o.tn += t.so_tien; });
-  const no = S.khoa_hoc.filter(x => !x.ket_thuc && tk(x).conNo > 0);
+  const no = S.khoa_hoc.filter(x => !x.ket_thuc && lopTheoId(x.lop_id) && tk(x).conNo > 0);
   return `
   <header class="dau-trang gon"><div><p class="mat-tren">Tài chính · Tổng kết thu nhập</p><h1>${ten}</h1></div>
     <div class="nhom-nut">

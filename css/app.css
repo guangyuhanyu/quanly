@@ -752,3 +752,8 @@ body.an-menu.menu-toi .thanh-ben { background: linear-gradient(170deg, #56707A, 
 @media (max-width: 760px) { .tin-gh { grid-template-columns: 1fr; } .bc-luoi, .bc-hai { grid-template-columns: 1fr; } .bao-cao { padding: 18px 16px; } .chao-zh { display: block; font-size: 13px; margin-top: 2px; } }
 .tb-ban { font-weight: 700; color: var(--nhan); }
 .menu-toi .tb-ban { color: var(--gold-soft); }
+/* bản 4.2 */
+.menu-nhom { margin: 20px 12px 8px; }
+.menu-nhom:empty { margin: 12px 12px 10px; }
+.tb-chan p.tb-phim { display: block; line-height: 1.5; }
+.tb-ban { white-space: nowrap; }

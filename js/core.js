@@ -95,7 +95,7 @@ function tongKy(tu, den) {   // [tu, den] chuỗi ngày
 }
 function tongHienTai() {
   let chuaThucHien = 0, chuaThu = 0;
-  S.khoa_hoc.forEach(k => { const t = tk(k); chuaThucHien += t.chuaThucHien; if (!k.ket_thuc && t.conNo > 0) chuaThu += t.conNo; });
+  S.khoa_hoc.filter(k => lopTheoId(k.lop_id)).forEach(k => { const t = tk(k); chuaThucHien += t.chuaThucHien; if (!k.ket_thuc && t.conNo > 0) chuaThu += t.conNo; });
   return { chuaThucHien, chuaThu };
 }
 

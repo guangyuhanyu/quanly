@@ -26,13 +26,13 @@ function moChiTietSo(loai, tu, den, tenKy) {
     bang = `<table class="bang gon"><thead><tr><th>Lớp</th><th>Khoá</th><th class="phai">Buổi đã dạy</th><th class="phai">Đơn giá / buổi</th><th class="phai">Thành tiền</th></tr></thead><tbody>
       ${dong.map(x => `<tr><td>${x.L ? tenLop(x.L) : ''}</td><td class="ma">${x.k ? x.k.ma : '—'}</td><td class="phai">${x.n}</td><td class="phai">${tien(x.dg)}</td><td class="phai"><b>${tien(x.tt)}</b></td></tr>`).join('')}</tbody></table>`;
   } else if (loai === 'chua_thuc_hien') {
-    const dong = S.khoa_hoc.filter(k => !k.ket_thuc && tk(k).chuaThucHien > 0).map(k => ({ k, L: lopTheoId(k.lop_id), t: tk(k) })).sort((a, b) => b.t.chuaThucHien - a.t.chuaThucHien);
+    const dong = S.khoa_hoc.filter(k => lopTheoId(k.lop_id) && !k.ket_thuc && tk(k).chuaThucHien > 0).map(k => ({ k, L: lopTheoId(k.lop_id), t: tk(k) })).sort((a, b) => b.t.chuaThucHien - a.t.chuaThucHien);
     tong = dong.reduce((s, x) => s + x.t.chuaThucHien, 0); tieuDe = 'Học phí chưa thực hiện';
     bang = `<table class="bang gon"><thead><tr><th>Lớp</th><th>Khoá</th><th class="phai">Đã đóng</th><th class="phai">Buổi đã đóng chưa dạy</th><th class="phai">Đơn giá / buổi</th><th class="phai">Giá trị</th><th>Tình trạng</th><th></th></tr></thead><tbody>
       ${dong.map(x => `<tr><td>${tenLop(x.L)}</td><td class="ma">${x.k.ma}</td><td class="phai">${tien(x.t.daDong)}</td><td class="phai">${(x.t.chuaThucHien / (x.t.donGiaBuoi || 1)).toLocaleString('vi-VN', { maximumFractionDigits: 1 })} / ${x.t.conLai} buổi</td><td class="phai">${tien(x.t.donGiaBuoi)}</td><td class="phai"><b>${tien(x.t.chuaThucHien)}</b></td><td>${x.L.dang_hoat_dong ? the('Đang học', 'xanh') : the('Bảo lưu', 'tt-tam_dung')}</td><td class="phai"><button class="nut nho" data-act="sua-khoa" data-id="${x.k.id}">Sửa khoá</button></td></tr>`).join('')}</tbody></table>
       <p class="mo nho">Lớp nào đã nghỉ hẳn và không học tiếp: Thầy bấm "Sửa khoá" → tick "Đã đóng khoá" để không tính vào đây nữa.</p>`;
   } else if (loai === 'chua_thu') {
-    const dong = S.khoa_hoc.filter(k => !k.ket_thuc && tk(k).conNo > 0).map(k => ({ k, L: lopTheoId(k.lop_id), t: tk(k) }));
+    const dong = S.khoa_hoc.filter(k => lopTheoId(k.lop_id) && !k.ket_thuc && tk(k).conNo > 0).map(k => ({ k, L: lopTheoId(k.lop_id), t: tk(k) }));
     tong = dong.reduce((s, x) => s + x.t.conNo, 0); tieuDe = 'Học phí chưa thu';
     bang = `<table class="bang gon"><thead><tr><th>Lớp</th><th>Khoá</th><th class="phai">Học phí</th><th class="phai">Đã đóng</th><th class="phai">Còn thiếu</th><th></th></tr></thead><tbody>
       ${dong.map(x => `<tr><td>${tenLop(x.L)}</td><td class="ma">${x.k.ma}</td><td class="phai">${tien(x.k.hoc_phi)}</td><td class="phai">${tien(x.t.daDong)}</td><td class="phai"><b class="chu-do">${tien(x.t.conNo)}</b></td><td class="phai"><button class="nut nho" data-act="thanh-toan" data-lop="${x.L.id}" data-khoa="${x.k.id}">Ghi đã thu</button></td></tr>`).join('')}</tbody></table>`;

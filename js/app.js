@@ -121,8 +121,9 @@ const HD = {
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el) return;
   const f = HD[el.dataset.act]; if (!f) return;
-  if (el.tagName === 'INPUT' && el.type === 'checkbox') { f(el, e); return; }
-  e.preventDefault(); f(el, e);
+  const chay = () => { try { const r = f(el, e); if (r && r.catch) r.catch(baoLoi); } catch (er) { baoLoi(er); } };
+  if (el.tagName === 'INPUT' && el.type === 'checkbox') { chay(); return; }
+  e.preventDefault(); chay();
 });
 document.addEventListener('change', e => {
   const el = e.target;
@@ -211,7 +212,7 @@ function moXuatPNG(lopId, mau) {
         $$('[data-xp=lang]', n).forEach(b => b.classList.toggle('on', b.dataset.v === st.lang));
         $('[data-chi="02"]', n).style.display = st.mau === '02' ? '' : 'none';
         $('[data-khoa-sau]', n).style.display = st.khoaSau ? '' : 'none';
-        const src = `templates/png${st.mau}.html?v=4.1`;
+        const src = `templates/png${st.mau}.html?v=4.2`;
         const dien = () => { const w = khung.contentWindow; if (!w.dien) return setTimeout(dien, 60); w.dien(duLieuPNG(L, khoaTheoId(st.khoa), st.mau, st), st.lang); setTimeout(() => { khung.style.height = w.document.documentElement.scrollHeight + 'px'; }, 120); };
         if (!khung.src.endsWith(src)) { khung.onload = dien; khung.src = src; } else dien();
       };
