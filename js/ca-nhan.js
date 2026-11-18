@@ -127,7 +127,7 @@ function moThemLa() {
 }
 
 /* ================= THÓI QUEN ================= */
-const TQ = { ngay: homNay(), chon: null };
+const TQ = { ngay: homNay(), chon: null, tab: 'ngay' };
 const ICON_TQ = ['tai-chinh', 'chay', 'sach', 'nuoc', 'trang', 'tra', 'cong-viec', 'thoi-quen', 'den-long', 'lua', 'hoc-vien', 'pomodoro', 'healthy', 'breathe', 'selflove', 'deepwork', 'break', 'time', 'messages', 'travel', 'gratitude', 'refresh', 'mindset', 'work', 'plan', 'youtime', 'priorities', 'notes', 'chi-tieu'];
 const MAU_TQ = ['#7C2C20', '#B08A3E', '#3F6B4F', '#2F5D86', '#6A4C93', '#A3445C', '#2F7A73', '#9A5B1F'];
 const TQ_GOI_Y = [
@@ -163,8 +163,10 @@ function vThoiQuen() {
   const tienTK = ds.filter(h => h.don_vi === 'đ').reduce((s, h) => s + S.thoi_quen_nhat_ky.filter(x => x.thoi_quen_id === h.id && x.ngay.startsWith(thang)).reduce((a, x) => a + Number(x.gia_tri), 0), 0);
   const chuoiMax = ds.reduce((m, h) => Math.max(m, chuoiTQ(h)), 0);
   const h0 = ds.find(h => h.id === TQ.chon) || ds[0];
+  const tabTQ = `<div class="phan-doan dam tq-tab"><button data-act="tq-tab" data-v="ngay" class="${TQ.tab !== 'hsk' ? 'on' : ''}">${ICON['thoi-quen']} Hằng ngày</button><button data-act="tq-tab" data-v="hsk" class="${TQ.tab === 'hsk' ? 'on' : ''}">${ICON.study} Lộ trình HSK 7–9</button></div>`;
+  if (TQ.tab === 'hsk') return `<header class="dau-trang gon"><div><p class="mat-tren">Mỗi ngày một chút</p><h1>${ICON['thoi-quen']} Thói quen</h1></div>${tabTQ}</header>${vLoTrinh()}`;
   return `
-  <header class="dau-trang gon"><div><p class="mat-tren">Mỗi ngày một chút</p><h1>${ICON['thoi-quen']} Thói quen</h1></div>
+  <header class="dau-trang gon"><div><p class="mat-tren">Mỗi ngày một chút</p><h1>${ICON['thoi-quen']} Thói quen</h1></div>${tabTQ}
     <div class="nhom-nut"><div class="vien-thang"><button class="nut-tron" data-act="tq-lui">${ICON.trai}</button><span>${n === hn ? 'Hôm nay' : `${THU_NGAN[s2d(n).getDay()]} ${ngayNgan(n)}`}</span><button class="nut-tron" data-act="tq-toi" ${n >= hn ? 'disabled' : ''}>${ICON.phai}</button></div>
     <button class="nut chinh" data-act="tq-moi">${ICON.cong} Thói quen mới</button></div></header>
   ${ds.length ? `
@@ -330,7 +332,9 @@ function khoiCaNhanHomNay(trong) {
     <section class="the-giay"><div class="dau-muc"><h2 class="co-icon">${ICON['thoi-quen']}Thói quen hôm nay</h2><a href="#/thoi-quen">Mở →</a></div>
       ${hs.length ? `<div class="tq-nhanh">${hs.map(h => { const v = giaTriTQ(h.id, hn); const dat = datTQ(h, v); return `<button class="tq-chip ${dat ? 'on' : ''}" style="--mau:${esc(h.mau)}" data-act="${h.loai === 'tich' ? 'tq-tich' : 'tq-nhap'}" data-id="${h.id}" data-nhanh="1"><span>${ICON[h.icon] || ICON['thoi-quen']}</span>${esc(h.ten)}${h.loai === 'so' ? `<small>${v ? soTQ(h, v) : '—'}</small>` : dat ? '<small>✓</small>' : ''}</button>`; }).join('')}</div>`
         : `<p class="mo">Chưa có thói quen. <a href="#/thoi-quen">Tạo ngay →</a></p>`}
+      ${l79HomNay()}
     </section>
+    ${mtHomNay()}
     <section class="the-giay"><div class="dau-muc"><h2 class="co-icon">${ICON['chiem-tinh']}Chiêm tinh hôm nay</h2><a href="#/chiem-tinh">Mở →</a></div>
       ${cungThay() != null ? theCTHomNay() : `<p class="mo">Thầy chưa lập lá số.</p><a class="nut" href="#/chiem-tinh">Lập lá số</a>`}
     </section>

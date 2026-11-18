@@ -4,7 +4,7 @@
 const MENU = [
   ['hom-nay', 'Hôm nay', '今日'], ['lich', 'Lịch dạy', '课表'], ['lop', 'Lớp học', '班级'], ['hoc-vien', 'Học viên', '学员'],
   ['tai-chinh', 'Tài chính', '财务'], ['cong-viec', 'Công việc', '事务'],
-  ['-', 'Cá nhân'], ['chiem-tinh', 'Chiêm tinh', '星座'], ['thoi-quen', 'Thói quen', '习惯'], ['chi-tieu', 'Chi tiêu', '记账'],
+  ['-', 'Cá nhân'], ['muc-tieu', 'Mục tiêu', '目标'], ['chiem-tinh', 'Chiêm tinh', '星座'], ['thoi-quen', 'Thói quen', '习惯'], ['chi-tieu', 'Chi tiêu', '记账'],
   ['-', ''], ['cai-dat', 'Cài đặt', '设置'],
 ];
 const NAV_DUOI = ['hom-nay', 'lich', 'lop', 'thoi-quen'];
@@ -23,6 +23,7 @@ function ve() {
     case 'cai-dat': html = vCaiDat(); break;
     case 'chiem-tinh': case 'rut-tham': html = vRutTham(); break;
     case 'thoi-quen': html = vThoiQuen(); break;
+    case 'muc-tieu': html = vMucTieu(); break;
     case 'chi-tieu': html = vChiTieu(); break;
     default: html = vHomNay();
   }
@@ -72,6 +73,7 @@ const HD = {
   'them-la': () => moThemLa(),
   'xoa-la': async el => { const ds = laRieng().slice(); ds.splice(Number(el.dataset.i), 1); await luuCaiDat('la_tham_rieng', ds); ve(); },
   'tham-thanh-viec': async () => { const la = laHomNay(); if (!la) return; await luu('cong_viec', { tieu_de: la.kh, nhom: 'Cá nhân', han: homNay(), uu_tien: 2, xong: false, ghi_chu: la.zh }); toast('Đã thêm vào việc hôm nay ✓'); },
+  'tq-tab': el => { TQ.tab = el.dataset.v; ve(); },
   'tq-lui': () => { TQ.ngay = congNgay(TQ.ngay, -1); ve(); },
   'tq-toi': () => { if (TQ.ngay < homNay()) { TQ.ngay = congNgay(TQ.ngay, 1); ve(); } },
   'tq-moi': () => moTQ(),
@@ -126,7 +128,7 @@ const HD = {
 };
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el) return;
-  const f = HD[el.dataset.act]; if (!f) return;
+  const f = HD[el.dataset.act] || HD_L79[el.dataset.act] || HD_MT[el.dataset.act]; if (!f) return;
   const chay = () => { try { const r = f(el, e); if (r && r.catch) r.catch(baoLoi); } catch (er) { baoLoi(er); } };
   if (el.tagName === 'INPUT' && el.type === 'checkbox') { chay(); return; }
   e.preventDefault(); chay();
@@ -136,6 +138,7 @@ document.addEventListener('change', e => {
   if (el.dataset.actChange === 'chon-khoa') { CHON_KHOA[Number(el.dataset.lop)] = Number(el.value); ve(); }
   if (el.dataset.change === 'khoi-phuc' && el.files[0]) khoiPhuc(el.files[0]);
   if (el.dataset.actChange === 'tq-chon') { TQ.chon = Number(el.value); ve(); }
+  if (el.dataset.actChange === 'l79-start') l79DoiNgayBatDau(el.value);
 });
 document.addEventListener('submit', async e => {
   const f = e.target;
@@ -224,7 +227,7 @@ function moXuatPNG(lopId, mau) {
         $$('[data-xp=lang]', n).forEach(b => b.classList.toggle('on', b.dataset.v === st.lang));
         $('[data-chi="02"]', n).style.display = st.mau === '02' ? '' : 'none';
         $('[data-khoa-sau]', n).style.display = st.khoaSau ? '' : 'none';
-        const src = `templates/png${st.mau}.html?v=4.8`;
+        const src = `templates/png${st.mau}.html?v=4.9`;
         const dien = () => { const w = khung.contentWindow; if (!w.dien) return setTimeout(dien, 60); w.dien(duLieuPNG(L, khoaTheoId(st.khoa), st.mau, st), st.lang); setTimeout(() => { khung.style.height = w.document.documentElement.scrollHeight + 'px'; }, 120); };
         if (!khung.src.endsWith(src)) { khung.onload = dien; khung.src = src; } else dien();
       };
