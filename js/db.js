@@ -50,6 +50,8 @@ const LocalDB = {
     return true;
   },
   async loadAll() { return JSON.parse(JSON.stringify(this._d)); },
+  async layAnh(keys) { const o = {}; this._d.cai_dat.filter(r => keys.includes(r.khoa)).forEach(r => o[r.khoa] = r.gia_tri); return o; },
+  async tatCaAnh() { return []; },
   _nextId(t) { return this._d[t].reduce((m, r) => Math.max(m, r.id || 0), 0) + 1; },
   async insert(t, row) {
     const r = { ...row };
@@ -152,6 +154,19 @@ const SupaDB = {
     if (error) { if (/invalid api key/i.test(error.message)) { localStorage.removeItem('gyq_ket_noi'); localStorage.removeItem('gyq_che_do'); throw new Error('Key kết nối bị gõ sai. Web đã tự đặt lại key đúng, Thầy tải lại trang rồi đăng nhập lại nhé.'); } throw new Error(error.message === 'Invalid login credentials' ? 'Sai email hoặc mật khẩu' : error.message); }
   },
   async logout() { await this.sb.auth.signOut(); },
+  async _caiDatNhe() {   // cài đặt nhưng bỏ ảnh (khoá 'anh:…'), ảnh tải khi cần
+    const { data, error } = await this.sb.from('cai_dat').select('*').not('khoa', 'like', 'anh:%');
+    if (error) throw new Error('cai_dat: ' + error.message); return data;
+  },
+  async layAnh(keys) {
+    const out = {};
+    for (let i = 0; i < keys.length; i += 40) {
+      const { data, error } = await this.sb.from('cai_dat').select('khoa,gia_tri').in('khoa', keys.slice(i, i + 40));
+      if (error) throw new Error(error.message); data.forEach(r => out[r.khoa] = r.gia_tri);
+    }
+    return out;
+  },
+  async tatCaAnh() { const { data, error } = await this.sb.from('cai_dat').select('*').like('khoa', 'anh:%'); if (error) throw new Error(error.message); return data; },
   async _all(t) {
     const out = []; let from = 0;
     while (true) {
@@ -163,7 +178,7 @@ const SupaDB = {
   },
   async loadAll() {
     const S = {}; this.thieuBang = [];
-    const res = await Promise.all(BANG.map(t => this._all(t).catch(e => {
+    const res = await Promise.all(BANG.map(t => (t === 'cai_dat' ? this._caiDatNhe() : this._all(t)).catch(e => {
       if (BANG_CA_NHAN.includes(t)) { this.thieuBang.push(t); return []; }  // chưa chạy file SQL số 3
       throw e;
     })));

@@ -51,7 +51,7 @@ const ICON = {
 };
 
 /* ===== Bộ icon pastel (bản 4.8) — ảnh màu thay cho icon nét ===== */
-const _a = n => `<img class="ic ic-anh" src="assets/icons/${n}.webp?v=4.9" alt="" aria-hidden="true" draggable="false">`;
+const _a = n => `<img class="ic ic-anh" src="assets/icons/${n}.webp?v=5.6" alt="" aria-hidden="true" draggable="false">`;
 Object.assign(ICON, {
   'hom-nay': _a('positive'), 'lich': _a('schedule'), 'lop': _a('study'), 'hoc-vien': _a('mood'),
   'tai-chinh': _a('progress'), 'cong-viec': _a('todo'), 'cai-dat': _a('notes'), 'den-long': _a('ideas'),
@@ -64,5 +64,5 @@ Object.assign(ICON, {
   'deepwork': _a('deepwork'), 'break': _a('break'), 'time': _a('time'), 'messages': _a('messages'),
   'travel': _a('travel'), 'gratitude': _a('gratitude'), 'celebrate': _a('celebrate'), 'refresh': _a('refresh'),
   'mindset': _a('mindset'), 'work': _a('work'), 'plan': _a('plan'), 'ideas': _a('ideas'), 'youtime': _a('youtime'),
-  'priorities': _a('priorities'), 'goals': _a('goals'), 'muc-tieu': _a('goals'), 'study': _a('study'), 'notes': _a('notes'),
+  'priorities': _a('priorities'), 'goals': _a('goals'), 'todo': _a('todo'), 'journal': _a('journal'), 'quy': _a('celebrate'), 'ky-niem': _a('memories'), 'tong-ket': _a('notes'), 'muc-tieu': _a('goals'), 'style': _a('youtime'), 'study': _a('study'), 'notes': _a('notes'),
 });

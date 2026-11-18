@@ -82,9 +82,10 @@ function vHomNay() {
   return `
   <header class="dau-trang">
     <div><p class="mat-tren">${THU[d.getDay()]}, ${ngayVN(hn)}</p><h1>${loiChao().chu} <span class="chao-zh">${loiChao().zh}</span></h1><p class="phu">Hôm nay có ${buoiNay.length} buổi dạy và ${tuNhac.length + viec.length} việc cần để ý.</p></div>
-    ${theCauNgay()}
+
     <div class="nhom-nut"><button class="nut" data-act="them-viec">＋ Việc</button><button class="nut chinh" data-act="them-buoi" data-ngay="${hn}">＋ Đặt buổi học</button></div>
   </header>
+  ${theDemNguoc()}
     <section class="the-giay lich-hom-nay">
       <div class="dau-muc"><h2 class="co-icon">${ICON.lich}Lịch dạy hôm nay</h2><a href="#/lich">Mở lịch →</a></div>
       <div class="lhn-luoi"><div>

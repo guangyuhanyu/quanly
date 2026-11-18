@@ -24,7 +24,7 @@ function apDungGiaoDien() {
   r.setProperty('--phu-do', GD.phuDo);
   r.setProperty('--phu-tron', GD.tron || 'color');
   r.setProperty('--kinh-a', GD.kinh);
-  r.setProperty('--nen-anh', GD.anh ? `url("${GD.anh}")` : 'url("assets/nen-son-thuy.svg")');
+  r.setProperty('--nen-anh', GD.anh ? `url("${GD.anh}")` : `url("${new URL('assets/nen-son-thuy.svg', location.href).href}")`);
   const b = document.body;
   b.classList.toggle('menu-toi', GD.menu === 'toi');
   b.classList.toggle('an-menu', !!GD.anMenu && window.innerWidth > 760);

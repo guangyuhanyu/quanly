@@ -246,7 +246,7 @@ function canSQL() {
 
 /* ================= CHI TIÊU ================= */
 const CT = { thang: homNay().slice(0, 7), loai: 'chi', locDm: null };
-const DM_CHI_MD = ['Ăn uống', 'Đi lại', 'Nhà cửa', 'Hoá đơn', 'Mua sắm', 'Sức khoẻ', 'Học tập', 'Gia đình', 'Giải trí', 'Quà tặng', 'Khác'];
+const DM_CHI_MD = ['Ăn uống', 'Đi lại', 'Nhà cửa', 'Hoá đơn', 'Mua sắm', 'Quần áo', 'Làm đẹp', 'Sức khoẻ', 'Học tập', 'Gia đình', 'Giải trí', 'Quà tặng', 'Khác'];
 const DM_THU_MD = ['Thu khác', 'Thưởng', 'Đầu tư', 'Được tặng'];
 const MAU_DM = ['#7C2C20', '#B08A3E', '#3F6B4F', '#2F5D86', '#6A4C93', '#A3445C', '#2F7A73', '#9A5B1F', '#56707A', '#C0582E', '#8A7F76'];
 const dmChi = () => caiDat('danh_muc_chi', DM_CHI_MD) || DM_CHI_MD;
@@ -334,7 +334,12 @@ function khoiCaNhanHomNay(trong) {
         : `<p class="mo">Chưa có thói quen. <a href="#/thoi-quen">Tạo ngay →</a></p>`}
       ${l79HomNay()}
     </section>
+    ${nhacSaoLuu()}
+    ${knHomNay()}
+    ${tongKetHomNay()}
     ${mtHomNay()}
+    ${quyHomNay()}
+    ${stOutfitHomNay()}
     <section class="the-giay"><div class="dau-muc"><h2 class="co-icon">${ICON['chiem-tinh']}Chiêm tinh hôm nay</h2><a href="#/chiem-tinh">Mở →</a></div>
       ${cungThay() != null ? theCTHomNay() : `<p class="mo">Thầy chưa lập lá số.</p><a class="nut" href="#/chiem-tinh">Lập lá số</a>`}
     </section>

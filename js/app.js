@@ -4,10 +4,56 @@
 const MENU = [
   ['hom-nay', 'Hôm nay', '今日'], ['lich', 'Lịch dạy', '课表'], ['lop', 'Lớp học', '班级'], ['hoc-vien', 'Học viên', '学员'],
   ['tai-chinh', 'Tài chính', '财务'], ['cong-viec', 'Công việc', '事务'],
-  ['-', 'Cá nhân'], ['muc-tieu', 'Mục tiêu', '目标'], ['chiem-tinh', 'Chiêm tinh', '星座'], ['thoi-quen', 'Thói quen', '习惯'], ['chi-tieu', 'Chi tiêu', '记账'],
+  ['-', 'Cá nhân'], ['muc-tieu', 'Mục tiêu', '目标'], ['thoi-quen', 'Thói quen', '习惯'], ['tong-ket', 'Tổng kết tuần', '回顾'], ['quy', 'Quỹ tiết kiệm', '存钱'], ['chi-tieu', 'Chi tiêu', '记账'],
+  ['-', 'Đời sống'], ['style', 'Style', '风格'], ['ky-niem', 'Kỷ niệm', '回忆'], ['chiem-tinh', 'Chiêm tinh', '星座'],
   ['-', ''], ['cai-dat', 'Cài đặt', '设置'],
 ];
-const NAV_DUOI = ['hom-nay', 'lich', 'lop', 'thoi-quen'];
+let NAV_DUOI = ['hom-nay', 'lich', 'lop', 'thoi-quen'];
+/* menu tuỳ chỉnh theo từng máy: ẩn mục, đổi thứ tự trong nhóm, chọn 4 mục cho thanh dưới (điện thoại) */
+const MENU_CO_DINH = ['hom-nay', 'cai-dat'];
+const menuCD = () => { try { return JSON.parse(localStorage.getItem('gyq_menu') || '{}'); } catch (e) { return {}; } };
+function nhomMenu() {
+  const nhom = []; let cur = { ten: '', ds: [] }; nhom.push(cur);
+  MENU.forEach(m => { if (m[0] === '-') { cur = { ten: m[1], ds: [] }; nhom.push(cur); } else cur.ds.push(m); });
+  const cd = menuCD(), tt = cd.thu_tu || {};
+  nhom.forEach(g => { const o = tt[g.ten]; if (o) g.ds.sort((a, b) => (o.indexOf(a[0]) + 1 || 99) - (o.indexOf(b[0]) + 1 || 99)); });
+  return nhom;
+}
+function veMenu() {
+  const cd = menuCD(), an = cd.an || [];
+  NAV_DUOI = (cd.duoi && cd.duoi.length === 4) ? cd.duoi : ['hom-nay', 'lich', 'lop', 'thoi-quen'];
+  $('#menu').innerHTML = nhomMenu().map((g, gi) => { const ds = g.ds.filter(m => !an.includes(m[0])); if (!ds.length) return ''; return (gi > 0 ? `<p class="menu-nhom">${g.ten}</p>` : '') + ds.map(([k, c, z]) => `<a href="#/${k}" data-trang="${k}"><i class="mi">${ICON[k]}</i><span>${c}</span><small>${z}</small>${k === 'cong-viec' ? '<em id="dem-viec"></em>' : ''}</a>`).join(''); }).join('');
+  $('#nav-duoi').innerHTML = NAV_DUOI.map(k => { const m = MENU.find(x => x[0] === k); return m ? `<a href="#/${k}" data-trang="${k}"><i>${ICON[k]}</i><span>${m[1]}</span></a>` : ''; }).join('') + `<button data-act="mo-menu"><i>${ICON.menu}</i><span>Thêm</span></button>`;
+  const tr = (location.hash.replace(/^#\/?/, '') || 'hom-nay').split('/')[0]; $$('.menu a, #nav-duoi a').forEach(a => a.classList.toggle('on', a.dataset.trang === tr));
+}
+function moSapMenu() {
+  const luuCD = cd => { localStorage.setItem('gyq_menu', JSON.stringify(cd)); veMenu(); };
+  const ve2 = n => {
+    const cd = menuCD(), an = cd.an || [];
+    n.querySelector('.sm-ds').innerHTML = nhomMenu().map(g => `<div class="sm-nhom"><h4>${g.ten || 'Dạy học'}</h4>${g.ds.map(([k, c], i) => `<div class="sm-dong ${an.includes(k) ? 'tat' : ''}"><label><input type="checkbox" data-sm-an="${k}" ${an.includes(k) ? '' : 'checked'} ${MENU_CO_DINH.includes(k) ? 'disabled' : ''}><i class="mi">${ICON[k]}</i>${c}</label><span><button type="button" data-sm-len="${k}" data-g="${g.ten}" ${i === 0 ? 'disabled' : ''}>↑</button><button type="button" data-sm-xuong="${k}" data-g="${g.ten}" ${i === g.ds.length - 1 ? 'disabled' : ''}>↓</button></span></div>`).join('')}</div>`).join('');
+    const duoi = (cd.duoi && cd.duoi.length === 4) ? cd.duoi : ['hom-nay', 'lich', 'lop', 'thoi-quen'];
+    n.querySelector('.sm-duoi').innerHTML = duoi.map((k, i) => `<select data-sm-duoi="${i}">${MENU.filter(m => m[0] !== '-').map(m => `<option value="${m[0]}" ${m[0] === k ? 'selected' : ''}>${m[1]}</option>`).join('')}</select>`).join('');
+  };
+  moHop({
+    tieuDe: '⇅ Sắp xếp menu', rong: true,
+    noiDung: `<div class="sm"><p class="mo nho">Bỏ tick để ẩn mục ít dùng · bấm ↑ ↓ để đổi thứ tự trong nhóm. Mỗi máy nhớ riêng (MacBook và iPhone có thể khác nhau).</p><div class="sm-ds"></div>
+      <h4>4 mục trên thanh dưới (điện thoại)</h4><div class="sm-duoi"></div></div>`,
+    nut: [{ chu: 'Về mặc định', trai: true, bam: n => { localStorage.removeItem('gyq_menu'); veMenu(); ve2(n); return false; } }, { chu: 'Xong', kieu: 'chinh', bam: () => { } }],
+    khiMo: n => {
+      ve2(n);
+      n.addEventListener('change', e => {
+        const cd = menuCD(), t = e.target;
+        if (t.dataset.smAn) { const an = new Set(cd.an || []); t.checked ? an.delete(t.dataset.smAn) : an.add(t.dataset.smAn); cd.an = [...an]; luuCD(cd); ve2(n); }
+        if (t.dataset.smDuoi != null) { const d = [...((cd.duoi && cd.duoi.length === 4) ? cd.duoi : ['hom-nay', 'lich', 'lop', 'thoi-quen'])]; d[Number(t.dataset.smDuoi)] = t.value; cd.duoi = d; luuCD(cd); }
+      });
+      n.addEventListener('click', e => {
+        const b = e.target.closest('[data-sm-len],[data-sm-xuong]'); if (!b) return;
+        const cd = menuCD(), g = nhomMenu().find(x => x.ten === b.dataset.g), ds = g.ds.map(m => m[0]), k = b.dataset.smLen || b.dataset.smXuong, i = ds.indexOf(k), j = b.dataset.smLen ? i - 1 : i + 1;
+        [ds[i], ds[j]] = [ds[j], ds[i]]; cd.thu_tu = { ...(cd.thu_tu || {}), [g.ten]: ds }; luuCD(cd); ve2(n);
+      });
+    },
+  });
+}
 function ve() {
   const [trang, id] = (location.hash.replace(/^#\/?/, '') || 'hom-nay').split('/');
   $$('.menu a, #nav-duoi a').forEach(a => a.classList.toggle('on', a.dataset.trang === trang));
@@ -24,6 +70,10 @@ function ve() {
     case 'chiem-tinh': case 'rut-tham': html = vRutTham(); break;
     case 'thoi-quen': html = vThoiQuen(); break;
     case 'muc-tieu': html = vMucTieu(); break;
+    case 'style': html = vStyle(); break;
+    case 'quy': html = vQuy(); break;
+    case 'tong-ket': html = vTongKetTuan(); break;
+    case 'ky-niem': html = vKyNiem(); break;
     case 'chi-tieu': html = vChiTieu(); break;
     default: html = vHomNay();
   }
@@ -121,6 +171,7 @@ const HD = {
   'chep-ics': async () => { await navigator.clipboard.writeText($('#link-ics').value); toast('Đã sao chép link'); },
   'tai-ics': () => taiFile(taoICS(), 'lich-day-guangyu.ics', 'text/calendar'),
   'sao-luu': () => saoLuu(),
+  'sap-menu': () => moSapMenu(),
   'sao-luu-csv': () => xuatCSV(),
   'nap-excel': () => napExcel(),
   'dang-xuat': async () => { await DBX.logout(); location.reload(); },
@@ -128,8 +179,14 @@ const HD = {
 };
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el) return;
-  const f = HD[el.dataset.act] || HD_L79[el.dataset.act] || HD_MT[el.dataset.act]; if (!f) return;
-  const chay = () => { try { const r = f(el, e); if (r && r.catch) r.catch(baoLoi); } catch (er) { baoLoi(er); } };
+  const f = HD[el.dataset.act] || HD_L79[el.dataset.act] || HD_MT[el.dataset.act] || HD_ST[el.dataset.act] || HD_QY[el.dataset.act] || HD_TK[el.dataset.act] || HD_KN[el.dataset.act] || HD_DN[el.dataset.act]; if (!f) return;
+  const chay = async () => {
+    try {
+      if (CHI_DOC && !/^(mo-|st-tab|l79-xem|tk-|mt-tuan|mt-nam|mt-chon|kn-mo|kn-loc|st-loc|mp-loc|st-dip|sk-buoi|chi-tiet|giao-dien)/.test(el.dataset.act)) { toast('Đang mất mạng, chỉ xem được. Có mạng lại Thầy thao tác tiếp nhé.', 'canh'); return; }
+      if (canLamMoi() && !el.closest('.hop-nen')) await taiLai(true);
+      const r = f(el, e); if (r && r.catch) r.catch(baoLoi);
+    } catch (er) { baoLoi(er); }
+  };
   if (el.tagName === 'INPUT' && el.type === 'checkbox') { chay(); return; }
   e.preventDefault(); chay();
 });
@@ -139,6 +196,9 @@ document.addEventListener('change', e => {
   if (el.dataset.change === 'khoi-phuc' && el.files[0]) khoiPhuc(el.files[0]);
   if (el.dataset.actChange === 'tq-chon') { TQ.chon = Number(el.value); ve(); }
   if (el.dataset.actChange === 'l79-start') l79DoiNgayBatDau(el.value);
+  if (el.dataset.actChange === 'kn-nam') { KN.nam = el.value; ve(); }
+  if (el.dataset.actChange === 'st-thu-mau') { ST.mauThu = el.value; ve(); }
+  if (el.dataset.actChange === 'st-size-loai') { ST.sizeLoai = el.value; ST.kqSize = null; ST.sizeVal = null; ve(); }
 });
 document.addEventListener('submit', async e => {
   const f = e.target;
@@ -147,6 +207,9 @@ document.addEventListener('submit', async e => {
     await luu('chi_tieu', { ngay: d.ngay || homNay(), so_tien: d.so_tien, loai: CT.loai, danh_muc: d.danh_muc, ghi_chu: d.ghi_chu });
     toast(`Đã ghi ${CT.loai === 'chi' ? 'chi' : 'thu'} ${tien(d.so_tien)} ✓`); ve(); const o = $('[data-form=chi-tieu] [name=so_tien]'); o && o.focus(); return;
   }
+  if (f.dataset.form === 'tk-luu') { e.preventDefault(); await luuTongKet(f); return; }
+  if (f.dataset.form === 'st-vali') { e.preventDefault(); const d = docForm(f); await luuCaiDat('vali', soanVali(d.noi || 'nui', Math.max(1, Number(d.ngay) || 3), !!f.querySelector('[name=tet]').checked, d.ten || '')); ve(); return; }
+  if (f.dataset.form === 'st-size') { e.preventDefault(); const d = docForm(f); ST.kqSize = kiemSize(d.loai, d); ST.sizeVal = d; ve(); return; }
   if (f.dataset.form === 'ct-ls') {
     e.preventDefault(); const d = docForm(f); if (!d.ngay) return;
     if (d.gio_den && !d.gio_tu) { d.gio_tu = d.gio_den; d.gio_den = ''; }
@@ -227,7 +290,7 @@ function moXuatPNG(lopId, mau) {
         $$('[data-xp=lang]', n).forEach(b => b.classList.toggle('on', b.dataset.v === st.lang));
         $('[data-chi="02"]', n).style.display = st.mau === '02' ? '' : 'none';
         $('[data-khoa-sau]', n).style.display = st.khoaSau ? '' : 'none';
-        const src = `templates/png${st.mau}.html?v=4.9`;
+        const src = `templates/png${st.mau}.html?v=5.6`;
         const dien = () => { const w = khung.contentWindow; if (!w.dien) return setTimeout(dien, 60); w.dien(duLieuPNG(L, khoaTheoId(st.khoa), st.mau, st), st.lang); setTimeout(() => { khung.style.height = w.document.documentElement.scrollHeight + 'px'; }, 120); };
         if (!khung.src.endsWith(src)) { khung.onload = dien; khung.src = src; } else dien();
       };
@@ -286,6 +349,7 @@ function taoICS() {
 async function saoLuu() {
   const du = { phien_ban: 1, ung_dung: 'guangyu-quanly', xuat_luc: new Date().toISOString() };
   BANG.forEach(t => du[t] = S[t]);
+  try { const anh = await DBX.tatCaAnh(); if (anh.length) du.cai_dat = [...S.cai_dat.filter(r => !r.khoa.startsWith('anh:')), ...anh]; } catch (e) { toast('Không lấy được ảnh để sao lưu, file chỉ có dữ liệu chữ', 'canh'); }
   taiFile(JSON.stringify(du, null, 1), `sao-luu-guangyu-${homNay()}.json`, 'application/json');
   await luuCaiDat('lan_sao_luu', new Date().toISOString()); ve();
 }
@@ -317,8 +381,35 @@ async function napExcel() {
 }
 
 /* ================= KHỞI ĐỘNG ================= */
-async function taiLai() {
-  const d = await DBX.loadAll(); Object.assign(S, d); lamMoi(); ve();
+let LAN_TAI = 0, CHI_DOC = false;
+async function taiLai(ngam) {
+  let d;
+  try { d = await DBX.loadAll(); }
+  catch (e) {   // mất mạng → dùng bản lưu gần nhất trên máy (chỉ xem)
+    const bs = (() => { try { return JSON.parse(localStorage.getItem('gyq_ban_sao') || 'null'); } catch (x) { return null; } })();
+    if (DBX.mode === 'supabase' && bs && /fetch|network|Failed|Load failed|NetworkError/i.test(e.message || '')) {
+      Object.assign(S, bs.S); CHI_DOC = true; lamMoi(); ve();
+      if (!ngam) toast(`Đang mất mạng: Thầy đang xem bản lưu lúc ${new Date(bs.luc).toLocaleString('vi-VN')}. Có mạng lại web tự cập nhật.`, 'canh');
+      return;
+    }
+    if (ngam) return; throw e;
+  }
+  Object.assign(S, d); LAN_TAI = Date.now(); CHI_DOC = false; lamMoi(); ve();
+  if (DBX.mode === 'supabase') { try { localStorage.setItem('gyq_ban_sao', JSON.stringify({ luc: Date.now(), S: d })); } catch (e) { } }
+}
+/* đồng bộ an toàn giữa các máy: dữ liệu cũ quá 2 phút thì lấy bản mới trước khi sửa */
+const canLamMoi = () => DBX.mode === 'supabase' && Date.now() - LAN_TAI > 120000;
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && canLamMoi() && !document.querySelector('.hop-nen')) taiLai(true); });
+window.addEventListener('online', () => { if (CHI_DOC) taiLai(true).then(() => !CHI_DOC && toast('Có mạng lại, đã cập nhật dữ liệu mới nhất ✓')); });
+
+/* ảnh lưu riêng (khoá 'anh:…'), chỉ tải khi cần xem */
+const ANH = {}; let _anhCho = new Set(), _anhHen = null;
+function layAnhCache(k) {
+  const v = caiDat(k, undefined); if (v !== undefined) return v || '';
+  if (k in ANH) return ANH[k];
+  _anhCho.add(k); clearTimeout(_anhHen);
+  _anhHen = setTimeout(async () => { const ks = [..._anhCho]; _anhCho = new Set(); ks.forEach(x => ANH[x] = ''); try { Object.assign(ANH, await DBX.layAnh(ks)); ve(); } catch (e) { } }, 40);
+  return '';
 }
 function manHinhDau(loi) {
   const conn = JSON.parse(localStorage.getItem('gyq_ket_noi') || 'null');
@@ -351,8 +442,7 @@ function manHinhDau(loi) {
   };
 }
 async function vaoApp() {
-  $('#menu').innerHTML = MENU.map(([k, c, z]) => k === '-' ? `<p class="menu-nhom">${c}</p>` : `<a href="#/${k}" data-trang="${k}"><i class="mi">${ICON[k]}</i><span>${c}</span><small>${z}</small>${k === 'cong-viec' ? '<em id="dem-viec"></em>' : ''}</a>`).join('');
-  $('#nav-duoi').innerHTML = NAV_DUOI.map(k => { const m = MENU.find(x => x[0] === k); return `<a href="#/${k}" data-trang="${k}"><i>${ICON[k]}</i><span>${m[1]}</span></a>`; }).join('') + `<button data-act="mo-menu"><i>${ICON.menu}</i><span>Thêm</span></button>`;
+  veMenu();
   $('#nut-giao-dien').innerHTML = `${ICON['giao-dien']}<span>Giao diện</span>`;
   $('#che-do').innerHTML = DBX.mode === 'supabase' ? '<i class="cham" style="--mau:#4F8A5B"></i>Đang lưu online' : '<i class="cham" style="--mau:#B08A3E"></i>Bản dùng thử (lưu trên máy)';
   $('#man-cho').classList.add('hien');
@@ -363,7 +453,8 @@ async function vaoApp() {
     if (DBX.thieuBang && DBX.thieuBang.length) toast('Có mục mới (Thói quen, Chi tiêu): Thầy chạy file SQL số 3 trên Supabase để dùng nhé', 'canh');
   } catch (e) { manHinhDau('Không tải được dữ liệu: ' + e.message + (/permission denied/i.test(e.message) ? ' – Thầy chạy file supabase/5-cap-quyen.sql trong SQL Editor rồi đăng nhập lại nhé.' : ' – Thầy kiểm tra đã chạy file SQL chưa nhé.')); }
   finally { $('#man-cho').classList.remove('hien'); }
-  setInterval(() => { if (!$('.hop-nen') && document.visibilityState === 'visible' && !document.activeElement.matches('input,textarea,select')) ve(); }, 60000);
+  setInterval(() => { if (!$('.hop-nen') && document.visibilityState === 'visible' && !document.activeElement.matches('input,textarea,select')) { if (canLamMoi()) taiLai(true); else ve(); } }, 60000);
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => { });
 }
 /* Kết nối Supabase của Thầy (publishable key là khoá công khai, an toàn khi để trong web) */
 const KET_NOI_MAC_DINH = { url: 'https://tifzrefqfygavobfjysi.supabase.co', key: 'sb_publishable_PS5aOpMFzG8tC25KC5yFMg_XZFV1uli' };
