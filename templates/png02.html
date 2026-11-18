@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PNG 02 · Theo dõi buổi học & học phí</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Serif:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky-light: #C9D5D9;
+    --sky-mid: #86A0AA;
+    --sky-deep: #56707A;
+    --sky-deepest: #435962;
+    --maroon: #7C2C20;
+    --maroon-deep: #5C2018;
+    --gold-line: #CBA765;
+    --gold-soft: #E1C989;
+    --paper: #F8F2E2;
+    --paper-soft: #EFE6CE;
+    --ink: #2B2013;
+    --ink-soft: #5C4E36;
+    --ink-faint: #9C8E70;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #253238;
+  }
+
+  body {
+    font-family: 'Noto Serif', 'Noto Serif SC', serif;
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    padding: 20px 10px 28px;
+    font-size: 13.5px;
+  }
+
+  .sheet {
+    width: 100%;
+    max-width: 760px;
+    background: linear-gradient(160deg, var(--sky-mid) 0%, var(--sky-deep) 55%, var(--sky-deepest) 100%);
+    border-radius: 16px;
+    padding: 13px;
+    position: relative;
+    box-shadow: 0 26px 54px -18px rgba(0,0,0,0.55);
+  }
+
+  .sheet::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border: 1.5px solid var(--maroon);
+    border-radius: 11px;
+    box-shadow: inset 0 0 0 1px rgba(220,190,130,0.28);
+    pointer-events: none;
+    z-index: 6;
+  }
+
+  .sheet-inner {
+    position: relative;
+    z-index: 1;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  /* logo defined once as CSS bg, reused via class on empty divs */
+  .logo-mark {
+    width: 38px;
+    height: 38px;
+    margin: 0 auto 7px;
+    background-image: url('../assets/logo.webp');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 3px 8px rgba(0,0,0,0.4));
+  }
+
+  /* ===== HEADER (banner xanh + hạc chìm) ===== */
+  .header {
+    position: relative;
+    padding: 16px 26px 12px;
+    text-align: center;
+    overflow: hidden;
+    background-image: url('../assets/hac-nen.webp');
+    background-size: cover;
+    background-position: center 30%;
+  }
+
+  .header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(60,80,88,0.58) 0%, rgba(60,80,88,0.72) 60%, rgba(60,80,88,0.82) 100%);
+    z-index: 0;
+  }
+
+  .cloud-motif {
+    position: absolute;
+    z-index: 1;
+    opacity: 0.55;
+  }
+  .cloud-motif path { stroke: var(--gold-soft); fill: none; }
+  .cloud-tl { top: 8px; left: 10px; width: 90px; }
+  .cloud-br { bottom: 4px; right: 8px; width: 110px; transform: scaleX(-1); }
+
+  .header-inner { position: relative; z-index: 2; }
+
+  .brand-cn {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 700;
+    font-size: 10.5px;
+    letter-spacing: 0.3em;
+    color: var(--gold-soft);
+    margin: 0 0 3px;
+  }
+
+  .brand-title {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 900;
+    font-size: clamp(18px, 4vw, 22px);
+    color: #FBF6E9;
+    margin: 0;
+    letter-spacing: 0.03em;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+  }
+
+  .brand-sub {
+    font-family: 'Noto Serif', serif;
+    font-weight: 600;
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    color: rgba(251,246,233,0.85);
+    margin: 5px 0 10px;
+    text-transform: uppercase;
+  }
+
+  .rule {
+    width: 40px;
+    height: 2px;
+    margin: 0 auto 9px;
+    background: linear-gradient(90deg, transparent, var(--gold-soft), transparent);
+  }
+
+  .header-intro {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--gold-soft);
+    max-width: 470px;
+    margin: 0 auto;
+  }
+
+  /* ===== CONTENT CARD (trắng kem) ===== */
+  .content-card {
+    background: var(--paper);
+    margin: 9px 12px 0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.16), inset 0 0 0 1px rgba(124,44,32,0.14);
+  }
+
+  section.card {
+    padding: 18px 22px 16px;
+  }
+
+  .section-eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .eyebrow-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .eyebrow-mark {
+    width: 8px;
+    height: 8px;
+    background: var(--maroon);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.12em;
+    color: var(--maroon-deep);
+    margin: 0;
+  }
+
+  /* ===== TABLE (dùng chung) ===== */
+  .tracker-wrap {
+    overflow-x: auto;
+    margin-bottom: 4px;
+  }
+
+  table.tracker-table {
+    width: 100%;
+    min-width: 560px;
+    border-collapse: collapse;
+  }
+
+  .tracker-table th, .tracker-table td {
+    border: 1px solid rgba(124,44,32,0.28);
+    padding: 8px 10px;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .tracker-table thead th {
+    background: var(--paper-soft);
+    line-height: 1.35;
+  }
+
+  .th-vn {
+    display: block;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--maroon-deep);
+  }
+
+  .th-cn {
+    display: block;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 10px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+  }
+
+  .tracker-table td.editable {
+    font-size: 12.5px;
+    color: var(--ink);
+    min-height: 20px;
+    outline: none;
+    line-height: 1.5;
+  }
+
+  .tracker-table td.editable:empty::before {
+    content: attr(data-placeholder);
+    color: var(--ink-faint);
+    font-style: italic;
+    font-size: 11.5px;
+  }
+
+  .tracker-table td.editable:focus {
+    background: rgba(124,44,32,0.08);
+  }
+
+  /* STT cell dùng để bấm mở lớp */
+  .stt-cell {
+    cursor: pointer;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 700;
+    color: var(--maroon-deep);
+    position: relative;
+    user-select: none;
+    width: 54px;
+  }
+  .stt-cell:hover {
+    background: rgba(124,44,32,0.10);
+  }
+  .stt-cell .stt-arrow {
+    display: block;
+    font-size: 9px;
+    font-weight: 400;
+    color: var(--ink-faint);
+    margin-top: 1px;
+    letter-spacing: 0.02em;
+  }
+
+  .add-row-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 7px 14px;
+    background: var(--maroon);
+    color: #FBF6E9;
+    border: none;
+    border-radius: 20px;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 700;
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(124,44,32,0.3);
+  }
+  .add-row-btn:hover { background: var(--maroon-deep); }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 10px 0 -2px 12px;
+    padding: 6px 14px;
+    background: rgba(251,246,233,0.14);
+    color: #FBF6E9;
+    border: 1px solid rgba(251,246,233,0.4);
+    border-radius: 20px;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+  .back-btn:hover { background: rgba(251,246,233,0.24); }
+
+  /* ===== PAYMENT NOTE SECTION ===== */
+  .notes-section {
+    background: var(--paper-soft);
+    padding: 16px 22px 18px;
+  }
+
+  .notes-intro {
+    font-style: italic;
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  /* ===== CLOSING (banner xanh) ===== */
+  .closing {
+    padding: 16px 26px 2px;
+    text-align: center;
+    background: linear-gradient(180deg, var(--sky-deepest) 0%, var(--sky-deep) 100%);
+  }
+
+  .signature-block {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    padding: 0 4px 12px;
+  }
+
+  .sig-logo {
+    width: 26px;
+    height: 26px;
+    margin: 0;
+  }
+
+  .sig-name {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    color: #FBF6E9;
+  }
+
+  /* ===== QR FOOTER ===== */
+  .qr-footer {
+    background: var(--sky-deepest);
+    display: flex;
+    padding: 12px 20px 12px;
+    gap: 10px;
+  }
+
+  .qr-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 5px;
+  }
+
+  .qr-divider {
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(203,167,101,0.45), transparent);
+  }
+
+  .qr-img {
+    width: 66px;
+    height: 66px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+    border: 2px solid #FBF6E9;
+  }
+
+  .qr-caption {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 700;
+    font-size: 9.5px;
+    letter-spacing: 0.09em;
+    color: var(--gold-soft);
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .qr-detail {
+    font-size: 10px;
+    color: rgba(251,246,233,0.88);
+    margin: 0;
+    letter-spacing: 0.01em;
+  }
+
+  .footnote {
+    text-align: center;
+    padding: 6px 20px 9px;
+    background: var(--sky-deepest);
+  }
+
+  .footnote p {
+    margin: 0;
+    font-size: 8.6px;
+    letter-spacing: 0.05em;
+    color: rgba(251,246,233,0.45);
+  }
+
+  .page { }
+
+  @media (max-width: 480px) {
+    body { padding: 12px 6px 18px; font-size: 12.5px; }
+    .header { padding: 18px 16px 14px; }
+    .content-card { margin: 9px 8px 0; border-radius: 11px; }
+    section.card { padding: 14px 14px 14px; }
+    .notes-section { padding: 13px 16px 15px; }
+    .closing { padding: 14px 16px 2px; }
+    .qr-footer { padding: 13px 12px 13px; gap: 6px; }
+    .qr-img { width: 60px; height: 60px; }
+    table.tracker-table { min-width: 520px; }
+  }
+
+  @media print {
+    @page { size: A4 landscape; margin: 6mm; }
+    html, body { background: white; padding: 0; font-size: 12px; }
+    .sheet { box-shadow: none; max-width: 100%; padding: 7px; }
+    .sheet::before { inset: 3px; }
+    .content-card { box-shadow: none; }
+    #page-list { display: none !important; }
+    #page-detail { display: block !important; }
+    .back-btn, .add-row-btn { display: none !important; }
+  }
+
+  /* ===== BỔ SUNG CHO WEB QUẢN LÝ (giữ đúng phong cách template) ===== */
+  body { padding: 0; background: transparent; }
+  .sheet { box-shadow: none; }
+  .tracker-table td { font-size: 12.5px; line-height: 1.5; }
+  table.log-table { min-width: 0; }
+  .log-table th:first-child { white-space: nowrap; width: 56px; }
+  .log-table td.c-stt { width: 56px; font-family: 'Noto Serif SC', serif; font-weight: 700; color: var(--maroon-deep); }
+  .log-table td.c-ngay { width: 150px; white-space: nowrap; }
+  .log-table td.c-nd { text-align: left; }
+  .log-table td.c-nd small { color: var(--ink-faint); font-style: italic; }
+  .log-table tbody tr:nth-child(even) td { background: rgba(239,230,206,0.45); }
+  section.card + section.card { padding-top: 4px; }
+  .pay-grid { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .pay-row { display: flex; align-items: baseline; gap: 12px; padding-bottom: 3px; border-bottom: 1px dashed rgba(43,32,19,0.28); }
+  .pay-label { font-family: 'Noto Serif SC', serif; font-weight: 700; font-size: 12px; color: var(--ink); white-space: nowrap; min-width: 150px; }
+  .pay-fill { flex: 1; font-size: 12.5px; color: var(--maroon-deep); font-weight: 600; outline: none; }
+  .tracker-table td.editable:focus, .pay-fill:focus { background: rgba(124,44,32,0.08); }
+  body.zh .th-cn { display: none; }
+  body.zh .th-vn { font-size: 12.5px; letter-spacing: 0.06em; }
+  body.zh .notes-intro, body.zh .header-intro { font-family: 'Noto Serif SC', serif; }
+  body.zh .section-title { letter-spacing: 0.2em; }
+  .dang-chup [contenteditable]:empty::before { content: none !important; }
+  #sum-head th:nth-child(-n+2), #sum-body td:nth-child(-n+2) { white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="sheet-inner">
+      <header class="header">
+        <svg class="cloud-motif cloud-tl" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 46 Q16 34 30 42 Q38 26 56 32 Q66 18 82 28 Q92 30 96 42" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <svg class="cloud-motif cloud-br" viewBox="0 0 110 60" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 46 Q18 32 34 40 Q44 22 64 30 Q76 16 94 26 Q102 28 106 40" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <div class="header-inner">
+          <div class="logo-mark"></div>
+          <p class="brand-cn">光 餘 · 汉语</p>
+          <h1 class="brand-title">GUANGYU HANYU</h1>
+          <p class="brand-sub">Chí Quang Vy Chinese</p>
+          <div class="rule"></div>
+          <p class="header-intro" id="t-intro">Bảng theo dõi buổi học và học phí</p>
+        </div>
+      </header>
+
+      <div class="content-card">
+        <section class="card">
+          <div class="section-eyebrow"><div class="eyebrow-left"><span class="eyebrow-mark"></span><h2 class="section-title" id="t-sec1">BẢNG THEO DÕI KHOÁ HỌC</h2></div></div>
+          <div class="tracker-wrap">
+            <table class="tracker-table">
+              <thead><tr id="sum-head"></tr></thead>
+              <tbody><tr id="sum-body"></tr></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card" id="log-sec">
+          <div class="section-eyebrow"><div class="eyebrow-left"><span class="eyebrow-mark"></span><h2 class="section-title" id="t-sec2">NỘI DUNG TỪNG BUỔI</h2></div></div>
+          <div class="tracker-wrap">
+            <table class="tracker-table log-table">
+              <thead><tr id="log-head"></tr></thead>
+              <tbody id="log-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="notes-section">
+          <div class="section-eyebrow"><div class="eyebrow-left"><span class="eyebrow-mark"></span><h2 class="section-title" id="t-sec3">THÔNG TIN ĐÓNG HỌC PHÍ</h2></div></div>
+          <p class="notes-intro" id="t-notes">Học phí xin được đóng vào đầu khoá học, qua hình thức chuyển khoản theo thông tin bên dưới. Sau khi chuyển khoản, mong anh/chị/bạn vui lòng chụp lại biên nhận giúp thầy để tiện đối soát.</p>
+          <div class="pay-grid">
+            <div class="pay-row"><span class="pay-label" id="l-tt">Tình trạng học phí</span><span class="pay-fill" id="v-tt" contenteditable="true"></span></div>
+            <div class="pay-row" id="row-next"><span class="pay-label" id="l-next">Học phí khoá tiếp theo</span><span class="pay-fill" id="v-next" contenteditable="true"></span></div>
+          </div>
+        </section>
+      </div>
+
+      <section class="closing">
+        <div class="signature-block">
+          <span class="sig-name">Chí Quang Vy</span>
+          <div class="logo-mark sig-logo"></div>
+        </div>
+      </section>
+
+      <div class="qr-footer">
+        <div class="qr-col">
+          <img class="qr-img" src="../assets/qr-zalo.webp" alt="Mã QR Zalo">
+          <p class="qr-caption" id="t-qr1">Liên hệ Zalo</p>
+          <p class="qr-detail">0358 840 411</p>
+        </div>
+        <div class="qr-divider"></div>
+        <div class="qr-col">
+          <img class="qr-img" src="../assets/qr-chuyen-khoan.webp" alt="Mã QR chuyển khoản học phí">
+          <p class="qr-caption" id="t-qr2">Chuyển khoản học phí</p>
+          <p class="qr-detail">1098 7076 3995 · Chi Quang Vy · VietinBank</p>
+        </div>
+      </div>
+
+      <div class="footnote"><p>GUANGYU HANYU · CHÍ QUANG VY CHINESE</p></div>
+  </div>
+</div>
+
+<script src="../vendor/modern-screenshot.js"></script>
+<script src="chup.js"></script>
+<script>
+const CHU = {
+  vi: {
+    intro: 'Bảng theo dõi buổi học và học phí', sec1: 'BẢNG THEO DÕI KHOÁ HỌC', sec2: 'NỘI DUNG TỪNG BUỔI', sec3: 'THÔNG TIN ĐÓNG HỌC PHÍ',
+    notes: 'Học phí xin được đóng vào đầu khoá học, qua hình thức chuyển khoản theo thông tin bên dưới. Sau khi chuyển khoản, mong anh/chị/bạn vui lòng chụp lại biên nhận giúp thầy để tiện đối soát.',
+    tt: 'Tình trạng học phí', next: 'Học phí khoá tiếp theo', qr1: 'Liên hệ Zalo', qr2: 'Chuyển khoản học phí',
+    cot: [['Lớp', '班级'], ['Trình độ', '程度'], ['Ngày học', '上课日期'], ['Tổng buổi đã học', '已学课次'], ['Số buổi học còn lại', '剩余课次'], ['Học phí', '学费']],
+    log: [['STT', '序号'], ['Ngày học', '上课日期'], ['Nội dung bài học', '上课内容']],
+  },
+  zh: {
+    intro: '上课记录及学费明细', sec1: '课程跟踪表', sec2: '每次课上课内容', sec3: '学费缴纳信息',
+    notes: '学费请于每期课程开始时以银行转账方式缴纳（账户信息见下方）。转账后，烦请截图转账记录发给老师，以便核对。',
+    tt: '缴费状态', next: '下期学费', qr1: 'Zalo 联系', qr2: '学费转账',
+    cot: [['班级'], ['程度'], ['上课日期'], ['已上课次'], ['剩余课次'], ['学费']],
+    log: [['序号'], ['上课日期'], ['上课内容']],
+  },
+};
+function th(c) { return `<th><span class="th-vn">${c[0]}</span>${c[1] ? `<span class="th-cn">${c[1]}</span>` : ''}</th>`; }
+function td(v, w) { return `<td class="editable" contenteditable="true"${w ? ` style="${w}"` : ''}>${escH(v)}</td>`; }
+window.dien = function (d, lang) {
+  const C = CHU[lang] || CHU.vi;
+  document.body.classList.toggle('zh', lang === 'zh');
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'vi';
+  datChu('#t-intro', C.intro); datChu('#t-sec1', C.sec1); datChu('#t-sec2', C.sec2); datChu('#t-sec3', C.sec3);
+  datChu('#t-notes', C.notes); datChu('#l-tt', C.tt); datChu('#t-qr1', C.qr1); datChu('#t-qr2', C.qr2);
+  const coBang = d.hien_noi_dung && d.buoi.length;
+  const cot = coBang ? C.cot.filter((_, i) => i !== 2) : C.cot;
+  document.getElementById('sum-head').innerHTML = cot.map(th).join('');
+  const giaTri = [d.lop, d.trinh_do, d.ngay_list, d.tong, d.con_lai, d.hoc_phi];
+  document.getElementById('sum-body').innerHTML = (coBang ? giaTri.filter((_, i) => i !== 2) : giaTri).map((v, i) => td(v, !coBang && i === 2 ? 'min-width:150px' : '')).join('');
+  document.getElementById('log-sec').style.display = coBang ? '' : 'none';
+  document.getElementById('log-head').innerHTML = C.log.map(th).join('');
+  document.getElementById('log-body').innerHTML = d.buoi.map(b => `<tr><td class="c-stt">${b.stt}</td><td class="c-ngay editable" contenteditable="true">${escH(b.ngay)}</td><td class="c-nd editable" contenteditable="true">${escH(b.noi_dung)}${b.tl ? ` <small>(${escH(b.tl)})</small>` : ''}</td></tr>`).join('');
+  datChu('#v-tt', d.tinh_trang);
+  document.getElementById('row-next').style.display = d.khoa_sau ? '' : 'none';
+  datChu('#l-next', C.next); datChu('#v-next', d.khoa_sau);
+};
+</script>
+</body>
+</html>

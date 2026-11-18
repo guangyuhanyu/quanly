@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="troi" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#DCE3E3"/>
+      <stop offset=".45" stop-color="#ECE8DC"/>
+      <stop offset="1" stop-color="#EAE2CF"/>
+    </linearGradient>
+    <radialGradient id="mattroi" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#E9C98C" stop-opacity=".75"/>
+      <stop offset=".6" stop-color="#E9C98C" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#E9C98C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="nui-xa" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9DB2B8" stop-opacity=".55"/>
+      <stop offset=".6" stop-color="#B9C7C8" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#B9C7C8" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="nui-giua" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6E8A94" stop-opacity=".62"/>
+      <stop offset=".55" stop-color="#86A0AA" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#86A0AA" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="nui-gan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#435962" stop-opacity=".7"/>
+      <stop offset=".7" stop-color="#56707A" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#56707A" stop-opacity=".12"/>
+    </linearGradient>
+    <linearGradient id="day" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ECE5D3" stop-opacity="0"/>
+      <stop offset="1" stop-color="#ECE5D3" stop-opacity=".9"/>
+    </linearGradient>
+    <filter id="mo" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="28"/></filter>
+    <filter id="mem"><feGaussianBlur stdDeviation="2.2"/></filter>
+    <filter id="giay">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/>
+      <feColorMatrix values="0 0 0 0 .36  0 0 0 0 .3  0 0 0 0 .21  0 0 0 .05 0"/>
+    </filter>
+    <g id="thong">
+      <path d="M0 0v-62" stroke="#2F3F46" stroke-width="3" stroke-linecap="round"/>
+      <path d="M0-60c-14-2-26 2-34 8 10 2 22 1 34-2 12 3 24 4 34 2-8-6-20-10-34-8z"/>
+      <path d="M0-44c-18-2-32 3-42 10 13 2 28 1 42-3 14 4 29 5 42 3-10-7-24-12-42-10z"/>
+      <path d="M0-26c-21-2-37 4-49 12 15 2 32 1 49-3 17 4 34 5 49 3-12-8-28-14-49-12z"/>
+    </g>
+  </defs>
+
+  <rect width="1600" height="1000" fill="url(#troi)"/>
+  <circle cx="1210" cy="230" r="170" fill="url(#mattroi)"/>
+  <circle cx="1210" cy="230" r="62" fill="#E7C789" opacity=".42"/>
+
+  <!-- hạc bay -->
+  <g fill="none" stroke="#5C4E36" stroke-linecap="round" opacity=".5">
+    <path d="M1010 190c14-12 26-14 36-6 9-10 22-12 38-4" stroke-width="2.4"/>
+    <path d="M1100 250c10-9 19-10 26-4 7-7 16-9 27-3" stroke-width="2"/>
+    <path d="M960 270c8-7 15-8 20-3 5-6 12-7 21-3" stroke-width="1.6"/>
+  </g>
+
+  <!-- dãy núi xa -->
+  <path filter="url(#mem)" fill="url(#nui-xa)" d="M0 560Q120 470 220 520Q300 430 400 500Q470 400 560 470Q650 380 760 460Q860 400 940 470Q1040 360 1150 450Q1250 400 1330 470Q1430 410 1520 480Q1570 460 1600 470L1600 1000L0 1000Z"/>
+  <ellipse cx="760" cy="560" rx="900" ry="60" fill="#F4F0E6" opacity=".7" filter="url(#mo)"/>
+
+  <!-- dãy núi giữa -->
+  <path fill="url(#nui-giua)" d="M0 690Q90 600 180 640Q250 540 330 610Q400 560 470 640Q560 590 650 670Q760 630 850 690Q940 650 1000 640Q1080 600 1120 560Q1170 500 1240 580Q1300 540 1380 600Q1480 560 1600 620L1600 1000L0 1000Z"/>
+  <ellipse cx="600" cy="720" rx="760" ry="55" fill="#F4F0E6" opacity=".75" filter="url(#mo)"/>
+  <ellipse cx="1300" cy="700" rx="420" ry="40" fill="#F4F0E6" opacity=".6" filter="url(#mo)"/>
+
+  <!-- đồi gần + thông -->
+  <path fill="url(#nui-gan)" d="M0 790Q140 700 260 760Q360 720 460 800Q540 850 600 1000L0 1000Z"/>
+  <path fill="url(#nui-gan)" d="M1600 740Q1480 690 1380 770Q1280 740 1180 820Q1100 880 1050 1000L1600 1000Z"/>
+  <g fill="#2F3F46" opacity=".5">
+    <use href="#thong" transform="translate(150 742) scale(1.1)"/>
+    <use href="#thong" transform="translate(240 760) scale(.8)"/>
+    <use href="#thong" transform="translate(1420 742) scale(1.2)"/>
+    <use href="#thong" transform="translate(1510 728) scale(.85)"/>
+    <use href="#thong" transform="translate(1330 772) scale(.7)"/>
+  </g>
+  <rect width="1600" height="1000" fill="url(#day)"/>
+  <rect width="1600" height="1000" filter="url(#giay)"/>
+</svg>
