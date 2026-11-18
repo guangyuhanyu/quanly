@@ -68,7 +68,7 @@ Vì vậy thay file code mới thì dữ liệu vẫn còn nguyên. Mỗi lần 
 1. Vào web → **Cài đặt → Tải bản sao lưu**, để phòng khi có sự cố.
 2. Giải nén file zip mới.
 3. Vào repo `quanly` trên GitHub → **Add file → Upload files**. Kéo thả các file và thư mục mới vào (vẫn **bỏ thư mục `data`**), rồi bấm **Commit changes**. File trùng tên sẽ tự được thay.
-4. Đợi 1–2 phút rồi tải lại trang web. Nếu vẫn thấy giao diện cũ, Thầy bấm ⌘⇧R.
+4. Đợi 1–2 phút rồi tải lại trang web. Nếu vẫn thấy giao diện cũ, Thầy bấm **⌥⌘R** (Option + Command + R) để Safari tải lại toàn bộ. Cuối thanh menu có ghi số bản để Thầy kiểm tra.
 5. Nếu em ghi chú có **file SQL mới**, Thầy dán file đó vào Supabase → SQL Editor → Run. Các file SQL chỉ thêm bảng mới, không xoá dữ liệu cũ.
 
 Hai điều cần nhớ:
