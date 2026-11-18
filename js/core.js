@@ -1,7 +1,7 @@
 /* =========================================================
    Lõi: trạng thái, tính toán học phí, tiện ích giao diện
    ========================================================= */
-const S = { bang_gia: [], hoc_vien: [], lop: [], lop_hoc_vien: [], khoa_hoc: [], buoi_hoc: [], thanh_toan: [], cong_viec: [], cai_dat: [] };
+const S = { bang_gia: [], hoc_vien: [], lop: [], lop_hoc_vien: [], khoa_hoc: [], buoi_hoc: [], thanh_toan: [], cong_viec: [], cai_dat: [], thoi_quen: [], thoi_quen_nhat_ky: [], chi_tieu: [] };
 let DBX = null;            // LocalDB hoặc SupaDB
 let CACHE = new Map();
 
@@ -57,7 +57,8 @@ function tk(k) {
   const r = {
     buoi, daDay, tong, daHoc, conLai, donGiaBuoi, daDong, conNo, duKien,
     daThucHien: daHoc * donGiaBuoi,
-    chuaThucHien: k.ket_thuc ? 0 : Math.max(conLai, 0) * donGiaBuoi,
+    // chỉ tính phần ĐÃ ĐÓNG TIỀN mà chưa dạy (tiền khoá trước chuyển sang coi như đã đóng)
+    chuaThucHien: k.ket_thuc ? 0 : Math.max(0, Math.min(Math.max(conLai, 0) * donGiaBuoi, daDong + (k.gia_tri_chuyen_sang || 0) - daHoc * donGiaBuoi)),
     ngayCuoi: daDay.length ? daDay[daDay.length - 1].ngay : null,
     ngayDau: daDay.length ? daDay[0].ngay : k.ngay_bat_dau,
     tt: S.thanh_toan.filter(t => t.khoa_id === k.id).sort((a, b) => a.ngay < b.ngay ? -1 : 1),

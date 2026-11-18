@@ -2,11 +2,17 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Guangyu Hanyu · Sổ quản lý lớp học</title>
 <link rel="icon" href="assets/logo.webp">
-<link rel="apple-touch-icon" href="assets/logo.webp">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#F3EDE0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Guangyu">
+<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
@@ -20,10 +26,14 @@
       <div><p class="tb-cn">光余汉语</p><p class="tb-ten">GUANGYU HANYU</p></div>
     </div>
     <nav class="menu" id="menu"></nav>
-    <div class="tb-chan"><p id="che-do"></p><p class="tb-phim">Phím tắt: <kbd>N</kbd> đặt buổi học</p></div>
+    <div class="tb-chan"><button class="nut-gd" id="nut-giao-dien" data-act="giao-dien"></button><p id="che-do"></p><p class="tb-phim">Phím tắt: <kbd>N</kbd> đặt buổi học</p></div>
   </aside>
   <main id="main"></main>
 </div>
+<div id="vung-menu"></div>
+<button id="tay-menu" aria-label="Mở menu"><i></i></button>
+<div id="man-che"></div>
+<nav id="nav-duoi"></nav>
 <div id="toasts"></div>
 <div id="man-dau" class="man-dau"></div>
 <div id="man-cho" class="man-cho"><div><img src="assets/logo.webp" alt=""><p>Đang tải dữ liệu…</p></div></div>
@@ -34,6 +44,10 @@
 <script src="js/db.js"></script>
 <script src="js/core.js"></script>
 <script src="js/views.js"></script>
+<script src="js/la-tham.js"></script>
+<script src="js/ca-nhan.js"></script>
+<script src="js/them.js"></script>
+<script src="js/giao-dien.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

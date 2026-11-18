@@ -7,7 +7,14 @@
 // =====================================================================
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+// Lấy khoá bí mật do Supabase tự cấp cho Edge Function (hỗ trợ cả khoá mới sb_secret_ lẫn khoá cũ)
+function khoaBiMat(): string {
+  const cu = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const moi = Deno.env.get("SUPABASE_SECRET_KEYS");
+  if (moi) { try { const o = JSON.parse(moi); return o.default ?? Object.values(o)[0] as string; } catch { return moi; } }
+  return cu!;
+}
+const db = createClient(Deno.env.get("SUPABASE_URL")!, khoaBiMat());
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const thoat = (s: string) => String(s ?? "").replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/[,;]/g, (m) => "\\" + m);

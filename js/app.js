@@ -3,11 +3,14 @@
    ========================================================= */
 const MENU = [
   ['hom-nay', 'Hôm nay', '今日'], ['lich', 'Lịch dạy', '课表'], ['lop', 'Lớp học', '班级'], ['hoc-vien', 'Học viên', '学员'],
-  ['tai-chinh', 'Tài chính', '财务'], ['cong-viec', 'Công việc', '事务'], ['cai-dat', 'Cài đặt', '设置'],
+  ['tai-chinh', 'Tài chính', '财务'], ['cong-viec', 'Công việc', '事务'],
+  ['-', 'Cá nhân'], ['rut-tham', 'Rút thăm', '灵签'], ['thoi-quen', 'Thói quen', '习惯'], ['chi-tieu', 'Chi tiêu', '记账'],
+  ['-', ''], ['cai-dat', 'Cài đặt', '设置'],
 ];
+const NAV_DUOI = ['hom-nay', 'lich', 'lop', 'thoi-quen'];
 function ve() {
   const [trang, id] = (location.hash.replace(/^#\/?/, '') || 'hom-nay').split('/');
-  $$('.menu a').forEach(a => a.classList.toggle('on', a.dataset.trang === trang));
+  $$('.menu a, #nav-duoi a').forEach(a => a.classList.toggle('on', a.dataset.trang === trang));
   const main = $('#main'); const cuon = main.scrollTop;
   const giuCuon = main.dataset.trang === location.hash;
   let html;
@@ -18,6 +21,9 @@ function ve() {
     case 'tai-chinh': html = vTaiChinh(); break;
     case 'cong-viec': html = vCongViec(); break;
     case 'cai-dat': html = vCaiDat(); break;
+    case 'rut-tham': html = vRutTham(); break;
+    case 'thoi-quen': html = vThoiQuen(); break;
+    case 'chi-tieu': html = vChiTieu(); break;
     default: html = vHomNay();
   }
   main.innerHTML = `<div class="noi-dung-trang">${html}</div>`;
@@ -47,6 +53,34 @@ const HD = {
   'lich-nay': () => { LICH.moc = homNay(); ve(); },
   'lich-den': el => { LICH.moc = el.dataset.ngay; LICH.kieu = 'tuan'; ve(); },
   'lich-apple': () => { location.hash = '#/cai-dat'; },
+  'mo-ngay': el => moNgay(el.dataset.ngay),
+  'tin-gia-han': el => moTinGiaHan(Number(el.dataset.lop)),
+  'chuc-sn': el => moChucSN(Number(el.dataset.id)),
+  'tong-ket': el => moTongKet(el.dataset.thang),
+  'chi-tiet-so': el => moChiTietSo(el.dataset.loai, el.dataset.tu, el.dataset.den, el.dataset.ten),
+  'giao-dien': () => moGiaoDien(),
+  'mo-menu': () => moMenu(),
+  'rt-cd': el => { RT.cd = el.dataset.v; ve(); },
+  'rut-tham': () => rutTham(),
+  'di-rut-tham': () => { location.hash = '#/rut-tham'; setTimeout(rutTham, 300); },
+  'them-la': () => moThemLa(),
+  'xoa-la': async el => { const ds = laRieng().slice(); ds.splice(Number(el.dataset.i), 1); await luuCaiDat('la_tham_rieng', ds); ve(); },
+  'tham-thanh-viec': async () => { const la = laHomNay(); if (!la) return; await luu('cong_viec', { tieu_de: la.kh, nhom: 'Cá nhân', han: homNay(), uu_tien: 2, xong: false, ghi_chu: la.zh }); toast('Đã thêm vào việc hôm nay ✓'); },
+  'tq-lui': () => { TQ.ngay = congNgay(TQ.ngay, -1); ve(); },
+  'tq-toi': () => { if (TQ.ngay < homNay()) { TQ.ngay = congNgay(TQ.ngay, 1); ve(); } },
+  'tq-moi': () => moTQ(),
+  'tq-sua': el => moTQ(Number(el.dataset.id)),
+  'tq-goi-y': async () => { for (const [i, h] of TQ_GOI_Y.entries()) await luu('thoi_quen', { ...h, thu_tu: i, dang_dung: true }); toast('Đã tạo 6 thói quen ✓'); ve(); },
+  'tq-tich': async el => { if (el.dataset.nhanh) TQ.ngay = homNay(); const h = S.thoi_quen.find(x => x.id === Number(el.dataset.id)); await ghiTQ(h, TQ.ngay, giaTriTQ(h.id, TQ.ngay) ? 0 : 1); ve(); },
+  'tq-cong': async el => { const h = S.thoi_quen.find(x => x.id === Number(el.dataset.id)); await ghiTQ(h, TQ.ngay, giaTriTQ(h.id, TQ.ngay) + Number(el.dataset.v)); ve(); },
+  'tq-nhap': el => { if (el.dataset.nhanh) TQ.ngay = homNay(); nhapTQ(S.thoi_quen.find(x => x.id === Number(el.dataset.id))); },
+  'ct-lui': () => { const d = s2d(CT.thang + '-01'); d.setMonth(d.getMonth() - 1); CT.thang = d2s(d).slice(0, 7); ve(); },
+  'ct-toi': () => { const d = s2d(CT.thang + '-01'); d.setMonth(d.getMonth() + 1); CT.thang = d2s(d).slice(0, 7); ve(); },
+  'ct-loai': el => { CT.loai = el.dataset.v; ve(); setTimeout(() => { const o = $('[data-form=chi-tieu] [name=so_tien]'); o && o.focus(); }, 30); },
+  'ct-sua': el => moCT(Number(el.dataset.id)),
+  'ct-loc': el => { CT.locDm = CT.locDm === el.dataset.v ? null : el.dataset.v; ve(); },
+  'ct-bo-loc': () => { CT.locDm = null; ve(); },
+  'ct-cai': () => moCaiCT(),
   'lich-loai': el => { LICH.loai = el.dataset.v; ve(); },
   'lich-tab': el => { LICH.tab = el.dataset.v; ve(); },
   'lich-loc': el => { const id = Number(el.dataset.lop); LICH.loc = LICH.loc === id ? null : id; ve(); },
@@ -94,9 +128,16 @@ document.addEventListener('change', e => {
   const el = e.target;
   if (el.dataset.actChange === 'chon-khoa') { CHON_KHOA[Number(el.dataset.lop)] = Number(el.value); ve(); }
   if (el.dataset.change === 'khoi-phuc' && el.files[0]) khoiPhuc(el.files[0]);
+  if (el.dataset.actChange === 'tq-chon') { TQ.chon = Number(el.value); ve(); }
 });
 document.addEventListener('submit', async e => {
-  const f = e.target; if (f.dataset.form !== 'viec-nhanh') return; e.preventDefault();
+  const f = e.target;
+  if (f.dataset.form === 'chi-tieu') {
+    e.preventDefault(); const d = docForm(f); if (!d.so_tien) { toast('Thầy nhập số tiền giúp em', 'loi'); return; }
+    await luu('chi_tieu', { ngay: d.ngay || homNay(), so_tien: d.so_tien, loai: CT.loai, danh_muc: d.danh_muc, ghi_chu: d.ghi_chu });
+    toast(`Đã ghi ${CT.loai === 'chi' ? 'chi' : 'thu'} ${tien(d.so_tien)} ✓`); ve(); const o = $('[data-form=chi-tieu] [name=so_tien]'); o && o.focus(); return;
+  }
+  if (f.dataset.form !== 'viec-nhanh') return; e.preventDefault();
   const d = docForm(f); if (!d.tieu_de) return;
   await luu('cong_viec', { tieu_de: d.tieu_de, han: d.han, nhom: d.nhom || 'Dạy học', uu_tien: d.uu_tien ? Number(d.uu_tien) : 2, xong: false });
   toast('Đã thêm việc'); ve(); const o = $('[data-form=viec-nhanh] [name=tieu_de]'); o && o.focus();
@@ -278,14 +319,14 @@ function manHinhDau(loi) {
       <button class="nut-chu" id="doi-kn">Đổi kết nối Supabase</button>`
     : `
       <form id="f-ket-noi" class="form">
-        <p class="mo nho">Dán 2 thông tin trong Supabase → Project Settings → API:</p>
-        <label>Project URL<input name="url" placeholder="https://xxxx.supabase.co" value="${esc(conn ? conn.url : '')}" required></label>
-        <label>anon public key<input name="key" placeholder="eyJhbGciOi…" value="${esc(conn ? conn.key : '')}" required></label>
+        <p class="mo nho">Dán 2 thông tin lấy từ Supabase (nút <b>Connect</b> trên đầu trang project, hoặc Settings → API Keys):</p>
+        <label>Project URL<input name="url" placeholder="https://xxxx.supabase.co" value="${esc(conn ? conn.url : '')}" required autocapitalize="off" autocorrect="off"></label>
+        <label>Publishable key<input name="key" placeholder="sb_publishable_…" value="${esc(conn ? conn.key : '')}" required autocapitalize="off" autocorrect="off"></label>
         <button class="nut chinh rong">Kết nối</button></form>
       <div class="hoac"><span>hoặc</span></div>
       <button class="nut rong" id="dung-thu">Dùng thử trên máy này (chưa cần Supabase)</button>`}
   </div>`;
-  const fk = $('#f-ket-noi'); if (fk) fk.onsubmit = e => { e.preventDefault(); const f = docForm(fk); localStorage.setItem('gyq_ket_noi', JSON.stringify({ url: f.url.replace(/\/$/, ''), key: f.key })); localStorage.setItem('gyq_che_do', 'supabase'); location.reload(); };
+  const fk = $('#f-ket-noi'); if (fk) fk.onsubmit = e => { e.preventDefault(); const f = docForm(fk); let url = f.url.trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, ''); if (!/^https?:\/\//.test(url)) url = 'https://' + url; localStorage.setItem('gyq_ket_noi', JSON.stringify({ url, key: f.key.trim() })); localStorage.setItem('gyq_che_do', 'supabase'); location.reload(); };
   const dt = $('#dung-thu'); if (dt) dt.onclick = () => { localStorage.setItem('gyq_che_do', 'local'); location.reload(); };
   const dk = $('#doi-kn'); if (dk) dk.onclick = () => { localStorage.removeItem('gyq_che_do'); manHinhDau(); };
   const fd = $('#f-dang-nhap'); if (fd) fd.onsubmit = async e => {
@@ -294,13 +335,16 @@ function manHinhDau(loi) {
   };
 }
 async function vaoApp() {
-  $('#menu').innerHTML = MENU.map(([k, c, z]) => `<a href="#/${k}" data-trang="${k}"><i class="mi">${ICON[k]}</i><span>${c}</span><small>${z}</small>${k === 'cong-viec' ? '<em id="dem-viec"></em>' : ''}</a>`).join('');
+  $('#menu').innerHTML = MENU.map(([k, c, z]) => k === '-' ? `<p class="menu-nhom">${c}</p>` : `<a href="#/${k}" data-trang="${k}"><i class="mi">${ICON[k]}</i><span>${c}</span><small>${z}</small>${k === 'cong-viec' ? '<em id="dem-viec"></em>' : ''}</a>`).join('');
+  $('#nav-duoi').innerHTML = NAV_DUOI.map(k => { const m = MENU.find(x => x[0] === k); return `<a href="#/${k}" data-trang="${k}"><i>${ICON[k]}</i><span>${m[1]}</span></a>`; }).join('') + `<button data-act="mo-menu"><i>${ICON.menu}</i><span>Thêm</span></button>`;
+  $('#nut-giao-dien').innerHTML = `${ICON['giao-dien']}<span>Giao diện</span>`;
   $('#che-do').innerHTML = DBX.mode === 'supabase' ? '<i class="cham" style="--mau:#4F8A5B"></i>Đang lưu online' : '<i class="cham" style="--mau:#B08A3E"></i>Bản dùng thử (lưu trên máy)';
   $('#man-cho').classList.add('hien');
   try {
     await taiLai();
     if (!caiDat('ngay_dung_web', null)) await luuCaiDat('ngay_dung_web', homNay());
     if (!S.lop.length && !location.hash) location.hash = '#/cai-dat';
+    if (DBX.thieuBang && DBX.thieuBang.length) toast('Có mục mới (Thói quen, Chi tiêu): Thầy chạy file SQL số 3 trên Supabase để dùng nhé', 'canh');
   } catch (e) { manHinhDau('Không tải được dữ liệu: ' + e.message + ' – Thầy kiểm tra đã chạy file SQL chưa nhé.'); }
   finally { $('#man-cho').classList.remove('hien'); }
   setInterval(() => { if (!$('.hop-nen') && document.visibilityState === 'visible' && !document.activeElement.matches('input,textarea,select')) ve(); }, 60000);

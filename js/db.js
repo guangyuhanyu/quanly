@@ -1,7 +1,8 @@
 /* =========================================================
    Lớp dữ liệu: Supabase (online) hoặc Máy này (localStorage)
    ========================================================= */
-const BANG = ['bang_gia', 'hoc_vien', 'lop', 'lop_hoc_vien', 'khoa_hoc', 'buoi_hoc', 'thanh_toan', 'cong_viec', 'cai_dat'];
+const BANG = ['bang_gia', 'hoc_vien', 'lop', 'lop_hoc_vien', 'khoa_hoc', 'buoi_hoc', 'thanh_toan', 'cong_viec', 'cai_dat', 'thoi_quen', 'thoi_quen_nhat_ky', 'chi_tieu'];
+const BANG_CA_NHAN = ['thoi_quen', 'thoi_quen_nhat_ky', 'chi_tieu'];
 const MA = {
   hoc_vien: id => 'HV' + String(id).padStart(4, '0'),
   lop: id => 'L' + String(id).padStart(4, '0'),
@@ -42,6 +43,9 @@ const LocalDB = {
       this._d.bang_gia = JSON.parse(JSON.stringify(BANG_GIA_MAC_DINH));
       this._save();
     }
+    // nâng cấp: thêm bảng mới, KHÔNG xoá dữ liệu cũ
+    let doi = false; BANG.forEach(t => { if (!Array.isArray(this._d[t])) { this._d[t] = []; doi = true; } });
+    if (doi) this._save();
     return true;
   },
   async loadAll() { return JSON.parse(JSON.stringify(this._d)); },
@@ -67,7 +71,7 @@ const LocalDB = {
   },
   async replaceAll(b) {
     BANG.forEach(t => {
-      if (t === 'bang_gia' && !b.bang_gia) return;
+      if (!Array.isArray(b[t])) return;   // file sao lưu cũ không có bảng này → giữ nguyên
       this._d[t] = (b[t] || []).map(r => { const x = { ...r }; if (MA[t] && x.id) x.ma = MA[t](x.id); return x; });
     });
     this._save();
@@ -98,8 +102,11 @@ const SupaDB = {
     return out.map(r => chuanHoaDong(t, r));
   },
   async loadAll() {
-    const S = {};
-    const res = await Promise.all(BANG.map(t => this._all(t)));
+    const S = {}; this.thieuBang = [];
+    const res = await Promise.all(BANG.map(t => this._all(t).catch(e => {
+      if (BANG_CA_NHAN.includes(t)) { this.thieuBang.push(t); return []; }  // chưa chạy file SQL số 3
+      throw e;
+    })));
     BANG.forEach((t, i) => S[t] = res[i]);
     return S;
   },
@@ -127,16 +134,16 @@ const SupaDB = {
     const { error } = await this.sb.from('cai_dat').upsert({ khoa, gia_tri }); if (error) throw new Error(error.message);
   },
   async replaceAll(b) {
-    const xoa = ['cong_viec', 'thanh_toan', 'buoi_hoc', 'lop_hoc_vien', 'khoa_hoc', 'lop', 'hoc_vien', 'cai_dat'];
-    if (b.bang_gia) xoa.push('bang_gia');
+    const xoa = ['thoi_quen_nhat_ky', 'thoi_quen', 'chi_tieu', 'cong_viec', 'thanh_toan', 'buoi_hoc', 'lop_hoc_vien', 'khoa_hoc', 'lop', 'hoc_vien', 'cai_dat', 'bang_gia']
+      .filter(t => Array.isArray(b[t]) && !(this.thieuBang || []).includes(t));   // chỉ thay bảng có trong file
     for (const t of xoa) {
       const q = this.sb.from(t).delete();
       const { error } = await (t === 'lop_hoc_vien' ? q.gte('lop_id', 0) : t === 'cai_dat' ? q.neq('khoa', '') : q.gte('id', 0));
       if (error) throw new Error(`Xoá ${t}: ${error.message}`);
     }
-    const thuTu = ['bang_gia', 'hoc_vien', 'lop', 'lop_hoc_vien', 'khoa_hoc', 'buoi_hoc', 'thanh_toan', 'cong_viec', 'cai_dat'];
+    const thuTu = ['bang_gia', 'hoc_vien', 'lop', 'lop_hoc_vien', 'khoa_hoc', 'buoi_hoc', 'thanh_toan', 'cong_viec', 'cai_dat', 'thoi_quen', 'thoi_quen_nhat_ky', 'chi_tieu'];
     for (const t of thuTu) {
-      if (t === 'bang_gia' && !b.bang_gia) continue;
+      if (!xoa.includes(t)) continue;
       let rows = b[t] || []; if (!rows.length) continue;
       if (t === 'khoa_hoc') rows = [...rows].sort((a, c) => a.id - c.id);
       for (let i = 0; i < rows.length; i += 500) {

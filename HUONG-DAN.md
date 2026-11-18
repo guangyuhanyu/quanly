@@ -23,7 +23,7 @@
 4. Vào **Authentication → Sign In / Providers**, tắt **Allow new users to sign up**. Như vậy chỉ mình Thầy đăng nhập được.
 
 ### Bước 2. Kết nối web
-1. Trong Supabase, vào **Project Settings → API** và copy 2 thông tin: **Project URL** và **anon public key**.
+1. Trong Supabase, bấm nút **Connect** ở đầu trang project (hoặc vào **Settings → API Keys**) và copy 2 thông tin: **Project URL** (dạng `https://xxxx.supabase.co`) và **Publishable key** (bắt đầu bằng `sb_publishable_`).
 2. Mở web, dán 2 thông tin đó vào màn hình đầu tiên, rồi đăng nhập bằng email vừa tạo.
 3. Vào **Cài đặt → nạp vào web** để đưa dữ liệu Excel 2026 lên.
 
@@ -32,7 +32,7 @@ Nếu trước đó Thầy đã dùng thử và nhập dữ liệu, hãy **Tải
 ### Bước 3. Lịch Apple (iPhone / MacBook)
 1. Trong Supabase, vào **Edge Functions → Deploy a new function → Via Editor**.
 2. Đặt tên hàm là `lich-apple`, dán toàn bộ file `supabase/2-lich-apple-edge-function.ts`, rồi bấm **Deploy**.
-3. Mở hàm vừa tạo → **Settings**, tắt **Enforce JWT verification** và lưu lại.
+3. Mở hàm vừa tạo → **Details / Settings**, tắt mục **Verify JWT** (có thể ghi là "Enforce JWT verification") rồi lưu lại.
 4. Trên web, vào **Cài đặt → Tạo link lịch Apple → Mở trong Lịch Apple**. Bấm **Đăng ký** (Subscribe), chọn **Tự động làm mới: Mỗi giờ** và đồng bộ qua iCloud để iPhone cũng có lịch.
 5. Mỗi buổi học sẽ được nhắc trước 15 phút. Lịch chỉ đồng bộ một chiều, từ web sang ứng dụng Lịch.
 
@@ -50,6 +50,41 @@ Nếu trước đó Thầy đã dùng thử và nhập dữ liệu, hãy **Tải
 | Sao lưu | **Cài đặt → Tải bản sao lưu**. Nên làm mỗi tháng và cất vào Google Drive. |
 
 Mã học viên (HV0001), mã lớp (L0001), mã khoá (K0001), mã buổi (B00001) và mã giao dịch (GD0001) đều do web tự tạo.
+
+## Dùng trên điện thoại
+
+1. Muốn MacBook và điện thoại **dùng chung một dữ liệu**, Thầy cần làm Cách 2 (Supabase). Ở chế độ dùng thử, mỗi máy giữ dữ liệu riêng.
+2. Trên iPhone, mở link web bằng Safari, bấm nút **Chia sẻ → Thêm vào MH chính**. Web sẽ có biểu tượng con dấu và mở toàn màn hình như một ứng dụng.
+3. Trên điện thoại, menu nằm ở thanh dưới cùng. Nút **Thêm** mở ra đầy đủ các mục.
+
+## Cập nhật web khi em gửi bản mới (không mất dữ liệu)
+
+Dữ liệu **không nằm trong các file code**:
+- Bản dùng thử: dữ liệu nằm trong Safari, gắn với địa chỉ `guangyuhanyu.github.io`.
+- Bản online: dữ liệu nằm trên Supabase.
+
+Vì vậy thay file code mới thì dữ liệu vẫn còn nguyên. Mỗi lần cập nhật, Thầy làm như sau:
+
+1. Vào web → **Cài đặt → Tải bản sao lưu**, để phòng khi có sự cố.
+2. Giải nén file zip mới.
+3. Vào repo `quanly` trên GitHub → **Add file → Upload files**. Kéo thả các file và thư mục mới vào (vẫn **bỏ thư mục `data`**), rồi bấm **Commit changes**. File trùng tên sẽ tự được thay.
+4. Đợi 1–2 phút rồi tải lại trang web. Nếu vẫn thấy giao diện cũ, Thầy bấm ⌘⇧R.
+5. Nếu em ghi chú có **file SQL mới**, Thầy dán file đó vào Supabase → SQL Editor → Run. Các file SQL chỉ thêm bảng mới, không xoá dữ liệu cũ.
+
+Hai điều cần nhớ:
+- **Không** bấm "Khôi phục từ file" hay "nạp vào web" khi cập nhật, vì hai nút này **thay toàn bộ** dữ liệu.
+- **Không** xoá dữ liệu trang web hay lịch sử của Safari khi đang ở bản dùng thử.
+
+## Bản 3: thêm Rút thăm, Thói quen, Chi tiêu
+
+- Ai đã cài Supabase từ trước: chạy thêm file `supabase/3-cap-nhat-ca-nhan.sql` một lần.
+- Ai cài mới: file số 1 đã gồm sẵn các bảng này.
+- Giao diện (màu, ảnh nền, menu tự ẩn) chỉnh ở nút **Giao diện**, phía dưới thanh menu. Mỗi máy nhớ giao diện riêng.
+
+## Bản 4: sinh nhật học viên, tin nhắn gia hạn, tổng kết tháng
+
+- **Cài Supabase lần đầu:** chỉ cần chạy file số 1, vì file này đã gồm sẵn mọi thứ.
+- **Đã cài Supabase từ trước bản 4:** chạy thêm file `supabase/4-cap-nhat-hoc-vien.sql` một lần.
 
 ## Dữ liệu chuyển từ Excel — 14 khoá cần Thầy kiểm tra
 
