@@ -64,5 +64,5 @@ Object.assign(ICON, {
   'deepwork': _a('deepwork'), 'break': _a('break'), 'time': _a('time'), 'messages': _a('messages'),
   'travel': _a('travel'), 'gratitude': _a('gratitude'), 'celebrate': _a('celebrate'), 'refresh': _a('refresh'),
   'mindset': _a('mindset'), 'work': _a('work'), 'plan': _a('plan'), 'ideas': _a('ideas'), 'youtime': _a('youtime'),
-  'priorities': _a('priorities'), 'goals': _a('goals'), 'todo': _a('todo'), 'journal': _a('journal'), 'quy': _a('celebrate'), 'ky-niem': _a('memories'), 'tong-ket': _a('notes'), 'muc-tieu': _a('goals'), 'style': _a('youtime'), 'study': _a('study'), 'notes': _a('notes'),
+  'priorities': _a('priorities'), 'goals': _a('goals'), 'todo': _a('todo'), 'journal': _a('journal'), 'quy': _a('celebrate'), 'ky-niem': _a('memories'), 'tong-ket': _a('notes'), 'muc-tieu': _a('goals'), 'manifest': _a('inspiration'), 'gratitude': _a('gratitude'), 'messages': _a('messages'), 'style': _a('youtime'), 'study': _a('study'), 'notes': _a('notes'),
 });

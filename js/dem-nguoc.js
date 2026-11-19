@@ -26,6 +26,7 @@ function cacMoc() {
   const ls = caiDat('la_so_goc', null); if (ls && ls.ngay) them('sinh_nhat', 'Sinh nhật Thầy', lanToi(ls.ngay.slice(5), hn), 'celebrate', '生日');
   try { const s = caiDat('lo_trinh_hsk79', null); if (s && s.start) them('hsk79', 'Xong lộ trình ôn HSK 7–9', congNgay(dauTuan(s.start), 35 * 7 - 1), 'study', '考试'); } catch (e) { }
   try { dsQuy().filter(q => q.han && q.dich && soDuQuy(q) < q.dich).forEach(q => them('quy_' + q.id, `Hạn ${q.ten}`, q.han, 'goals', '存钱')); } catch (e) { }
+  try { mfMocThu().forEach(m => ds.push(m)); } catch (e) { }
   const an = mocAn(); const kq = ds.filter(m => !an.includes(m.khoa));
   dsMoc().forEach(m => { const ngay = m.hang_nam ? lanToi(m.ngay.slice(5), hn) : m.ngay; if (ngay >= hn) kq.push({ khoa: m.id, ten: m.ten, ngay, gio: m.gio, icon: m.icon || 'important', ghim: m.ghim, nguon: 'thay', id: m.id }); });
   return kq.sort((a, b) => (b.ghim ? 1 : 0) - (a.ghim ? 1 : 0) || (a.ngay + (a.gio || '')).localeCompare(b.ngay + (b.gio || '')));

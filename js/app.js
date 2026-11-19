@@ -4,7 +4,7 @@
 const MENU = [
   ['hom-nay', 'Hôm nay', '今日'], ['lich', 'Lịch dạy', '课表'], ['lop', 'Lớp học', '班级'], ['hoc-vien', 'Học viên', '学员'],
   ['tai-chinh', 'Tài chính', '财务'], ['cong-viec', 'Công việc', '事务'],
-  ['-', 'Cá nhân'], ['muc-tieu', 'Mục tiêu', '目标'], ['thoi-quen', 'Thói quen', '习惯'], ['tong-ket', 'Tổng kết tuần', '回顾'], ['quy', 'Quỹ tiết kiệm', '存钱'], ['chi-tieu', 'Chi tiêu', '记账'],
+  ['-', 'Cá nhân'], ['muc-tieu', 'Mục tiêu', '目标'], ['manifest', 'Manifest', '显化'], ['thoi-quen', 'Thói quen', '习惯'], ['tong-ket', 'Tổng kết tuần', '回顾'], ['quy', 'Quỹ tiết kiệm', '存钱'], ['chi-tieu', 'Chi tiêu', '记账'],
   ['-', 'Đời sống'], ['style', 'Style', '风格'], ['ky-niem', 'Kỷ niệm', '回忆'], ['chiem-tinh', 'Chiêm tinh', '星座'],
   ['-', ''], ['cai-dat', 'Cài đặt', '设置'],
 ];
@@ -74,6 +74,7 @@ function ve() {
     case 'quy': html = vQuy(); break;
     case 'tong-ket': html = vTongKetTuan(); break;
     case 'ky-niem': html = vKyNiem(); break;
+    case 'manifest': html = vManifest(); break;
     case 'chi-tieu': html = vChiTieu(); break;
     default: html = vHomNay();
   }
@@ -179,7 +180,7 @@ const HD = {
 };
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el) return;
-  const f = HD[el.dataset.act] || HD_L79[el.dataset.act] || HD_MT[el.dataset.act] || HD_ST[el.dataset.act] || HD_QY[el.dataset.act] || HD_TK[el.dataset.act] || HD_KN[el.dataset.act] || HD_DN[el.dataset.act] || HD_FC[el.dataset.act]; if (!f) return;
+  const f = HD[el.dataset.act] || HD_L79[el.dataset.act] || HD_MT[el.dataset.act] || HD_ST[el.dataset.act] || HD_QY[el.dataset.act] || HD_TK[el.dataset.act] || HD_KN[el.dataset.act] || HD_DN[el.dataset.act] || HD_FC[el.dataset.act] || HD_MF[el.dataset.act]; if (!f) return;
   const chay = async () => {
     try {
       if (CHI_DOC && !/^(mo-|st-tab|l79-xem|tk-|mt-tuan|mt-nam|mt-chon|kn-mo|kn-loc|st-loc|mp-loc|st-dip|sk-buoi|chi-tiet|giao-dien)/.test(el.dataset.act)) { toast('Đang mất mạng, chỉ xem được. Có mạng lại Thầy thao tác tiếp nhé.', 'canh'); return; }

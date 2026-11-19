@@ -211,6 +211,7 @@ function vTongKetTuan() {
       ${s.muaMoi.length ? `<p class="tk-dong">Đồ mới mua: ${s.muaMoi.map(x => esc(x.ten)).join(', ')}</p>` : ''}
       ${s.ngayCoOutfit ? `<p class="tk-dong">Ghi outfit <b>${s.ngayCoOutfit}</b> ngày</p>` : ''}
     </section>
+    ${mfTongKet(s.dau, s.cuoi)}
     <section class="the-giay"><div class="dau-muc"><h2 class="co-icon">${ICON.todo}Mục tiêu tuần</h2>${s.mtTuan.length ? `<span class="the">${s.mtTuan.filter(x => x.t.p >= 1).length}/${s.mtTuan.length} đạt</span>` : ''}</div>
       ${s.mtTuan.length ? s.mtTuan.map(({ g, t }) => `<div class="tk-mt"><span>${esc(g.ten)}</span><div class="mt-thanh"><i style="width:${(t.p * 100).toFixed(0)}%"></i></div><span class="the mt-nhan ${t.lop}">${t.nhan}</span></div>`).join('') : '<p class="mo">Tuần này chưa đặt mục tiêu. <a href="#/muc-tieu">Đặt mục tiêu tuần →</a></p>'}
     </section>

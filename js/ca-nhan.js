@@ -335,6 +335,7 @@ function khoiCaNhanHomNay(trong) {
       ${l79HomNay()}
     </section>
     ${nhacSaoLuu()}
+    ${mfHomNay()}
     ${knHomNay()}
     ${tongKetHomNay()}
     ${mtHomNay()}
