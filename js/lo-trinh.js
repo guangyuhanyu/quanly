@@ -16,7 +16,7 @@ const L79_GD = [
 ];
 // d: 1 = Thứ 2 … 7 = Chủ nhật · m: tháng 1–8 của lộ trình · w: tuần 1–35
 const L79_BAI = [
-  { id: 'anki', cat: 'vocab', ten: 'Anki từ vựng', note: '20 từ mới + ôn từ cũ', min: 15, khi: () => true },
+  { id: 'fc', cat: 'vocab', ten: 'Flashcard từ vựng', note: 'Ôn thẻ đến hạn + từ mới', min: 15, khi: () => true },
   { id: 'pinyin', cat: 'write', ten: 'Gõ pinyin', note: 'Luyện tốc độ gõ để thi trên máy', min: 10, khi: m => m <= 2 },
   { id: 'nghetd', cat: 'listen', ten: 'Nghe thụ động', note: '小宇宙 / 喜马拉雅 khi di chuyển', min: 0, khi: () => true },
   { id: 'docpc', cat: 'read', ten: 'Đọc bài phân cấp', note: 'Du Chinese / The Chairman’s Bao', min: 20, khi: (m, d) => m <= 2 && d <= 5 },
@@ -110,7 +110,7 @@ function l79VeNgay() {
   const n = L79.ngay, w = l79Tuan(n), bs = l79BaiNgay(n), phut = bs.reduce((a, h) => a + h.min, 0);
   const phu = w < 1 ? 'Trước ngày bắt đầu' : w > L79_TONG_TUAN ? 'Sau khi kết thúc lộ trình' : `Tuần ${w} · Tháng ${l79Thang(w)} · ${l79GD(l79Thang(w)).ten}`;
   return `<div class="lt79-nav"><button class="lt79-nut" data-act="l79-ngay" data-d="-1">‹ Trước</button><div class="t">${l79Thu2(n)}<small>${phu}${bs.length ? ` · khoảng ${phut} phút` : ''}</small></div><button class="lt79-nut" data-act="l79-ngay" data-d="1">Sau ›</button></div>
-    ${bs.length ? `<div class="lt79-ds">${bs.map(h => { const on = l79Xong(n, h); return `<div class="lt79-muc ${on ? 'xong' : ''}" style="${l79Mau(h)}" data-act="l79-tick" data-n="${n}" data-h="${h.id}"><div class="o">${on ? '✓' : ''}</div><div><div class="nm">${h.ten}</div><div class="nt">${h.note}</div></div><div class="mn">${h.min ? h.min + ' phút' : 'Lúc rảnh'}</div></div>`; }).join('')}</div>`
+    ${bs.length ? `<div class="lt79-ds">${bs.map(h => { const on = l79Xong(n, h); return `<div class="lt79-muc ${on ? 'xong' : ''}" style="${l79Mau(h)}" data-act="l79-tick" data-n="${n}" data-h="${h.id}"><div class="o">${on ? '✓' : ''}</div><div><div class="nm">${h.ten}</div><div class="nt">${h.note}</div></div>${h.id === 'fc' ? '<button class="lt79-nut fc-nut" data-act="fc-mo">📇 Mở thẻ</button>' : ''}<div class="mn">${h.min ? h.min + ' phút' : 'Lúc rảnh'}</div></div>`; }).join('')}</div>`
       : `<div class="lt79-trong-bai">Hôm nay không có bài, Thầy nghỉ ngơi nhé ✦</div>`}
     ${n !== homNay() ? `<div class="giua" style="margin-top:12px"><button class="lt79-nut" data-act="l79-ngay" data-d="0">Về hôm nay</button></div>` : ''}`;
 }
@@ -142,7 +142,7 @@ function l79HomNay() {
   const s = caiDat('lo_trinh_hsk79', null); if (!s) return '';
   const hn = homNay(), bs = l79BaiNgay(hn); if (!bs.length) return '';
   const ok = bs.filter(h => l79Xong(hn, h)).length, phut = bs.filter(h => !l79Xong(hn, h)).reduce((a, h) => a + h.min, 0);
-  return `<div class="lt79-mini"><div class="lt79-mini-dau"><b>Ôn HSK 7–9 · tuần ${l79Tuan(hn)}</b><small>${ok}/${bs.length} bài${phut ? ` · còn ~${phut} phút` : ' · xong hết ✦'}</small></div>
+  return `<div class="lt79-mini"><div class="lt79-mini-dau"><b>Ôn HSK 7–9 · tuần ${l79Tuan(hn)}</b><small>${ok}/${bs.length} bài${phut ? ` · còn ~${phut} phút` : ' · xong hết ✦'}</small>${bs.some(h => h.id === 'fc') ? '<button class="lt79-nut fc-nut" data-act="fc-mo">📇 Học flashcard</button>' : ''}</div>
     ${bs.map(h => { const on = l79Xong(hn, h); return `<button class="lt79-chip ${on ? 'on' : ''}" style="${l79Mau(h)}" data-act="l79-tick" data-n="${hn}" data-h="${h.id}"><i>${on ? '✓' : ''}</i>${h.ten}<small>${h.min ? h.min + "'" : '∞'}</small></button>`; }).join('')}</div>`;
 }
 

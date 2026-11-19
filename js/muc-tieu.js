@@ -11,7 +11,7 @@ const MT_DO = {
 const MT = { ky: 'thang', nam: Number(homNay().slice(0, 4)), thang: Number(homNay().slice(5, 7)), tuan: dauTuan(homNay()) };
 const nhanTuan = t => `${ngayNgan(t)} – ${ngayNgan(congNgay(t, 6))}`;
 const thangCuaTuan = t => { const d = congNgay(t, 3); return [Number(d.slice(0, 4)), Number(d.slice(5, 7))]; };
-const mtIcon = n => `<img class="ic ic-anh" src="assets/icons/${MT_NHOM[n] || 'goals'}.webp?v=5.6" alt="">`;
+const mtIcon = n => `<img class="ic ic-anh" src="assets/icons/${MT_NHOM[n] || 'goals'}.webp?v=5.7" alt="">`;
 const dsMT = () => caiDat('muc_tieu', []) || [];
 async function luuDsMT(a) { await luuCaiDat('muc_tieu', a); }
 const pad2 = n => String(n).padStart(2, '0');
@@ -156,7 +156,7 @@ function moMT(id, ky) {
   moHop({
     tieuDe: id ? 'Sửa mục tiêu' : g.ky === 'nam' ? `Mục tiêu năm ${g.nam}` : g.ky === 'tuan' ? `Mục tiêu tuần ${nhanTuan(g.tuan)}` : `Mục tiêu tháng ${g.thang}/${g.nam}`,
     noiDung: `<div class="form luoi-form mt-form">
-      <label class="ca-dong">Mục tiêu<input name="ten" value="${esc(g.ten || '')}" placeholder="VD: Dạy 12 buổi, Anki đủ 7 ngày, Góp Quỹ Tết 800k…" required></label>
+      <label class="ca-dong">Mục tiêu<input name="ten" value="${esc(g.ten || '')}" placeholder="VD: Dạy 12 buổi, Ôn HSK đủ 6 ngày, Góp Quỹ Tết 800k…" required></label>
       <label>Kỳ<select name="ky"><option value="tuan" ${g.ky === 'tuan' ? 'selected' : ''}>Tuần</option><option value="thang" ${g.ky === 'thang' ? 'selected' : ''}>Tháng</option><option value="nam" ${g.ky === 'nam' ? 'selected' : ''}>Năm</option></select></label>
       <label class="mt-chi-tuan">Tuần (chọn một ngày bất kỳ trong tuần)<input type="date" name="tuan" value="${g.tuan || MT.tuan}"></label>
       <label class="mt-chi-thang">Tháng<select name="thang">${[...Array(12)].map((_, i) => `<option value="${i + 1}" ${g.thang === i + 1 ? 'selected' : ''}>Tháng ${i + 1}</option>`).join('')}</select></label>
