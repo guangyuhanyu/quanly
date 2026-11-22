@@ -81,7 +81,7 @@ function vHomNay() {
   for (let i = 1; i <= 7; i++) { const n = congNgay(hn, i); const bs = S.buoi_hoc.filter(b => b.ngay === n && b.trang_thai === 'du_kien').sort(soBuoi); if (bs.length) toi.push([n, bs]); }
   return `
   <header class="dau-trang">
-    <div><p class="mat-tren">${THU[d.getDay()]}, ${ngayVN(hn)}</p><h1>${loiChao().chu} <span class="chao-zh">${loiChao().zh}</span></h1><p class="phu">Hôm nay có ${buoiNay.length} buổi dạy và ${tuNhac.length + viec.length} việc cần để ý.</p></div>
+    <div><p class="mat-tren">${THU[d.getDay()]}, ${ngayVN(hn)}</p>${(() => { try { const nh = AL.nhac(hn); return `<p class="am-lich">☾ Âm lịch ${AL.chu(hn)}${nh ? ` <span class="al-nhac ${nh.hom}">${nh.hom === 'nay' ? '🪷' : '🕯'} ${nh.chu}</span>` : ''}</p>`; } catch (e) { return ''; } })()}<h1>${loiChao().chu} <span class="chao-zh">${loiChao().zh}</span></h1><p class="phu">${ngayOff(hn) ? `🏮 Hôm nay Thầy off: <b>${esc(ngayOff(hn).ten)}</b>. ` : ''}Hôm nay có ${buoiNay.filter(b => b.trang_thai !== 'nghi').length} buổi dạy và ${tuNhac.length + viec.length} việc cần để ý.</p></div>
 
     <div class="nhom-nut"><button class="nut" data-act="them-viec">＋ Việc</button><button class="nut chinh" data-act="them-buoi" data-ngay="${hn}">＋ Đặt buổi học</button></div>
   </header>
@@ -95,6 +95,7 @@ function vHomNay() {
       </div></div>
     </section>
   ${theTongKetHomNay()}
+  ${theChiemTinhHomNay()}
   <div class="o-so">
     <div class="o-so-the bam" data-act="chi-tiet-so" data-loai="buoi_tuan" data-tu="${tuan}" data-den="${congNgay(tuan, 6)}"><i class="o-so-icon">${ICON['den-long']}</i><span>Buổi dạy tuần này</span><b>${soTuan}</b><small>${ngayNgan(tuan)} – ${ngayNgan(congNgay(tuan, 6))}</small></div>
     <div class="o-so-the bam" data-act="chi-tiet-so" data-loai="thuc_nhan" data-tu="${hn.slice(0, 8)}01" data-den="${hn.slice(0, 8)}31" data-ten="Tháng ${d.getMonth() + 1}"><i class="o-so-icon">${ICON['tai-chinh']}</i><span>Thực nhận tháng ${d.getMonth() + 1}</span><b>${tienGon(thang.thucNhan)}</b><small>${tien(thang.thucNhan)}</small></div>
@@ -143,6 +144,7 @@ function vLich() {
           <div class="vien-thang"><button class="nut-tron" data-act="lich-lui" aria-label="Trước">${ICON.trai}</button><span>${LICH.kieu === 'tuan' ? 'Tuần ' + ngayNgan(dauTuan(LICH.moc)) : 'Tháng ' + thang}</span><button class="nut-tron" data-act="lich-toi" aria-label="Sau">${ICON.phai}</button></div>
           <button class="nut" data-act="lich-nay">Hôm nay</button>
           <div class="phan-doan"><button data-act="lich-kieu" data-v="tuan" class="${LICH.kieu === 'tuan' ? 'on' : ''}">Tuần</button><button data-act="lich-kieu" data-v="thang" class="${LICH.kieu === 'thang' ? 'on' : ''}">Tháng</button></div>
+          <button class="nut" data-act="ngay-off" data-ngay="${LICH.kieu === 'tuan' ? homNay() : LICH.moc}">🏮 Ngày off</button>
           <button class="nut-tron vien" data-act="lich-apple" title="Lịch Apple & cài đặt">${ICON['cai-dat']}</button>
           <button class="nut chinh" data-act="them-buoi" data-ngay="${LICH.kieu === 'tuan' ? homNay() : LICH.moc}" data-lop="${LICH.loc || ''}">${ICON.cong} Đặt buổi</button>
         </div>
@@ -226,7 +228,7 @@ function lichTuan() {
   const gio = []; for (let m = GIO_DAU; m < GIO_CUOI; m += 60) gio.push(`<span style="top:${(m - GIO_DAU) / 30 * O}px">${pad(m / 60)}:00</span>`);
   const now = new Date(); const phutNay = now.getHours() * 60 + now.getMinutes();
   return `<div class="lich-tuan">
-    <div class="lt-dau"><div></div>${ngay.map(n => { const d = s2d(n); return `<div class="lt-ngay ${n === hn ? 'nay' : ''}" data-act="lich-den" data-ngay="${n}"><small>${THU_NGAN[d.getDay()]}</small><b>${d.getDate()}</b></div>`; }).join('')}</div>
+    <div class="lt-dau"><div></div>${ngay.map(n => { const d = s2d(n); const off = ngayOff(n); return `<div class="lt-ngay ${n === hn ? 'nay' : ''} ${off ? 'off' : ''}" data-act="lich-den" data-ngay="${n}"><small>${THU_NGAN[d.getDay()]}</small><b>${d.getDate()}</b>${off ? `<em title="${esc(off.ten)}">🏮 ${esc(off.ten)}</em>` : ''}</div>`; }).join('')}</div>
     <div class="lt-ca-ngay"><div class="lt-nhan">Chưa giờ<br>/ hạn việc</div>${ngay.map(n => `<div class="lt-o-ca-ngay" data-tha="${n}" data-ca-ngay="1">${viecNgay(n).map(theHan).join('')}${buoiNgay(n, false).map(b => chipBuoi(b, false)).join('')}</div>`).join('')}</div>
     <div class="lt-than"><div class="lt-gio" style="height:${cao}px">${gio.join('')}</div>
       ${ngay.map(n => `<div class="lt-cot ${n === hn ? 'nay' : ''}" data-tha="${n}" data-cot="${n}" style="height:${cao}px">
@@ -245,8 +247,9 @@ function lichThang() {
     const n = congNgay(dau, i); const ngoai = Number(n.slice(5, 7)) !== m;
     const muc = [...buoiNgay(n).map(b => chipBuoi(b)), ...viecNgay(n).map(theHan)];
     const toiDa = 3; const hien = muc.length > toiDa ? muc.slice(0, toiDa - 1) : muc;
-    o += `<div class="lm-o ${ngoai ? 'ngoai' : ''} ${n === hn ? 'nay' : ''}" data-tha="${n}" data-ca-ngay="1" data-o-thang="${n}">
-      <button class="lm-so" data-act="mo-ngay" data-ngay="${n}">${Number(n.slice(8))}</button>
+    const off = ngayOff(n);
+    o += `<div class="lm-o ${ngoai ? 'ngoai' : ''} ${n === hn ? 'nay' : ''} ${off ? 'off' : ''}" data-tha="${n}" data-ca-ngay="1" data-o-thang="${n}">
+      <button class="lm-so" data-act="mo-ngay" data-ngay="${n}">${Number(n.slice(8))}</button>${off ? `<span class="lm-off" title="${esc(off.ten)}">🏮<span class="dai"> ${esc(off.ten)}</span></span>` : ''}
       ${hien.join('')}
       ${muc.length > hien.length ? `<button class="lm-them" data-act="mo-ngay" data-ngay="${n}">+${muc.length - hien.length}<span class="dai"> mục khác</span></button>` : ''}
     </div>`;
@@ -317,7 +320,7 @@ function moBuoi({ id, ngay, gio, lopId, dat } = {}) {
       ${!b ? `<label class="ca-dong lap">Lặp lại hằng tuần <input type="number" name="lap" value="1" min="1" max="30" style="width:70px"> lần <small class="mo">(VD: 8 → đặt luôn 8 tuần cùng giờ)</small></label>` : ''}
     </div>`,
     nut: [
-      ...(b ? [{ chu: 'Xoá buổi', kieu: 'nguy', trai: true, bam: async () => { if (!(await hoi('Xoá hẳn buổi học này?', 'Xoá', 'nguy'))) return false; await xoa('buoi_hoc', b.id); toast('Đã xoá buổi học'); ve(); } }] : []),
+      ...(b ? [{ chu: 'Xoá buổi', kieu: 'nguy', trai: true, bam: async () => { if (!(await hoi('Xoá hẳn buổi học này?', 'Xoá', 'nguy'))) return false; await xoa('buoi_hoc', b.id); toast('Đã xoá buổi học'); ve(); } }] : [{ chu: '🏮 Set ngày off', trai: true, bam: n => { const d = $('[name=ngay]', n).value; setTimeout(() => moNgayOff(d), 60); } }]),
       { chu: 'Huỷ', bam: () => {} },
       { chu: 'Lưu', kieu: 'chinh', bam: async (n) => {
         const f = docForm(n); const lop_id = b ? b.lop_id : Number(f.lop_id);
@@ -325,16 +328,22 @@ function moBuoi({ id, ngay, gio, lopId, dat } = {}) {
         if (!f.ngay) { toast('Thiếu ngày học', 'loi'); return false; }
         const row = { ngay: f.ngay, gio_bat_dau: f.gio_bat_dau, thoi_luong_phut: f.thoi_luong_phut || 90, trang_thai: f.trang_thai, tinh_phi: f.trang_thai === 'da_day' ? f.tinh_phi : true, noi_dung: f.noi_dung, ghi_chu: f.ghi_chu };
         if (f.khoa_id) row.khoa_id = Number(f.khoa_id);
+        const off = ngayOff(row.ngay);
+        if (off && row.trang_thai === 'du_kien' && (!b || b.ngay !== row.ngay) && !(await hoi(`${ngayVN(row.ngay)} là ngày off (<b>${esc(off.ten)}</b>). Vẫn đặt buổi?`, 'Vẫn đặt'))) return false;
         const trung = trungLich({ ...row }, b && b.id);
         if (trung.length && !(await hoi(`Giờ này trùng với <b>${trung.map(x => esc(lopTheoId(x.lop_id).ten) + ' ' + x.gio_bat_dau).join(', ')}</b>. Vẫn lưu?`, 'Vẫn lưu'))) return false;
         if (b) {
           await luu('buoi_hoc', row, b.id);
         } else {
           const lap = Math.max(1, Math.min(30, f.lap || 1));
-          for (let i = 0; i < lap; i++) {
+          let daDat = 0, boOff = [];
+          for (let i = 0; daDat < lap && i < lap + 20; i++) {
+            const ng = congNgay(row.ngay, 7 * i);
+            if (i > 0 && ngayOff(ng)) { boOff.push(ngayNgan(ng)); continue; }
             const k = khoaHienTai(lop_id);
-            await luu('buoi_hoc', { ...row, lop_id, khoa_id: k ? k.id : null, ngay: congNgay(row.ngay, 7 * i) });
+            await luu('buoi_hoc', { ...row, lop_id, khoa_id: k ? k.id : null, ngay: ng }); daDat++;
           }
+          if (boOff.length) setTimeout(() => toast(`Đã né ngày off: ${boOff.join(', ')}`), 900);
         }
         const kk = khoaTheoId(b ? (row.khoa_id || b.khoa_id) : (khoaHienTai(lop_id) || {}).id);
         if (row.trang_thai === 'da_day' && kk) {
@@ -439,6 +448,7 @@ function vChiTietLop(id) {
       <button class="nut" data-act="xuat-png" data-lop="${L.id}" data-mau="01">PNG Thông tin lớp</button>
       <button class="nut chinh" data-act="xuat-png" data-lop="${L.id}" data-mau="02">PNG Buổi học & học phí</button></div>
   </header>
+  ${theLichLop(L)}
   ${k ? `
   <section class="the-giay khoa-the">
     <div class="dau-muc"><h2>Khoá ${k.ma} ${k === kht ? '<small class="mo">(đang học)</small>' : k.ket_thuc ? '<small class="mo">(đã đóng)</small>' : ''}</h2>
@@ -605,7 +615,7 @@ function moGiaHan(lopId) {
       }
       if (f.da_dong && f.hoc_phi) await luu('thanh_toan', { khoa_id: moi.id, lop_id: L.id, ngay: homNay(), so_tien: f.hoc_phi, hinh_thuc: 'Chuyển khoản' });
       if (!L.dang_hoat_dong) await luu('lop', { dang_hoat_dong: true }, L.id);
-      CHON_KHOA[L.id] = moi.id; toast(`Đã tạo khoá ${moi.ma} ✓`); location.hash = '#/lop/' + L.id; ve();
+      CHON_KHOA[L.id] = moi.id; toast(`Đã tạo khoá ${moi.ma} ✓`); location.hash = '#/lop/' + L.id; ve(); setTimeout(() => goiYXepSauGiaHan(L.id), 500);
     } }],
     khiMo: n => {
       ganOTien(n);

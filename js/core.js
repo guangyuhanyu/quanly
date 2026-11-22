@@ -168,15 +168,54 @@ function docForm(nen) {
   $$('[name]', nen).forEach(el => {
     if (el.type === 'checkbox') o[el.name] = el.checked;
     else if (el.type === 'radio') { if (el.checked) o[el.name] = el.value; }
-    else if (el.type === 'number' || el.dataset.so != null) o[el.name] = el.value === '' ? null : Number(String(el.value).replace(/[.\s]/g, ''));
+    else if (el.dataset.so != null) { const v = tinhBieuThuc(el.value); o[el.name] = el.value === '' ? null : v == null ? NaN : Math.round(v); }
+    else if (el.type === 'number') o[el.name] = el.value === '' ? null : Number(String(el.value).replace(/[.\s]/g, ''));
     else o[el.name] = el.value.trim() === '' ? null : el.value.trim();
   });
   return o;
 }
 /* ô nhập tiền: tự thêm dấu chấm */
+/* máy tính trong ô tiền: 50k+35.000*2, 1,5tr-200k, (120+80)/2 … (bản 5.8) */
+function tinhBieuThuc(s) {
+  let t = String(s == null ? '' : s).toLowerCase().replace(/\s/g, '').replace(/[×x]/g, '*').replace(/[÷:]/g, '/').replace(/[−–]/g, '-');
+  if (!t) return null;
+  while (/(\d)\.(\d{3})(?!\d)/.test(t)) t = t.replace(/(\d)\.(\d{3})(?!\d)/g, '$1$2');
+  t = t.replace(/,/g, '.').replace(/(\d+(?:\.\d+)?)(tr|k|m|t)/g, (_, n, u) => String(Number(n) * (u === 'k' ? 1e3 : 1e6)));
+  if (!/^[\d.+\-*/()]+$/.test(t)) return null;
+  let i = 0;
+  const so = () => { const m = /^\d+(\.\d+)?|^\.\d+/.exec(t.slice(i)); if (!m) throw 0; i += m[0].length; return Number(m[0]); };
+  const yeuTo = () => { if (t[i] === '-') { i++; return -yeuTo(); } if (t[i] === '+') { i++; return yeuTo(); } if (t[i] === '(') { i++; const v = cong(); if (t[i] === ')') i++; return v; } return so(); };
+  const nhan = () => { let v = yeuTo(); while (t[i] === '*' || t[i] === '/') { const o = t[i++]; const r = yeuTo(); v = o === '*' ? v * r : v / r; } return v; };
+  const cong = () => { let v = nhan(); while (t[i] === '+' || t[i] === '-') { const o = t[i++]; const r = nhan(); v = o === '+' ? v + r : v - r; } return v; };
+  try { const v = cong(); return i === t.length && isFinite(v) ? v : null; } catch (e) { return null; }
+}
+const laBieuThuc = v => /[+\-*/×x÷:()]|\d(k|tr|m)\b/i.test(String(v).replace(/^-/, ''));
 function ganOTien(goc) {
   $$('input[data-so]', goc).forEach(el => {
-    const fmt = () => { const v = el.value.replace(/\D/g, ''); el.value = v ? NF.format(Number(v)) : ''; };
+    if (el.dataset.ganTien) return; el.dataset.ganTien = 1;
+    let goiY = null;
+    if (el.dataset.tinh != null) {
+      el.setAttribute('inputmode', 'decimal'); el.setAttribute('autocomplete', 'off');
+      goiY = document.createElement('span'); goiY.className = 'tinh-goi-y'; el.insertAdjacentElement('afterend', goiY);
+      const bo = document.createElement('span'); bo.className = 'tinh-phim';
+      bo.innerHTML = ['+', '−', '×', '÷', '000', 'k', '='].map(k => `<button type="button" tabindex="-1" data-k="${k}">${k}</button>`).join('');
+      goiY.insertAdjacentElement('afterend', bo);
+      bo.addEventListener('mousedown', e => e.preventDefault());
+      bo.addEventListener('click', e => {
+        const b = e.target.closest('[data-k]'); if (!b) return; const k = b.dataset.k;
+        if (k === '=') chot(); else { el.value += k; capGoiY(); }
+        el.focus();
+      });
+      el.addEventListener('focus', () => bo.classList.add('hien'));
+      el.addEventListener('blur', () => { setTimeout(() => bo.classList.remove('hien'), 120); chot(); });
+      el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === '=') { if (e.key === '=') e.preventDefault(); chot(); } });
+    }
+    function capGoiY() { if (!goiY) return; const v = laBieuThuc(el.value) ? tinhBieuThuc(el.value) : null; goiY.textContent = v != null ? '= ' + NF.format(Math.round(v)) : ''; }
+    function chot() { if (!laBieuThuc(el.value)) return; const v = tinhBieuThuc(el.value); if (v != null) { el.value = NF.format(Math.max(0, Math.round(v))); capGoiY(); } }
+    const fmt = () => {
+      if (laBieuThuc(el.value)) { capGoiY(); return; }
+      const v = el.value.replace(/\D/g, ''); el.value = v ? NF.format(Number(v)) : ''; capGoiY();
+    };
     el.addEventListener('input', fmt); fmt();
   });
 }

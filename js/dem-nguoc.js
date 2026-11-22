@@ -31,7 +31,7 @@ function cacMoc() {
   dsMoc().forEach(m => { const ngay = m.hang_nam ? lanToi(m.ngay.slice(5), hn) : m.ngay; if (ngay >= hn) kq.push({ khoa: m.id, ten: m.ten, ngay, gio: m.gio, icon: m.icon || 'important', ghim: m.ghim, nguon: 'thay', id: m.id }); });
   return kq.sort((a, b) => (b.ghim ? 1 : 0) - (a.ghim ? 1 : 0) || (a.ngay + (a.gio || '')).localeCompare(b.ngay + (b.gio || '')));
 }
-const mocIcon = (i, co = '') => `<img class="ic ic-anh ${co}" src="assets/icons/${i}.webp?v=5.7" alt="">`;
+const mocIcon = (i, co = '') => `<img class="ic ic-anh ${co}" src="assets/icons/${i}.webp?v=5.8" alt="">`;
 function conLai(m) {
   const dich = new Date(`${m.ngay}T${m.gio || '00:00'}:00+07:00`).getTime(), ms = Math.max(0, dich - Date.now());
   return { ms, ngay: Math.floor(ms / 864e5), gio: Math.floor(ms / 36e5) % 24, phut: Math.floor(ms / 6e4) % 60, giay: Math.floor(ms / 1e3) % 60 };
@@ -46,7 +46,7 @@ function theDemNguoc() {
   const n = m ? stSoNgay(homNay(), m.ngay) : 0;
   return `<section class="dn">
     <button class="dn-o the-giay" data-act="dn-chon" title="Bấm để chọn mốc khác">
-      ${m ? `${mocIcon(m.icon, 'dn-ic')}<span class="dn-so-ngay">${m.ngay === homNay() ? '🎉' : n}</span><small>${m.ngay === homNay() ? 'Chính là hôm nay' : 'ngày nữa'}</small><b>${esc(m.ten)}</b><em>${ngayVN(m.ngay)}</em>`
+      ${m ? `${mocIcon(m.icon, 'dn-ic')}<span class="dn-so-ngay">${m.ngay === homNay() ? '🎉' : n}</span><span class="dn-chu"><small>${m.ngay === homNay() ? 'Chính là hôm nay' : 'ngày nữa'}</small><b>${esc(m.ten)}</b><em>${ngayVN(m.ngay)}</em></span>`
         : `<span class="dn-so-ngay">＋</span><b>Chọn mốc đếm ngược</b>`}
     </button>
     <div class="tn the-giay">

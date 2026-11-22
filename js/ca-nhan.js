@@ -261,7 +261,10 @@ function vChiTieu() {
   const tongChi = chi.reduce((s, x) => s + x.so_tien, 0), tongThu = thu.reduce((s, x) => s + x.so_tien, 0);
   const day = tongKy(tu, den).thucNhan;
   const conLai = day + tongThu - tongChi;
-  const ns = Number(caiDat('ngan_sach_thang', 0)) || 0;
+  const ns = duChi(th);
+  const thuNhap = day + tongThu, du = thuNhap - tongChi, conTieu = ns - tongChi;
+  const nay = homNay().slice(0, 7), qua = th < nay, soNgayThang = new Date(y, m, 0).getDate(), ngayNay = th === nay ? Number(homNay().slice(8)) : soNgayThang;
+  const conNgay = th === nay ? soNgayThang - ngayNay + 1 : 0;
   const theoDm = {}; chi.forEach(x => theoDm[x.danh_muc || 'Khác'] = (theoDm[x.danh_muc || 'Khác'] || 0) + x.so_tien);
   const dmSap = Object.entries(theoDm).sort((a, b) => b[1] - a[1]);
   const hienDs = CT.locDm ? ds.filter(x => (x.danh_muc || 'Khác') === CT.locDm) : ds;
@@ -270,15 +273,19 @@ function vChiTieu() {
   return `
   <header class="dau-trang gon"><div><p class="mat-tren">Sổ thu chi cá nhân</p><h1>${ICON['chi-tieu']} Chi tiêu</h1></div>
     <div class="nhom-nut"><div class="vien-thang"><button class="nut-tron" data-act="ct-lui">${ICON.trai}</button><span>Tháng ${m}/${y}</span><button class="nut-tron" data-act="ct-toi">${ICON.phai}</button></div></div></header>
-  <div class="o-so">
-    <div class="o-so-the xanh" data-act="chi-tiet-so" data-loai="thuc_nhan" data-tu="${tu}" data-den="${den}" data-ten="Tháng ${m}/${y}"><i class="o-so-icon">${ICON['tai-chinh']}</i><span>Thu từ dạy học</span><b>${tien(day)}</b><small>tự lấy từ mục Tài chính</small></div>
-    <div class="o-so-the"><i class="o-so-icon">${ICON['tui-gam']}</i><span>Thu khác</span><b>${tien(tongThu)}</b><small>${thu.length} khoản</small></div>
-    <div class="o-so-the canh"><i class="o-so-icon">${ICON['chi-tieu']}</i><span>Đã chi</span><b>${tien(tongChi)}</b>${ns ? `<div class="tien-do ${tongChi > ns ? 'vuot' : ''}"><div class="tien-do-cot"><i style="width:${Math.min(100, tongChi / ns * 100)}%"></i></div><span>${Math.round(tongChi / ns * 100)}%</span></div><small>ngân sách ${tien(ns)}</small>` : `<small>${chi.length} khoản</small>`}</div>
-    <div class="o-so-the ${conLai < 0 ? 'canh' : 'xanh'}"><i class="o-so-icon">${ICON['ban-tinh']}</i><span>Còn lại tháng này</span><b>${tien(conLai)}</b><small>thu dạy + thu khác − chi</small></div>
+  <div class="o-so ct-o-so">
+    <div class="o-so-the xanh bam" data-act="chi-tiet-so" data-loai="thuc_nhan" data-tu="${tu}" data-den="${den}" data-ten="Tháng ${m}/${y}"><i class="o-so-icon">${ICON['tai-chinh']}</i><span>Thu nhập tháng</span><b>${tien(thuNhap)}</b><small>học phí đã thu ${tienGon(day)}${tongThu ? ` · khác ${tienGon(tongThu)}` : ''}</small></div>
+    <div class="o-so-the bam ${ns && conTieu < 0 ? 'canh' : ''}" data-act="ct-du-chi"><i class="o-so-icon">${ICON['tui-gam']}</i><span>Dự chi tháng ${m} <em class="ct-sua">✎</em></span>
+      ${ns ? `<b>${tien(ns)}</b><div class="tien-do ${tongChi > ns ? 'vuot' : ''}"><div class="tien-do-cot"><i style="width:${Math.min(100, tongChi / ns * 100)}%"></i></div><span>${Math.round(tongChi / ns * 100)}%</span></div>
+        <small>${conTieu >= 0 ? `còn được tiêu <span class="ct-con chu-xanh">${tien(conTieu)}</span>${conNgay > 1 ? ` · ~${tienGon(conTieu / conNgay)}/ngày` : ''}` : `<span class="ct-con chu-do">vượt ${tien(-conTieu)}</span>`}</small>`
+      : `<b class="mo">Chưa đặt</b><small>Bấm để đặt số tiền định chi tháng này</small>`}</div>
+    <div class="o-so-the canh"><i class="o-so-icon">${ICON['chi-tieu']}</i><span>Đã chi</span><b>${tien(tongChi)}</b><small>${chi.length} khoản${ns ? ` · ${Math.round(tongChi / ns * 100)}% dự chi` : ''}</small></div>
+    <div class="o-so-the ${du < 0 ? 'canh' : 'xanh'}"><i class="o-so-icon">${ICON['ban-tinh']}</i><span>${qua ? 'Đã dư được' : 'Dư tháng này (tới giờ)'}</span><b>${tien(du)}</b><small>thu nhập − chi thực${!qua && ns && thuNhap ? (thuNhap - Math.max(ns, tongChi) >= 0 ? ` · tiêu đúng dự chi cuối tháng còn dư ${tienGon(thuNhap - Math.max(ns, tongChi))}` : ` · tiêu hết dự chi sẽ thiếu ${tienGon(Math.max(ns, tongChi) - thuNhap)} so với thu nhập`) : ''}</small></div>
   </div>
+  ${qua || ngayNay >= 25 ? tongKetThangCT(th, { thuNhap, day, tongThu, tongChi, du, ns, dmSap, qua }) : ''}
   <form class="them-nhanh lon ct-form" data-form="chi-tieu">
     <div class="phan-doan"><button type="button" data-act="ct-loai" data-v="chi" class="${CT.loai === 'chi' ? 'on' : ''}">Chi</button><button type="button" data-act="ct-loai" data-v="thu" class="${CT.loai === 'thu' ? 'on' : ''}">Thu</button></div>
-    <input data-so name="so_tien" placeholder="Số tiền" autocomplete="off" inputmode="numeric">
+    <span class="o-tinh"><input data-so data-tinh name="so_tien" placeholder="Số tiền (VD 50k+35k)" autocomplete="off"></span>
     <select name="danh_muc">${dmHien.map(d => `<option>${esc(d)}</option>`).join('')}</select>
     <input name="ghi_chu" placeholder="Ghi chú (VD: cà phê với bạn)">
     <input type="date" name="ngay" value="${th === homNay().slice(0, 7) ? homNay() : tu}">
@@ -300,7 +307,7 @@ function moCT(id) {
   moHop({
     tieuDe: x.loai === 'chi' ? 'Sửa khoản chi' : 'Sửa khoản thu',
     noiDung: `<div class="form luoi-form">
-      <label>Số tiền<input data-so name="so_tien" value="${x.so_tien}"></label>
+      <label>Số tiền <small class="mo">(gõ phép tính được)</small><span class="o-tinh"><input data-so data-tinh name="so_tien" value="${x.so_tien}"></span></label>
       <label>Ngày<input type="date" name="ngay" value="${x.ngay}"></label>
       <label>Danh mục<select name="danh_muc">${[...new Set([...dms, x.danh_muc].filter(Boolean))].map(d => `<option ${d === x.danh_muc ? 'selected' : ''}>${esc(d)}</option>`).join('')}</select></label>
       <label>Ghi chú<input name="ghi_chu" value="${esc(x.ghi_chu || '')}"></label></div>`,
@@ -313,7 +320,7 @@ function moCaiCT() {
   moHop({
     tieuDe: 'Ngân sách & danh mục',
     noiDung: `<div class="form">
-      <label>Ngân sách chi mỗi tháng <small class="mo">(để trống nếu không cần)</small><input data-so name="ns" value="${caiDat('ngan_sach_thang', '') || ''}"></label>
+      <label>Dự chi mặc định mỗi tháng <small class="mo">(tháng nào chưa đặt riêng sẽ dùng số này)</small><span class="o-tinh"><input data-so data-tinh name="ns" value="${caiDat('ngan_sach_thang', '') || ''}"></span></label>
       <label>Danh mục chi <small class="mo">(mỗi dòng một mục)</small><textarea name="chi" rows="6">${esc(dmChi().join('\n'))}</textarea></label>
       <label>Danh mục thu<textarea name="thu" rows="3">${esc(dmThu().join('\n'))}</textarea></label></div>`,
     nut: [{ chu: 'Huỷ', bam: () => { } }, { chu: 'Lưu', kieu: 'chinh', bam: async n => {
@@ -324,7 +331,66 @@ function moCaiCT() {
   });
 }
 
+/* ---- dự chi theo tháng & tổng kết tháng (bản 5.8) ---- */
+function duChi(th) { const r = caiDat('du_chi_thang', {}) || {}; return Number(r[th] != null ? r[th] : caiDat('ngan_sach_thang', 0)) || 0; }
+function soLieuThangCT(th) {
+  const [y, m] = th.split('-').map(Number), tu = `${th}-01`, den = `${th}-${pad(new Date(y, m, 0).getDate())}`;
+  const ds = S.chi_tieu.filter(x => x.ngay >= tu && x.ngay <= den);
+  const tongChi = ds.filter(x => x.loai === 'chi').reduce((a, x) => a + x.so_tien, 0), tongThu = ds.filter(x => x.loai === 'thu').reduce((a, x) => a + x.so_tien, 0);
+  const day = tongKy(tu, den).thucNhan; return { th, m, y, day, tongThu, thuNhap: day + tongThu, tongChi, du: day + tongThu - tongChi, ns: duChi(th) };
+}
+function tongKetThangCT(th, x) {
+  const m = Number(th.slice(5)), lich = [];
+  for (let i = 5; i >= 0; i--) { const d = new Date(Number(th.slice(0, 4)), m - 1 - i, 1); lich.push(soLieuThangCT(`${d.getFullYear()}-${pad(d.getMonth() + 1)}`)); }
+  const max = Math.max(1, ...lich.map(l => Math.max(l.thuNhap, l.tongChi)));
+  const soDuChi = x.ns ? x.ns - x.tongChi : null;
+  return `<section class="the-giay ct-tong-ket"><div class="dau-muc"><h2 class="co-icon">${ICON['tong-ket'] || ''}${x.qua ? 'Tổng kết' : 'Sắp hết'} tháng ${m}</h2>${x.qua ? '' : '<small class="mo">tạm tính tới hôm nay</small>'}</div>
+    <div class="ct-tk-luoi"><div class="ct-tk-chinh">
+      <p class="ct-tk-cau">Tháng ${m} Thầy ${x.du >= 0 ? `dư được <b class="chu-xanh">${tien(x.du)}</b>` : `chi vượt thu nhập <b class="chu-do">${tien(-x.du)}</b>`}.</p>
+      <table class="bang gon ct-tk-bang"><tbody>
+        <tr><td>Học phí đã thu</td><td class="phai">${tien(x.day)}</td></tr>
+        ${x.tongThu ? `<tr><td>Thu nhập khác</td><td class="phai">${tien(x.tongThu)}</td></tr>` : ''}
+        <tr><td>Chi tiêu thực</td><td class="phai">− ${tien(x.tongChi)}</td></tr>
+        <tr class="dam"><td>Dư</td><td class="phai">${tien(x.du)}</td></tr>
+        ${soDuChi != null ? `<tr><td>So với dự chi ${tienGon(x.ns)}</td><td class="phai ${soDuChi >= 0 ? 'chu-xanh' : 'chu-do'}">${soDuChi >= 0 ? `tiết kiệm ${tien(soDuChi)}` : `vượt ${tien(-soDuChi)}`}</td></tr>` : ''}
+      </tbody></table>
+      ${x.dmSap.length ? `<p class="mo nho">Chi nhiều nhất: ${x.dmSap.slice(0, 3).map(([d, v]) => `${esc(d)} ${tienGon(v)}`).join(' · ')}</p>` : ''}
+      ${x.du > 0 && typeof dsQuy === 'function' && dsQuy().length ? `<a class="nut nho" href="#/quy">💰 Góp phần dư vào Quỹ →</a>` : ''}
+    </div>
+    <div class="ct-tk-6"><small class="mo">6 tháng gần nhất · thu nhập / chi / dư</small>${lich.map(l => `<div class="ct-6-dong ${l.th === th ? 'on' : ''}"><span>T${l.m}</span><div class="ct-6-cot"><i class="thu" style="width:${l.thuNhap / max * 100}%"></i><i class="chi" style="width:${l.tongChi / max * 100}%"></i></div>${!l.thuNhap && !l.tongChi ? '<b class="mo">—</b>' : `<b class="${l.du >= 0 ? 'chu-xanh' : 'chu-do'}">${l.du >= 0 ? '+' : '−'}${tienGon(Math.abs(l.du))}</b>`}</div>`).join('')}</div></div>
+  </section>`;
+}
+function moDuChi() {
+  const th = CT.thang, m = Number(th.slice(5)), r = caiDat('du_chi_thang', {}) || {};
+  const tr = (() => { const d = new Date(Number(th.slice(0, 4)), m - 2, 1); return soLieuThangCT(`${d.getFullYear()}-${pad(d.getMonth() + 1)}`); })();
+  moHop({
+    tieuDe: `Dự chi tháng ${m}/${th.slice(0, 4)}`,
+    noiDung: `<div class="form">
+      <label>Số tiền định chi trong tháng <small class="mo">(gõ phép tính được, VD: 3tr+500k)</small><span class="o-tinh"><input data-so data-tinh name="v" value="${duChi(th) || ''}"></span></label>
+      <p class="mo nho">Tháng trước: thu nhập ${tien(tr.thuNhap)} · chi ${tien(tr.tongChi)}${tr.ns ? ` · dự chi ${tien(tr.ns)}` : ''}</p>
+      <label class="st-chk"><input type="checkbox" name="md"> Dùng làm dự chi mặc định cho các tháng chưa đặt</label></div>`,
+    khiMo: ganOTien,
+    nut: [
+      ...(r[th] != null ? [{ chu: 'Bỏ số riêng tháng này', trai: true, bam: async () => { const q = { ...r }; delete q[th]; await luuCaiDat('du_chi_thang', q); ve(); } }] : []),
+      { chu: 'Huỷ', bam: () => { } },
+      { chu: 'Lưu', kieu: 'chinh', bam: async n => { const f = docForm(n); if (f.v != null && isNaN(f.v)) { toast('Phép tính chưa đúng', 'loi'); return false; }
+        await luuCaiDat('du_chi_thang', { ...r, [th]: f.v || 0 }); if (f.md) await luuCaiDat('ngan_sach_thang', f.v || 0); toast('Đã đặt dự chi ✓'); ve(); } }],
+  });
+}
+/* trang Hôm nay: 1–5 đầu tháng nhắc tổng kết tháng trước */
+function ctHomNay() {
+  const hn = homNay(), d = Number(hn.slice(8)); if (d > 5 || !S.chi_tieu || !S.chi_tieu.length) return '';
+  const t = new Date(Number(hn.slice(0, 4)), Number(hn.slice(5, 7)) - 2, 1), th = `${t.getFullYear()}-${pad(t.getMonth() + 1)}`, x = soLieuThangCT(th);
+  return `<section class="the-giay ct-hn"><div class="dau-muc"><h2 class="co-icon">${ICON['chi-tieu']}Tổng kết tháng ${x.m}</h2><a href="#/chi-tieu" data-act="ct-xem-thang" data-th="${th}">Xem →</a></div>
+    <p>Thu nhập ${tien(x.thuNhap)} · chi ${tien(x.tongChi)} → ${x.du >= 0 ? `dư <b class="chu-xanh">${tien(x.du)}</b>` : `<b class="chu-do">âm ${tien(-x.du)}</b>`}${x.ns ? ` · ${x.ns >= x.tongChi ? 'giữ được dự chi ✓' : 'vượt dự chi ' + tienGon(x.tongChi - x.ns)}` : ''}</p></section>`;
+}
+
 /* ================= KHỐI NHỎ TRÊN TRANG CHỦ ================= */
+function theChiemTinhHomNay() {
+  return `<section class="the-giay ct-hom-nay"><div class="dau-muc"><h2 class="co-icon">${ICON['chiem-tinh']}Chiêm tinh hôm nay</h2><a href="#/chiem-tinh">Mở →</a></div>
+      ${cungThay() != null ? theCTHomNay() : `<p class="mo">Thầy chưa lập lá số.</p><a class="nut" href="#/chiem-tinh">Lập lá số</a>`}
+    </section>`;
+}
 function khoiCaNhanHomNay(trong) {
   const hs = S.thoi_quen.filter(h => h.dang_dung !== false).sort((a, b) => (a.thu_tu || 0) - (b.thu_tu || 0) || a.id - b.id);
   const hn = homNay();
@@ -335,14 +401,12 @@ function khoiCaNhanHomNay(trong) {
       ${l79HomNay()}
     </section>
     ${nhacSaoLuu()}
+    ${ctHomNay()}
     ${mfHomNay()}
     ${knHomNay()}
     ${tongKetHomNay()}
     ${mtHomNay()}
     ${quyHomNay()}
     ${stOutfitHomNay()}
-    <section class="the-giay"><div class="dau-muc"><h2 class="co-icon">${ICON['chiem-tinh']}Chiêm tinh hôm nay</h2><a href="#/chiem-tinh">Mở →</a></div>
-      ${cungThay() != null ? theCTHomNay() : `<p class="mo">Thầy chưa lập lá số.</p><a class="nut" href="#/chiem-tinh">Lập lá số</a>`}
-    </section>
   </div>`;
 }
