@@ -1,7 +1,7 @@
 /* HIỆU ỨNG & ÂM THANH (bản 5.4) — phong cách cổ phong, tiết chế.
    Cài đặt lưu theo từng máy (localStorage 'gyq_hieu_ung'). Âm thanh mặc định TẮT và tự im trong giờ dạy. */
 
-const HU_MD = { am: false, amLuong: 0.5, nen: true, giam: false };
+const HU_MD = { am: false, amLuong: 0.5, nen: true, giam: false, mua: 'tu_dong', muaDay: 'vua' };
 let HU = (() => { try { return { ...HU_MD, ...JSON.parse(localStorage.getItem('gyq_hieu_ung') || '{}') }; } catch (e) { return { ...HU_MD }; } })();
 const luuHU = () => { try { localStorage.setItem('gyq_hieu_ung', JSON.stringify(HU)); } catch (e) { } };
 const giamDong = () => HU.giam || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -183,8 +183,10 @@ if (typeof moGiaoDien === 'function') {   // thêm mục "Hiệu ứng & âm tha
     const sm = document.createElement('div'); sm.className = 'hu-cd'; sm.innerHTML = '<h4>Menu</h4><button class="nut nho" type="button" data-sm-mo>⇅ Sắp xếp / ẩn bớt mục trong menu</button>';
     gd.appendChild(sm); sm.querySelector('[data-sm-mo]').addEventListener('click', () => { const x = document.querySelector('.hop-gd'); if (x) x.closest('.hop-nen').remove(); moSapMenu(); });
     gd.appendChild(k);
-    k.querySelectorAll('[data-hu]').forEach(i => i.addEventListener(i.type === 'range' ? 'input' : 'change', () => { const x = i.dataset.hu; HU[x] = i.type === 'checkbox' ? i.checked : Number(i.value); luuHU(); if (x === 'nen' || x === 'giam') chayNen(); }));
+    const km = document.createElement('div'); km.className = 'hu-cd mua-cd'; km.innerHTML = khungMua(); k.insertAdjacentElement('beforebegin', km); ganKhungMua(km);
+    k.querySelectorAll('[data-hu]').forEach(i => i.addEventListener(i.type === 'range' ? 'input' : 'change', () => { const x = i.dataset.hu; HU[x] = i.type === 'checkbox' ? i.checked : Number(i.value); luuHU(); if (x === 'nen' || x === 'giam') chayNen(); if (x === 'giam') { _muaDang = null; veMua(); } }));
     k.querySelector('[data-hu-thu]').addEventListener('click', () => { const bat = HU.am; HU.am = true; AM.thu(); HU.am = bat; HIEU_UNG.hoaDao(); });
   };
 }
 chayNen();
+veMua();

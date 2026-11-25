@@ -1,7 +1,7 @@
 /* Service worker — giúp app mở được khi mạng yếu / mất mạng.
    File của web: lấy bản mới trên mạng trước (để luôn cập nhật), mất mạng thì dùng bản đã lưu.
    Ô bản đồ: lấy bản đã lưu trước cho nhanh. Dữ liệu Supabase: không lưu ở đây. */
-const BAN = 'gyq-5.8';
+const BAN = 'gyq-6.3';
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== BAN && k !== 'gyq-ban-do').map(k => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', e => {

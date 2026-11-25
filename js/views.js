@@ -83,7 +83,7 @@ function vHomNay() {
   <header class="dau-trang">
     <div><p class="mat-tren">${THU[d.getDay()]}, ${ngayVN(hn)}</p>${(() => { try { const nh = AL.nhac(hn); return `<p class="am-lich">☾ Âm lịch ${AL.chu(hn)}${nh ? ` <span class="al-nhac ${nh.hom}">${nh.hom === 'nay' ? '🪷' : '🕯'} ${nh.chu}</span>` : ''}</p>`; } catch (e) { return ''; } })()}<h1>${loiChao().chu} <span class="chao-zh">${loiChao().zh}</span></h1><p class="phu">${ngayOff(hn) ? `🏮 Hôm nay Thầy off: <b>${esc(ngayOff(hn).ten)}</b>. ` : ''}Hôm nay có ${buoiNay.filter(b => b.trang_thai !== 'nghi').length} buổi dạy và ${tuNhac.length + viec.length} việc cần để ý.</p></div>
 
-    <div class="nhom-nut"><button class="nut" data-act="them-viec">＋ Việc</button><button class="nut chinh" data-act="them-buoi" data-ngay="${hn}">＋ Đặt buổi học</button></div>
+    <div class="nhom-nut">${typeof nutMuaNhanh === 'function' ? nutMuaNhanh() : ''}<button class="nut" data-act="them-viec">＋ Việc</button><button class="nut chinh" data-act="them-buoi" data-ngay="${hn}">＋ Đặt buổi học</button></div>
   </header>
   ${theDemNguoc()}
     <section class="the-giay lich-hom-nay">

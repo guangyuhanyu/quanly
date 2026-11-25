@@ -11,7 +11,7 @@ const MT_DO = {
 const MT = { ky: 'thang', nam: Number(homNay().slice(0, 4)), thang: Number(homNay().slice(5, 7)), tuan: dauTuan(homNay()) };
 const nhanTuan = t => `${ngayNgan(t)} – ${ngayNgan(congNgay(t, 6))}`;
 const thangCuaTuan = t => { const d = congNgay(t, 3); return [Number(d.slice(0, 4)), Number(d.slice(5, 7))]; };
-const mtIcon = n => `<img class="ic ic-anh" src="assets/icons/${MT_NHOM[n] || 'goals'}.webp?v=5.8" alt="">`;
+const mtIcon = n => `<img class="ic ic-anh" src="assets/icons/${MT_NHOM[n] || 'goals'}.webp?v=6.3" alt="">`;
 const dsMT = () => caiDat('muc_tieu', []) || [];
 async function luuDsMT(a) { await luuCaiDat('muc_tieu', a); }
 const pad2 = n => String(n).padStart(2, '0');

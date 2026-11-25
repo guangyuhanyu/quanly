@@ -31,7 +31,7 @@ function cacMoc() {
   dsMoc().forEach(m => { const ngay = m.hang_nam ? lanToi(m.ngay.slice(5), hn) : m.ngay; if (ngay >= hn) kq.push({ khoa: m.id, ten: m.ten, ngay, gio: m.gio, icon: m.icon || 'important', ghim: m.ghim, nguon: 'thay', id: m.id }); });
   return kq.sort((a, b) => (b.ghim ? 1 : 0) - (a.ghim ? 1 : 0) || (a.ngay + (a.gio || '')).localeCompare(b.ngay + (b.gio || '')));
 }
-const mocIcon = (i, co = '') => `<img class="ic ic-anh ${co}" src="assets/icons/${i}.webp?v=5.8" alt="">`;
+const mocIcon = (i, co = '') => `<img class="ic ic-anh ${co}" src="assets/icons/${i}.webp?v=6.3" alt="">`;
 function conLai(m) {
   const dich = new Date(`${m.ngay}T${m.gio || '00:00'}:00+07:00`).getTime(), ms = Math.max(0, dich - Date.now());
   return { ms, ngay: Math.floor(ms / 864e5), gio: Math.floor(ms / 36e5) % 24, phut: Math.floor(ms / 6e4) % 60, giay: Math.floor(ms / 1e3) % 60 };
