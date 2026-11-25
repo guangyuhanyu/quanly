@@ -293,7 +293,7 @@ function moXuatPNG(lopId, mau) {
         $$('[data-xp=lang]', n).forEach(b => b.classList.toggle('on', b.dataset.v === st.lang));
         $('[data-chi="02"]', n).style.display = st.mau === '02' ? '' : 'none';
         $('[data-khoa-sau]', n).style.display = st.khoaSau ? '' : 'none';
-        const src = `templates/png${st.mau}.html?v=6.3`;
+        const src = `templates/png${st.mau}.html?v=6.4`;
         const dien = () => { const w = khung.contentWindow; if (!w.dien) return setTimeout(dien, 60); w.dien(duLieuPNG(L, khoaTheoId(st.khoa), st.mau, st), st.lang); setTimeout(() => { khung.style.height = w.document.documentElement.scrollHeight + 'px'; }, 120); };
         if (!khung.src.endsWith(src)) { khung.onload = dien; khung.src = src; } else dien();
       };
