@@ -6,7 +6,8 @@
 <title>PNG 02 · Theo dõi buổi học & học phí</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Serif:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fonts.css?v=6.6">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --sky-light: #C9D5D9;
@@ -33,7 +34,7 @@
   }
 
   body {
-    font-family: 'Noto Serif', 'Noto Serif SC', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     color: var(--ink);
     display: flex;
     justify-content: center;
@@ -112,7 +113,7 @@
   .header-inner { position: relative; z-index: 2; }
 
   .brand-cn {
-    font-family: 'Noto Serif SC', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     font-weight: 700;
     font-size: 10.5px;
     letter-spacing: 0.3em;
@@ -121,7 +122,7 @@
   }
 
   .brand-title {
-    font-family: 'Noto Serif SC', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     font-weight: 900;
     font-size: clamp(18px, 4vw, 22px);
     color: #FBF6E9;
@@ -131,7 +132,7 @@
   }
 
   .brand-sub {
-    font-family: 'Noto Serif', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     font-weight: 600;
     font-size: 9.5px;
     letter-spacing: 0.22em;
@@ -148,7 +149,7 @@
   }
 
   .header-intro {
-    font-family: 'Noto Serif SC', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     font-weight: 600;
     font-style: italic;
     font-size: 12px;
@@ -194,7 +195,7 @@
   }
 
   .section-title {
-    font-family: 'Noto Serif SC', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     font-weight: 700;
     font-size: 15px;
     letter-spacing: 0.12em;
@@ -228,7 +229,7 @@
 
   .th-vn {
     display: block;
-    font-family: 'Noto Serif SC', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     font-weight: 700;
     font-size: 12px;
     color: var(--maroon-deep);
@@ -236,7 +237,7 @@
 
   .th-cn {
     display: block;
-    font-family: 'Noto Serif SC', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     font-size: 10px;
     color: var(--ink-soft);
     margin-top: 2px;
@@ -265,7 +266,7 @@
   /* STT cell dùng để bấm mở lớp */
   .stt-cell {
     cursor: pointer;
-    font-family: 'Noto Serif SC', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     font-weight: 700;
     color: var(--maroon-deep);
     position: relative;
@@ -294,7 +295,7 @@
     color: #FBF6E9;
     border: none;
     border-radius: 20px;
-    font-family: 'Noto Serif SC', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     font-weight: 700;
     font-size: 11.5px;
     letter-spacing: 0.06em;
@@ -313,7 +314,7 @@
     color: #FBF6E9;
     border: 1px solid rgba(251,246,233,0.4);
     border-radius: 20px;
-    font-family: 'Noto Serif SC', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     font-weight: 700;
     font-size: 11px;
     letter-spacing: 0.05em;
@@ -357,7 +358,7 @@
   }
 
   .sig-name {
-    font-family: 'Noto Serif SC', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     font-weight: 700;
     font-size: 15px;
     letter-spacing: 0.04em;
@@ -391,12 +392,14 @@
     height: 66px;
     object-fit: cover;
     border-radius: 8px;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.4);
-    border: 2px solid #FBF6E9;
+    border: 3px solid #FBF6E9;
+    background: #FBF6E9;
+    box-shadow: none;
+    display: block;
   }
 
   .qr-caption {
-    font-family: 'Noto Serif SC', serif;
+    font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     font-weight: 700;
     font-size: 9.5px;
     letter-spacing: 0.09em;
@@ -456,7 +459,7 @@
   .tracker-table td { font-size: 12.5px; line-height: 1.5; }
   table.log-table { min-width: 0; }
   .log-table th:first-child { white-space: nowrap; width: 56px; }
-  .log-table td.c-stt { width: 56px; font-family: 'Noto Serif SC', serif; font-weight: 700; color: var(--maroon-deep); }
+  .log-table td.c-stt { width: 56px; font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif; font-weight: 700; color: var(--maroon-deep); }
   .log-table td.c-ngay { width: 150px; white-space: nowrap; }
   .log-table td.c-nd { text-align: left; }
   .log-table td.c-nd small { color: var(--ink-faint); font-style: italic; }
@@ -464,18 +467,18 @@
   section.card + section.card { padding-top: 4px; }
   .pay-grid { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
   .pay-row { display: flex; align-items: baseline; gap: 12px; padding-bottom: 3px; border-bottom: 1px dashed rgba(43,32,19,0.28); }
-  .pay-label { font-family: 'Noto Serif SC', serif; font-weight: 700; font-size: 12px; color: var(--ink); white-space: nowrap; min-width: 150px; }
+  .pay-label { font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif; font-weight: 700; font-size: 12px; color: var(--ink); white-space: nowrap; min-width: 150px; }
   .pay-fill { flex: 1; font-size: 12.5px; color: var(--maroon-deep); font-weight: 600; outline: none; }
   .tracker-table td.editable:focus, .pay-fill:focus { background: rgba(124,44,32,0.08); }
   body.zh .th-cn { display: none; }
   body.zh .th-vn { font-size: 12.5px; letter-spacing: 0.06em; }
-  body.zh .notes-intro, body.zh .header-intro { font-family: 'Noto Serif SC', serif; }
+  body.zh .notes-intro, body.zh .header-intro { font-family: 'Noto Serif', 'Noto Serif SC', 'Songti SC', 'STSong', serif; }
   body.zh .section-title { letter-spacing: 0.2em; }
   .dang-chup [contenteditable]:empty::before { content: none !important; }
   #sum-head th:nth-child(-n+2), #sum-body td:nth-child(-n+2) { white-space: nowrap; }
 </style>
 </head>
-<body>
+<body spellcheck="false">
 <div class="sheet">
   <div class="sheet-inner">
       <header class="header">
@@ -535,13 +538,13 @@
 
       <div class="qr-footer">
         <div class="qr-col">
-          <img class="qr-img" src="../assets/qr-zalo.webp" alt="Mã QR Zalo">
+          <img class="qr-img" crossorigin="anonymous" decoding="sync" src="../assets/qr-zalo.png" alt="Mã QR Zalo">
           <p class="qr-caption" id="t-qr1">Liên hệ Zalo</p>
           <p class="qr-detail">0358 840 411</p>
         </div>
         <div class="qr-divider"></div>
         <div class="qr-col">
-          <img class="qr-img" src="../assets/qr-chuyen-khoan.webp" alt="Mã QR chuyển khoản học phí">
+          <img class="qr-img" crossorigin="anonymous" decoding="sync" src="../assets/qr-chuyen-khoan.png" alt="Mã QR chuyển khoản học phí">
           <p class="qr-caption" id="t-qr2">Chuyển khoản học phí</p>
           <p class="qr-detail">1098 7076 3995 · Chi Quang Vy · VietinBank</p>
         </div>
@@ -551,8 +554,8 @@
   </div>
 </div>
 
-<script src="../vendor/modern-screenshot.js?v=5.6"></script>
-<script src="chup.js?v=5.6"></script>
+<script src="../vendor/modern-screenshot.js?v=6.6"></script>
+<script src="chup.js?v=6.6"></script>
 <script>
 const CHU = {
   vi: {
