@@ -182,7 +182,7 @@ const HD = {
 };
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el) return;
-  const f = HD[el.dataset.act] || HD_L79[el.dataset.act] || HD_MT[el.dataset.act] || HD_ST[el.dataset.act] || HD_QY[el.dataset.act] || HD_TK[el.dataset.act] || HD_KN[el.dataset.act] || HD_DN[el.dataset.act] || HD_FC[el.dataset.act] || HD_MF[el.dataset.act] || HD_LH[el.dataset.act] || (typeof HD_MUA !== 'undefined' && HD_MUA[el.dataset.act]); if (!f) return;
+  const f = HD[el.dataset.act] || HD_L79[el.dataset.act] || HD_MT[el.dataset.act] || HD_ST[el.dataset.act] || HD_QY[el.dataset.act] || HD_TK[el.dataset.act] || HD_KN[el.dataset.act] || HD_DN[el.dataset.act] || HD_FC[el.dataset.act] || HD_MF[el.dataset.act] || HD_LH[el.dataset.act] || (typeof HD_MUA !== 'undefined' && HD_MUA[el.dataset.act]) || (typeof HD_CONG !== 'undefined' && HD_CONG[el.dataset.act]); if (!f) return;
   const chay = async () => {
     try {
       if (CHI_DOC && !/^(mo-|st-tab|l79-xem|tk-|mt-tuan|mt-nam|mt-chon|kn-mo|kn-loc|st-loc|mp-loc|st-dip|sk-buoi|chi-tiet|giao-dien)/.test(el.dataset.act)) { toast('Đang mất mạng, chỉ xem được. Có mạng lại Thầy thao tác tiếp nhé.', 'canh'); return; }
@@ -197,6 +197,7 @@ document.addEventListener('change', e => {
   const el = e.target;
   if (el.dataset.actChange === 'chon-khoa') { CHON_KHOA[Number(el.dataset.lop)] = Number(el.value); ve(); }
   if (el.dataset.change === 'khoi-phuc' && el.files[0]) khoiPhuc(el.files[0]);
+  if (typeof HD_CONG_DOI !== 'undefined' && HD_CONG_DOI[el.dataset.actChange]) HD_CONG_DOI[el.dataset.actChange](el);
   if (el.dataset.actChange === 'tq-chon') { TQ.chon = Number(el.value); ve(); }
   if (el.dataset.actChange === 'l79-start') l79DoiNgayBatDau(el.value);
   if (el.dataset.actChange === 'kn-nam') { KN.nam = el.value; ve(); }
@@ -293,7 +294,7 @@ function moXuatPNG(lopId, mau) {
         $$('[data-xp=lang]', n).forEach(b => b.classList.toggle('on', b.dataset.v === st.lang));
         $('[data-chi="02"]', n).style.display = st.mau === '02' ? '' : 'none';
         $('[data-khoa-sau]', n).style.display = st.khoaSau ? '' : 'none';
-        const src = `templates/png${st.mau}.html?v=6.4`;
+        const src = `templates/png${st.mau}.html?v=6.6`;
         const dien = () => { const w = khung.contentWindow; if (!w.dien) return setTimeout(dien, 60); w.dien(duLieuPNG(L, khoaTheoId(st.khoa), st.mau, st), st.lang); setTimeout(() => { khung.style.height = w.document.documentElement.scrollHeight + 'px'; }, 120); };
         if (!khung.src.endsWith(src)) { khung.onload = dien; khung.src = src; } else dien();
       };

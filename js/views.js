@@ -95,6 +95,7 @@ function vHomNay() {
       </div></div>
     </section>
   ${theTongKetHomNay()}
+  ${typeof hsHomNay === 'function' ? hsHomNay() : ''}
   ${theChiemTinhHomNay()}
   <div class="o-so">
     <div class="o-so-the bam" data-act="chi-tiet-so" data-loai="buoi_tuan" data-tu="${tuan}" data-den="${congNgay(tuan, 6)}"><i class="o-so-icon">${ICON['den-long']}</i><span>Buổi dạy tuần này</span><b>${soTuan}</b><small>${ngayNgan(tuan)} – ${ngayNgan(congNgay(tuan, 6))}</small></div>
@@ -316,6 +317,8 @@ function moBuoi({ id, ngay, gio, lopId, dat } = {}) {
         <p class="giai-thich" id="gt-tt"></p></div>
       <label class="ca-dong dong-tinh-phi"><input type="checkbox" name="tinh_phi" ${v.tinh_phi !== false ? 'checked' : ''}> Trừ buổi &amp; tính học phí cho buổi này</label>
       <label class="ca-dong">Nội dung bài học<textarea name="noi_dung" rows="3" placeholder="VD: Bài 5 – 我的家 · từ vựng + ngữ pháp 有/没有">${esc(v.noi_dung || '')}</textarea></label>
+      <label class="ca-dong">Bài tập về nhà <small class="mo">(hiện trên trang học viên)</small><textarea name="bai_tap" rows="2" placeholder="VD: Làm bài 1–3 trang 45 · chép từ mới 3 lần">${esc(v.bai_tap || '')}</textarea></label>
+      <label class="ca-dong">Link bài giảng <small class="mo">(học viên bấm để ôn lại)</small><input name="link_bai" type="url" list="ds-link-bai" value="${esc(v.link_bai || '')}" placeholder="https://guangyuhanyu.github.io/q1/…"><datalist id="ds-link-bai">${[...new Set(S.buoi_hoc.filter(x => x.link_bai && (!v.lop_id || x.lop_id === v.lop_id)).sort(soBuoi).reverse().map(x => x.link_bai))].slice(0, 8).map(u => `<option value="${esc(u)}">`).join('')}</datalist></label>
       <label class="ca-dong">Ghi chú<input name="ghi_chu" value="${esc(v.ghi_chu || '')}" placeholder="VD: học bù cho buổi 12/11"></label>
       ${!b ? `<label class="ca-dong lap">Lặp lại hằng tuần <input type="number" name="lap" value="1" min="1" max="30" style="width:70px"> lần <small class="mo">(VD: 8 → đặt luôn 8 tuần cùng giờ)</small></label>` : ''}
     </div>`,
@@ -327,6 +330,9 @@ function moBuoi({ id, ngay, gio, lopId, dat } = {}) {
         if (!lop_id) { toast('Thầy chọn lớp giúp em', 'loi'); return false; }
         if (!f.ngay) { toast('Thiếu ngày học', 'loi'); return false; }
         const row = { ngay: f.ngay, gio_bat_dau: f.gio_bat_dau, thoi_luong_phut: f.thoi_luong_phut || 90, trang_thai: f.trang_thai, tinh_phi: f.trang_thai === 'da_day' ? f.tinh_phi : true, noi_dung: f.noi_dung, ghi_chu: f.ghi_chu };
+        const coCot = S.buoi_hoc.some(x => 'bai_tap' in x);
+        if (coCot || f.bai_tap) row.bai_tap = f.bai_tap || null;
+        if (coCot || f.link_bai) row.link_bai = f.link_bai || null;
         if (f.khoa_id) row.khoa_id = Number(f.khoa_id);
         const off = ngayOff(row.ngay);
         if (off && row.trang_thai === 'du_kien' && (!b || b.ngay !== row.ngay) && !(await hoi(`${ngayVN(row.ngay)} là ngày off (<b>${esc(off.ten)}</b>). Vẫn đặt buổi?`, 'Vẫn đặt'))) return false;
@@ -449,6 +455,7 @@ function vChiTietLop(id) {
       <button class="nut chinh" data-act="xuat-png" data-lop="${L.id}" data-mau="02">PNG Buổi học & học phí</button></div>
   </header>
   ${theLichLop(L)}
+  ${typeof theCongLop === 'function' ? theCongLop(L) : ''}
   ${k ? `
   <section class="the-giay khoa-the">
     <div class="dau-muc"><h2>Khoá ${k.ma} ${k === kht ? '<small class="mo">(đang học)</small>' : k.ket_thuc ? '<small class="mo">(đã đóng)</small>' : ''}</h2>
@@ -485,7 +492,7 @@ function vChiTietLop(id) {
   <div class="luoi-2">
     <section class="the-giay">
       <div class="dau-muc"><h2>Học viên (${hv.length})</h2><button class="nut nho" data-act="sua-lop" data-lop="${L.id}">Thêm / bớt</button></div>
-      ${hv.length ? `<div class="ds-hv-the">${hv.map(h => `<div class="hv-the" data-act="sua-hv" data-id="${h.id}"><div><b>${esc(h.ten_goi || h.ho_ten)}</b> <span class="ma">${h.ma}</span>${h.ngon_ngu === 'zh' ? ' ' + the('中文') : ''}<small class="mo">${esc(h.sdt || '')}${h.ngay_sinh ? ' · 🎂 ' + ngayNgan(h.ngay_sinh) : ''}</small></div>
+      ${hv.length ? `<div class="ds-hv-the">${hv.map(h => `<div class="hv-the" data-act="sua-hv" data-id="${h.id}"><div><b>${esc(h.ten_goi || h.ho_ten)}</b> <span class="ma">${h.ma}</span>${h.ngon_ngu === 'zh' ? ' ' + the('中文') : ''}<small class="mo">${esc(h.sdt || '')}${h.email ? ' · ' + esc(h.email) : ''}${h.ngay_sinh ? ' · 🎂 ' + ngayNgan(h.ngay_sinh) : ''}</small></div>
         ${h.muc_tieu ? `<p>🎯 ${esc(h.muc_tieu)}</p>` : ''}${h.diem_yeu ? `<p class="diem-yeu">⚠ ${esc(h.diem_yeu)}</p>` : ''}${!h.muc_tieu && !h.diem_yeu ? '<p class="mo nho">Bấm để thêm sinh nhật, mục tiêu, điểm yếu</p>' : ''}</div>`).join('')}</div>` : oTrong('Chưa có học viên.')}
     </section>
     <section class="the-giay">
@@ -696,6 +703,7 @@ function moHocVien(id) {
       <label>Tên gọi (cách Thầy gọi)<input name="ten_goi" value="${esc(h ? h.ten_goi || '' : '')}" placeholder="VD: Chị Thuỳ"></label>
       <label>Họ và tên<input name="ho_ten" value="${esc(h ? h.ho_ten : '')}" placeholder="VD: Nguyễn Thị Thuỳ"></label>
       <label>Số điện thoại / Zalo<input name="sdt" value="${esc(h ? h.sdt || '' : '')}"></label>
+      <label>Gmail<input name="email" type="email" value="${esc(h ? h.email || '' : '')}" placeholder="ten@gmail.com"></label>
       <label>Ngôn ngữ báo cáo<select name="ngon_ngu"><option value="vi">Tiếng Việt</option><option value="zh" ${h && h.ngon_ngu === 'zh' ? 'selected' : ''}>中文</option></select></label>
       <label class="ca-dong">Thuộc lớp<select name="lop_them"><option value="">— Không thêm vào lớp nào —</option>${S.lop.filter(L => L.dang_hoat_dong && !lopCo.includes(L.id)).map(L => `<option value="${L.id}">${esc(L.ten)} · ${L.ma}</option>`).join('')}</select>
         ${lopCo.length ? `<small class="mo">Đang ở: ${lopCo.map(i => esc(lopTheoId(i).ten)).join(', ')}</small>` : ''}</label>
@@ -711,7 +719,9 @@ function moHocVien(id) {
       { chu: 'Huỷ', bam: () => {} },
       { chu: 'Lưu', kieu: 'chinh', bam: async n => {
         const f = docForm(n); if (!f.ho_ten && !f.ten_goi) { toast('Thiếu tên học viên', 'loi'); return false; }
-        const r = await luu('hoc_vien', { ho_ten: f.ho_ten || f.ten_goi, ten_goi: f.ten_goi || f.ho_ten, sdt: f.sdt, ngon_ngu: f.ngon_ngu, ghi_chu: f.ghi_chu, ngay_sinh: f.ngay_sinh, muc_tieu: f.muc_tieu, diem_yeu: f.diem_yeu }, h && h.id);
+        const rowHV = { ho_ten: f.ho_ten || f.ten_goi, ten_goi: f.ten_goi || f.ho_ten, sdt: f.sdt, ngon_ngu: f.ngon_ngu, ghi_chu: f.ghi_chu, ngay_sinh: f.ngay_sinh, muc_tieu: f.muc_tieu, diem_yeu: f.diem_yeu };
+        if (S.hoc_vien.some(x => 'email' in x) || f.email) rowHV.email = f.email || null;
+        const r = await luu('hoc_vien', rowHV, h && h.id);
         if (f.lop_them) { await DBX.insert('lop_hoc_vien', { lop_id: Number(f.lop_them), hoc_vien_id: r.id }); S.lop_hoc_vien.push({ lop_id: Number(f.lop_them), hoc_vien_id: r.id }); }
         toast(h ? 'Đã lưu' : `Đã thêm ${r.ma} ✓`); ve();
       } }],

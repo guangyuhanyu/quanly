@@ -10,7 +10,7 @@ const KN_DIP = {
 const KN = { loc: 'Tất cả', nam: 'Tất cả', ban_do: null, mo: null };
 const dsKN = () => caiDat('ky_niem', []) || [];
 async function luuKN(a) { await luuCaiDat('ky_niem', a); }
-const knIcon = (dip, co = '') => `<img class="ic ic-anh ${co}" src="assets/icons/${(KN_DIP[dip] || KN_DIP['Khác'])[0]}.webp?v=6.4" alt="">`;
+const knIcon = (dip, co = '') => `<img class="ic ic-anh ${co}" src="assets/icons/${(KN_DIP[dip] || KN_DIP['Khác'])[0]}.webp?v=6.6" alt="">`;
 const knAnh = (x, i) => layAnhCache(`anh:kn_${x.id}_${i}`);
 
 /* ----- ảnh: nén + đọc vị trí/ngày chụp từ EXIF (nếu ảnh còn giữ) ----- */
