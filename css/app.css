@@ -1554,7 +1554,7 @@ body.fc-dang-mo{overflow:hidden}
 .cong-ma b{font-family:'SF Mono',ui-monospace,Menlo,monospace;font-size:24px;letter-spacing:.12em;color:var(--maroon-deep);background:#FBF3E4;border:1px dashed #D9BF8F;border-radius:10px;padding:4px 14px}
 .cong-link{word-break:break-all;margin:2px 0 8px}
 .cong-zoom{display:flex;flex-direction:column;gap:4px;font-size:13.5px;margin-bottom:8px}
-.cong-zoom input{padding:8px 10px;border:1px solid var(--vien);border-radius:9px;font:inherit}
+.cong-zoom input,.cong-zoom select{padding:8px 10px;border:1px solid var(--vien);border-radius:9px;font:inherit}
 .hs-moi{border-left:4px solid #C9964A}
 .hs-ds{display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow:auto}
 .hs-dong{border:1px solid var(--vien);border-radius:12px;padding:10px 12px;background:#fff}

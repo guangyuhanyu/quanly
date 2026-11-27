@@ -112,6 +112,7 @@ function theCongLop(L) {
     ${!coSupa() ? '<p class="mo">Cần dùng chế độ Supabase (online) để học viên tra cứu được.</p>' : CONG.loi === 'chua_sql' ? '<p class="canh-bao">Supabase chưa có phần trang học viên. Thầy chạy file <b>supabase/6-trang-hoc-vien.sql</b> một lần (hướng dẫn trong tin nhắn em gửi), rồi tải lại trang.</p>' : ''}
     ${c ? `<div class="cong-ma"><span>Mã lớp</span><b>${maDep(c.ma)}</b><button class="nut nho" data-act="cong-chep" data-lop="${L.id}">📋 Chép tin nhắn gửi Zalo</button></div>
       <p class="mo nho cong-link">${esc(link)}</p>
+      <label class="cong-zoom">Link gửi học viên mở ở <select data-act-change="cong-url"><option value="">Trang lớp riêng (guangyuhanyu.github.io/lop)</option><option value="https://guangyuhanyu.github.io/" ${caiDat('cong_url', '') === 'https://guangyuhanyu.github.io/' ? 'selected' : ''}>Trang chủ, lớp hiện thành lớp phủ</option></select></label>
       <label class="cong-zoom">Link Zoom của lớp <input data-act-change="cong-zoom" data-lop="${L.id}" type="url" value="${esc(c.zoom || '')}" placeholder="https://zoom.us/j/…"></label>
       <p class="mo nho">${thieu.length ? `Còn thiếu SĐT / Gmail / ngày sinh: ${thieu.map(h => esc(h.ten_goi || h.ho_ten)).join(', ')}, học viên tự điền được trên trang.` : 'Hồ sơ học viên đã đủ SĐT, Gmail và ngày sinh ✓'}${CONG.luc ? ` · Đồng bộ lúc ${CONG.luc.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}` : ''}</p>
       <div class="nhom-nut trai"><button class="nut nho" data-act="tl-kho" data-lop="${L.id}">📚 Kho tài liệu (${tlCuaLop(L.id).length})</button><a class="nut nho" href="${esc(link)}" target="_blank" rel="noopener">👁 Xem như học viên</a><button class="nut nho" data-act="cong-doi-ma" data-lop="${L.id}">↻ Đổi mã</button><button class="nut nho" data-act="cong-bat" data-lop="${L.id}">${c.bat !== false ? 'Tắt tra cứu' : 'Mở lại tra cứu'}</button></div>`
@@ -132,7 +133,7 @@ const HD_CONG = {
   'hs-duyet': () => moDuyetHoSo(),
   'tl-kho': el => moKhoTL(Number(el.dataset.lop)),
 };
-const HD_CONG_DOI = { 'cong-zoom': async el => { await luuCong(el.dataset.lop, { zoom: el.value.trim() }); toast('Đã lưu link Zoom ✓'); } };
+const HD_CONG_DOI = { 'cong-url': async el => { await luuCaiDat('cong_url', el.value); toast(el.value ? 'Link gửi học viên sẽ mở trang chủ ✓' : 'Link gửi học viên sẽ mở trang lớp riêng ✓'); ve(); }, 'cong-zoom': async el => { await luuCong(el.dataset.lop, { zoom: el.value.trim() }); toast('Đã lưu link Zoom ✓'); } };
 
 /* khởi động: đồng bộ 1 lần + tải hồ sơ chờ duyệt, rồi kiểm tra định kỳ */
 setTimeout(() => { henDongBo(true); taiHoSo(true); }, 2500);
