@@ -10,7 +10,7 @@ const QY = { mo: null };
 const dsQuy = () => caiDat('quy', []) || [];
 async function luuQuy(a) { await luuCaiDat('quy', a); }
 const soDuQuy = q => (q.ghi || []).reduce((s, g) => s + Number(g.so_tien), 0);
-const quyIcon = q => `<img class="ic ic-anh" src="assets/icons/${QUY_ICON[q.icon] || q.icon || 'goals'}.webp?v=6.6" alt="">`;
+const quyIcon = q => `<img class="ic ic-anh" src="assets/icons/${QUY_ICON[q.icon] || q.icon || 'goals'}.webp?v=6.8" alt="">`;
 
 function chiTieuTB3Thang() {
   const hn = homNay(), tu = congNgay(hn, -90);

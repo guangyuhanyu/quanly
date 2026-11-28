@@ -16,7 +16,7 @@ async function luuUoc(a) { await luuCaiDat('manifest', a); }
 const ghiMF = () => caiDat('manifest_ghi', {}) || {};
 const dsThu = () => caiDat('thu_tuong_lai', []) || [];
 async function luuThu(a) { await luuCaiDat('thu_tuong_lai', a); }
-const mfIcon = (m, co = '') => `<img class="ic ic-anh ${co}" src="assets/icons/${(MF_MANG[m] || MF_MANG['Khác'])[0]}.webp?v=6.6" alt="">`;
+const mfIcon = (m, co = '') => `<img class="ic ic-anh ${co}" src="assets/icons/${(MF_MANG[m] || MF_MANG['Khác'])[0]}.webp?v=6.8" alt="">`;
 const mfMau = m => (MF_MANG[m] || MF_MANG['Khác'])[1];
 const mfAnh = (x, i = 0) => layAnhCache(`anh:mf_${x.id}_${i}`);
 const mfMung = () => { try { HIEU_UNG.hac(); AM.datMucTieu(); } catch (e) { } };

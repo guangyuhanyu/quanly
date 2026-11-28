@@ -8,6 +8,11 @@ const CONG_URL_MD = 'https://guangyuhanyu.github.io/lop/';
 const congCD = () => caiDat('cong_lop', {}) || {};
 const congUrl = () => caiDat('cong_url', '') || CONG_URL_MD;
 const coSupa = () => !!(DBX && DBX.sb);
+/* dữ liệu khối "Trang theo dõi lớp học" trong PNG (chỉ khi lớp đã có mã và đang bật) */
+function congPNG(L) {
+  const c = congCD()[L.id]; if (!c || !c.ma || c.bat === false) return null;
+  const u = congUrl(); return { link: `${u}?ma=${c.ma}`, dia_chi: u.replace(/^https?:\/\//, '').replace(/\/$/, ''), ma: maDep(c.ma) };
+}
 const maDep = m => m ? m.slice(0, 4) + '-' + m.slice(4) : '';
 function taoMaLop() {
   const chu = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', a = new Uint32Array(8); crypto.getRandomValues(a);
@@ -37,7 +42,7 @@ function banTomTat(L) {
     buoi = S.buoi_hoc.filter(b => b.lop_id === L.id && (b.khoa_id === k.id || (b.trang_thai === 'du_kien' && b.ngay >= hn)) && b.trang_thai !== 'huy').sort(soBuoi)
       .map(b => ({ id: b.id, ngay: b.ngay, gio: b.gio_bat_dau || '', phut: b.thoi_luong_phut || k.thoi_luong_phut || 90, tt: b.trang_thai, tinh: b.trang_thai === 'da_day' ? tinhBuoi(b) : undefined, nd: b.noi_dung || '', bt: b.bai_tap || '', link: b.link_bai || '', lydo: b.trang_thai === 'nghi' ? (b.ghi_chu || '').replace(/^Nghỉ:\s*/, '').split(' · ')[0] : '', tl: tlCuaLop(L.id).filter(t => t.buoi === b.id).map(t => t.id) }));
     const duKien = buoi.filter(b => b.tt === 'du_kien');
-    khoa = { ma: k.ma, giao_trinh: k.giao_trinh || '', muc_tieu: k.muc_tieu || '', bd: k.ngay_bat_dau || (t.ngayDau || ''), kt: duKien.length ? duKien[duKien.length - 1].ngay : (t.ngayCuoi || ''), tong: t.tong, da_hoc: t.daHoc, con_lai: Math.max(0, t.conLai), vuot: t.conLai < 0 ? -t.conLai : 0, tl: k.thoi_luong_phut || 90, hoc_phi: tien(k.hoc_phi), hp, sau, lich: k.lich_hoc || (typeof chuLichLop === 'function' && lichLop(L.id).kieu === 'co_dinh' ? chuLichLop(lichLop(L.id)) : '') };
+    khoa = { ma: k.ma, giao_trinh: k.giao_trinh || '', muc_tieu: k.muc_tieu || '', bd: k.ngay_bat_dau || (t.ngayDau || ''), kt: duKien.length ? duKien[duKien.length - 1].ngay : (t.ngayCuoi || ''), tong: t.tong, da_hoc: t.daHoc, con_lai: Math.max(0, t.conLai), vuot: t.conLai < 0 ? -t.conLai : 0, tl: k.thoi_luong_phut || 90, theo_gio: !!t.theoGio, so_buoi_day: t.soBuoiDay, hoc_phi: tien(k.hoc_phi), hp, sau, lich: k.lich_hoc || (typeof chuLichLop === 'function' && lichLop(L.id).kieu === 'co_dinh' ? chuLichLop(lichLop(L.id)) : '') };
   }
   const off = (typeof dsOff === 'function' ? dsOff() : []).filter(o => (o.den || o.tu) >= hn).sort((a, b) => a.tu.localeCompare(b.tu)).slice(0, 6).map(o => ({ ten: o.ten, tu: o.tu, den: o.den || o.tu }));
   return { bat: c.bat !== false, lop: L.ten, loai: L.loai, trinh_do: trinhDoCua(L, k) || '', hoc_vien: hv, khoa, buoi, off, zoom: c.zoom || '', zalo: '0358840411', tk: typeof TK_NGAN_HANG !== 'undefined' ? TK_NGAN_HANG : '', luu_y: LUU_Y_LOP, nguong: nguongGiaHan(), tai_lieu: tlCuaLop(L.id).map(t => ({ id: t.id, ten: t.ten, loai: t.loai, url: t.url, ghi: t.ghi || '', ngay: t.ngay, buoi: t.buoi || null })) };

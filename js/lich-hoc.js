@@ -99,7 +99,7 @@ function sinhNgay(slots, tu, n, lopId, boQuaIds = []) {
 }
 function soCanXep(lopId) {
   const k = khoaHienTai(lopId); if (!k) return { k: null, can: 0 };
-  const t = tk(k); return { k, t, can: Math.max(0, t.conLai - t.duKien.length) };
+  const t = tk(k); return { k, t, can: Math.max(0, Math.ceil(t.conLai) - t.duKien.length) };
 }
 function theLichLop(L) {
   const ll = lichLop(L.id), { k, t, can } = soCanXep(L.id), hn = homNay();
@@ -108,7 +108,7 @@ function theLichLop(L) {
   return `<section class="the-giay lich-lop">
     <div class="dau-muc"><h2 class="co-icon">${ICON.lich}Lịch học</h2><span class="the ${ll.kieu === 'co_dinh' ? 'xanh' : ''}">${ll.kieu === 'co_dinh' ? 'Cố định' : 'Linh hoạt'}</span></div>
     <p class="ll-chu">${ll.kieu === 'co_dinh' && ll.slots.length ? ll.slots.slice().sort((a, b) => ((a.thu || 7) - (b.thu || 7))).map(s => `<span class="ll-slot"><b>${THU_TEN[s.thu]}</b> ${s.gio || '—'} <small>${thoiLuongChu(s.phut || 90)}</small></span>`).join('') : '<span class="mo">Chưa có lịch cố định. Lớp học giờ thay đổi thì bấm "Chọn lại lịch" để xếp từng buổi.</span>'}</p>
-    <p class="mo nho">${k ? `Khoá ${k.ma}: còn ${t.conLai} buổi chưa dạy · đã xếp ${t.duKien.length}${can ? ` · <b class="chu-cam">còn ${can} buổi chưa có ngày</b>` : ' ✓'}` : 'Lớp chưa có khoá học.'}${sapToi.length ? ` · buổi tới: ${THU_NGAN[s2d(sapToi[0].ngay).getDay()]} ${ngayNgan(sapToi[0].ngay)} ${sapToi[0].gio_bat_dau || ''}` : ''}${offToi.length ? ` · 🏮 off: ${offToi.map(o => esc(o.ten) + ' ' + ngayNgan(o.tu)).join(', ')}` : ''}</p>
+    <p class="mo nho">${k ? `Khoá ${k.ma}: còn ${luongChu(t, t.conLai)} chưa dạy${t.theoGio ? ` (≈ ${Math.max(0, Math.ceil(t.conLai))} buổi ${thoiLuongChu(t.tl)})` : ''} · đã xếp ${t.duKien.length}${can ? ` · <b class="chu-cam">còn ${can} buổi chưa có ngày</b>` : ' ✓'}` : 'Lớp chưa có khoá học.'}${sapToi.length ? ` · buổi tới: ${THU_NGAN[s2d(sapToi[0].ngay).getDay()]} ${ngayNgan(sapToi[0].ngay)} ${sapToi[0].gio_bat_dau || ''}` : ''}${offToi.length ? ` · 🏮 off: ${offToi.map(o => esc(o.ten) + ' ' + ngayNgan(o.tu)).join(', ')}` : ''}</p>
     <div class="nhom-nut trai">
       <button class="nut ${ll.kieu === 'co_dinh' ? '' : 'chinh'}" data-act="ll-chon-lai" data-lop="${L.id}">✎ Chọn lại lịch</button>
       <button class="nut ${ll.kieu === 'co_dinh' ? 'chinh' : ''}" data-act="ll-co-dinh" data-lop="${L.id}">${ll.kieu === 'co_dinh' ? '↻ Đổi lịch cố định' : '＋ Đặt lịch cố định'}</button>
@@ -163,7 +163,7 @@ function moLichCoDinh(lopId, chiXep) {
     const xoa = f.xep_lai ? S.buoi_hoc.filter(b => b.lop_id === lopId && b.trang_thai === 'du_kien' && b.ngay >= tu) : [];
     const kk = khoaHienTai(lopId), t = kk ? tk(kk) : null;
     const conDuKien = t ? t.duKien.filter(b => !xoa.includes(b)).length : 0;
-    let soMoi = f.them ? Math.max(0, (t ? t.conLai : 0) - conDuKien) : xoa.length;
+    let soMoi = f.them ? Math.max(0, (t ? Math.ceil(t.conLai) : 0) - conDuKien) : xoa.length;
     if (!kk && f.them) soMoi = xoa.length;
     const moi = sinhNgay(slots, tu, soMoi, lopId, xoa.map(b => b.id));
     const cuoi = moi.length ? moi[moi.length - 1].ngay : tu;
@@ -183,9 +183,9 @@ function moChonLaiLich(lopId) {
       <span class="cl-so">${i + 1}</span><input type="date" value="${b.ngay}" class="cl-ngay"><input type="time" value="${b.gio_bat_dau || ''}" step="300" class="cl-gio"><input type="number" value="${b.thoi_luong_phut || phutMD}" min="15" step="15" class="cl-phut"><small class="cl-thu"></small><button type="button" class="nut-x" data-bo title="Bỏ buổi này">×</button></div>`;
   const { nen } = moHop({
     tieuDe: `Chọn lại lịch · ${esc(L.ten)}`, rong: true,
-    noiDung: `<p class="mo nho">${k ? `Khoá ${k.ma} còn <b>${t.conLai}</b> buổi chưa dạy. ` : ''}Sửa ngày, giờ từng buổi sắp tới; thêm hoặc bỏ buổi. Buổi đã dạy không bị ảnh hưởng.</p>
+    noiDung: `<p class="mo nho">${k ? `Khoá ${k.ma} còn <b>${luongChu(t, t.conLai)}</b> chưa dạy. ` : ''}Sửa ngày, giờ từng buổi sắp tới; thêm hoặc bỏ buổi. Buổi đã dạy không bị ảnh hưởng.</p>
       <div class="cl-ds" id="cl-ds">${cu.map(dong).join('')}</div>
-      <div class="nhom-nut trai"><button type="button" class="nut nho" id="cl-them">＋ Thêm buổi</button>${k && t.conLai > cu.length ? `<button type="button" class="nut nho" id="cl-du">＋ Thêm cho đủ ${t.conLai} buổi</button>` : ''}</div>
+      <div class="nhom-nut trai"><button type="button" class="nut nho" id="cl-them">＋ Thêm buổi</button>${k && t.conLai > cu.length ? `<button type="button" class="nut nho" id="cl-du">＋ Thêm cho đủ ${Math.ceil(t.conLai)} buổi</button>` : ''}</div>
       <p class="mo nho" id="cl-tom"></p>`,
     khiMo: n => {
       const ds = n.querySelector('#cl-ds');

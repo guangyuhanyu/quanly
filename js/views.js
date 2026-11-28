@@ -19,13 +19,13 @@ function tenLop(L, link = true) { return link ? `<a href="#/lop/${L.id}" class="
 function the(chu, kieu = '') { return `<span class="the ${kieu}">${chu}</span>`; }
 function thanhTienDo(t) {
   const p = t.tong > 0 ? Math.min(100, Math.max(0, t.daHoc / t.tong * 100)) : 0;
-  return `<div class="tien-do"><div class="tien-do-cot"><i style="width:${p}%"></i></div><span>${t.daHoc}/${t.tong}</span></div>`;
+  return `<div class="tien-do"><div class="tien-do-cot"><i style="width:${p}%"></i></div><span>${luongNgan(t, t.daHoc)}/${luongNgan(t, t.tong)}</span></div>`;
 }
 function thuTuBuoi(b) {
   const k = khoaTheoId(b.khoa_id); if (!k) return '';
   const t = tk(k);
-  if (tinhBuoi(b)) return `${t.daDay.findIndex(x => x.id === b.id) + 1}/${t.tong}`;
-  if (b.trang_thai === 'du_kien') { const i = t.duKien.findIndex(x => x.id === b.id); return `${t.daHoc + i + 1}/${t.tong}`; }
+  if (tinhBuoi(b)) return `${t.daDay.findIndex(x => x.id === b.id) + 1}${t.theoGio ? '' : '/' + t.tong}`;
+  if (b.trang_thai === 'du_kien') { const i = t.duKien.findIndex(x => x.id === b.id); return t.theoGio ? `${t.soBuoiDay + i + 1}` : `${t.daHoc + i + 1}/${t.tong}`; }
   return '';
 }
 function oTrong(chu, nut = '') { return `<div class="o-trong"><p>${chu}</p>${nut}</div>`; }
@@ -37,8 +37,8 @@ function viecTuNhac() {
     const k = khoaHienTai(L.id); if (!k) return; const t = tk(k);
     const coKhoaSau = khoaCuaLop(L.id).some(x => x.id > k.id);
     if (coKhoaSau) return;
-    if (t.conLai <= 0) ds.push({ muc: 1, icon: '◆', chu: `${esc(L.ten)}: hết buổi – gợi ý khoá tiếp theo`, lop: L, act: `data-act="tin-gia-han" data-lop="${L.id}"`, nut: 'Soạn tin' });
-    else if (t.conLai <= nguongGiaHan()) ds.push({ muc: 2, icon: '◇', chu: `${esc(L.ten)}: còn ${t.conLai} buổi – gợi ý khoá tiếp theo`, lop: L, act: `data-act="tin-gia-han" data-lop="${L.id}"`, nut: 'Soạn tin' });
+    if (t.conLai <= 0) ds.push({ muc: 1, icon: '◆', chu: `${esc(L.ten)}: hết ${t.theoGio ? 'giờ học' : 'buổi'} – gợi ý khoá tiếp theo`, lop: L, act: `data-act="tin-gia-han" data-lop="${L.id}"`, nut: 'Soạn tin' });
+    else if (t.conLai <= nguongGiaHan()) ds.push({ muc: 2, icon: '◇', chu: `${esc(L.ten)}: còn ${luongChu(t, t.conLai)} – gợi ý khoá tiếp theo`, lop: L, act: `data-act="tin-gia-han" data-lop="${L.id}"`, nut: 'Soạn tin' });
   });
   S.khoa_hoc.filter(k => !k.ket_thuc && lopTheoId(k.lop_id)).forEach(k => {
     const t = tk(k); const L = lopTheoId(k.lop_id); if (!L || t.conNo <= 0) return;
@@ -190,7 +190,7 @@ function lichBen() {
     const cho = S.buoi_hoc.filter(b => b.trang_thai === 'du_kien' && (b.ngay < hn || (b.ngay === hn && b.gio_bat_dau && gio2phut(b.gio_bat_dau) + (b.thoi_luong_phut || 90) <= gioNay))).sort(soBuoi);
     const conLai = dang.filter(L => !can.includes(L));
     const hangLop = L => { const k = khoaHienTai(L.id); const t = tk(k); const tt = tinhTrangLop(L);
-      return `<button class="ben-muc ${LICH.loc === L.id ? 'on' : ''}" data-act="lich-loc" data-lop="${L.id}"><b>${chamMau(L)}${esc(L.ten)}</b><small>${t ? `${t.daHoc}/${t.tong} buổi` : 'chưa có khoá'}${tt.ma === 'het' || tt.ma === 'sap_het' ? ' · ' + tt.chu : k && k.lich_hoc ? ' · ' + esc(k.lich_hoc) : ''}</small></button>`; };
+      return `<button class="ben-muc ${LICH.loc === L.id ? 'on' : ''}" data-act="lich-loc" data-lop="${L.id}"><b>${chamMau(L)}${esc(L.ten)}</b><small>${t ? `${luongNgan(t, t.daHoc)}/${luongNgan(t, t.tong)}${t.theoGio ? '' : ' buổi'}` : 'chưa có khoá'}${tt.ma === 'het' || tt.ma === 'sap_het' ? ' · ' + tt.chu : k && k.lich_hoc ? ' · ' + esc(k.lich_hoc) : ''}</small></button>`; };
     than = nhomBen('can', 'Cần gia hạn', '#7C2C20', can, hangLop)
       + nhomBen('cho', 'Chờ xác nhận', '#A9792B', cho, b => { const L = lopTheoId(b.lop_id); return `<button class="ben-muc" data-act="mo-buoi" data-id="${b.id}"><b>${chamMau(L)}${esc(L ? L.ten : '')}</b><small>${THU_NGAN[s2d(b.ngay).getDay()]} ${ngayNgan(b.ngay)}${b.gio_bat_dau ? ' · ' + b.gio_bat_dau : ''} · chưa ghi đã dạy/nghỉ</small></button>`; })
       + nhomBen('dang', 'Đang học', '#56707A', conLai, hangLop);
@@ -354,8 +354,8 @@ function moBuoi({ id, ngay, gio, lopId, dat } = {}) {
         const kk = khoaTheoId(b ? (row.khoa_id || b.khoa_id) : (khoaHienTai(lop_id) || {}).id);
         if (row.trang_thai === 'da_day' && kk) {
           const t = tk(kk);
-          if (t.conLai < 0) toast(`Khoá ${kk.ma} đã vượt ${-t.conLai} buổi – Thầy nhớ gia hạn nhé`, 'canh');
-          else if (t.conLai <= nguongGiaHan()) toast(`Lớp ${esc(lopTheoId(kk.lop_id).ten)} còn ${t.conLai} buổi`, 'canh');
+          if (t.conLai < 0) toast(`Khoá ${kk.ma} đã vượt ${luongChu(t, -t.conLai)} – Thầy nhớ gia hạn nhé`, 'canh');
+          else if (t.conLai <= nguongGiaHan()) toast(`Lớp ${esc(lopTheoId(kk.lop_id).ten)} còn ${luongChu(t, t.conLai)}`, 'canh');
           else toast('Đã ghi buổi học ✓');
         } else toast(b ? 'Đã lưu' : 'Đã đặt lịch ✓');
         ve();
@@ -370,7 +370,7 @@ function moBuoi({ id, ngay, gio, lopId, dat } = {}) {
         const L = lopTheoId(lid);
         if (!k) { box.innerHTML = `<p class="canh-bao">Lớp này chưa có khoá học. Buổi vẫn được lưu nhưng chưa tính học phí. <a href="#/lop/${lid}" data-dong>Mở khoá →</a></p>`; return; }
         const t = tk(k);
-        box.innerHTML = `<p class="mo">Khoá ${k.ma}: đã học <b>${t.daHoc}/${t.tong}</b> buổi · còn <b>${t.conLai}</b> · ${tien(t.donGiaBuoi)}/buổi${L.loai === 'nhom' ? ` · lớp nhóm ${hvCuaLop(lid).length} học viên` : ''}</p>`;
+        box.innerHTML = `<p class="mo">Khoá ${k.ma}: đã học <b>${luongNgan(t, t.daHoc)}/${luongNgan(t, t.tong)}</b>${t.theoGio ? '' : ' buổi'} · còn <b>${luongChu(t, t.conLai)}</b> · ${tien(t.donGiaBuoi)}/buổi${L.loai === 'nhom' ? ` · lớp nhóm ${hvCuaLop(lid).length} học viên` : ''}</p>`;
         if (!b) { const tl = $('[name=thoi_luong_phut]', n); if (!tl.dataset.sua) tl.value = k.thoi_luong_phut || 90; }
       };
       const capTT = () => {
@@ -460,13 +460,14 @@ function vChiTietLop(id) {
   <section class="the-giay khoa-the">
     <div class="dau-muc"><h2>Khoá ${k.ma} ${k === kht ? '<small class="mo">(đang học)</small>' : k.ket_thuc ? '<small class="mo">(đã đóng)</small>' : ''}</h2>
       <div class="nhom-nut">
-        ${ks.length > 1 ? `<select data-act-change="chon-khoa" data-lop="${L.id}">${ks.slice().reverse().map(x => `<option value="${x.id}" ${x.id === k.id ? 'selected' : ''}>${x.ma} · ${x.ngay_bat_dau ? ngayNgan(x.ngay_bat_dau) + '/' + x.ngay_bat_dau.slice(2, 4) : 'chưa học'} · ${tk(x).daHoc}/${tk(x).tong}</option>`).join('')}</select>` : ''}
+        ${ks.length > 1 ? `<select data-act-change="chon-khoa" data-lop="${L.id}">${ks.slice().reverse().map(x => `<option value="${x.id}" ${x.id === k.id ? 'selected' : ''}>${x.ma} · ${x.ngay_bat_dau ? ngayNgan(x.ngay_bat_dau) + '/' + x.ngay_bat_dau.slice(2, 4) : 'chưa học'} · ${luongNgan(tk(x), tk(x).daHoc)}/${luongNgan(tk(x), tk(x).tong)}</option>`).join('')}</select>` : ''}
+        <button class="nut nho ${t.theoGio ? 'chinh' : ''}" data-act="lop-theo-gio" data-lop="${L.id}" title="Buổi dài ngắn khác nhau thì trừ theo số phút thực tế">⏱ Tính theo giờ: ${t.theoGio ? 'Bật' : 'Tắt'}</button>
         <button class="nut nho" data-act="sua-khoa" data-id="${k.id}">Sửa khoá</button>
       </div></div>
     ${k.ghi_chu && k.ghi_chu.startsWith('⚠') ? `<p class="canh-bao">${esc(k.ghi_chu)}</p>` : ''}
     <div class="o-so nho">
-      <div class="o-so-the"><span>Đã học</span><b>${t.daHoc}<small>/${t.tong}</small></b>${thanhTienDo(t)}</div>
-      <div class="o-so-the ${t.conLai <= nguongGiaHan() ? 'canh' : ''}"><span>Còn lại</span><b>${t.conLai}</b><small>${k.buoi_chuyen_sang ? `gồm ${k.buoi_chuyen_sang > 0 ? '+' : ''}${k.buoi_chuyen_sang} buổi từ khoá trước` : thoiLuongChu(k.thoi_luong_phut) + '/buổi'}</small></div>
+      <div class="o-so-the"><span>Đã học</span><b>${luongNgan(t, t.daHoc)}<small>/${luongNgan(t, t.tong)}</small></b>${thanhTienDo(t)}</div>
+      <div class="o-so-the ${t.conLai <= nguongGiaHan() ? 'canh' : ''}"><span>Còn lại</span><b>${luongNgan(t, t.conLai)}</b><small>${t.theoGio ? `${t.soBuoiDay} buổi đã dạy · ≈ ${String(lam2(Math.max(t.conLai, 0))).replace(".", ",")} buổi ${thoiLuongChu(t.tl)}` : k.buoi_chuyen_sang ? `gồm ${k.buoi_chuyen_sang > 0 ? '+' : ''}${k.buoi_chuyen_sang} buổi từ khoá trước` : thoiLuongChu(k.thoi_luong_phut) + '/buổi'}</small></div>
       <div class="o-so-the"><span>Học phí khoá</span><b>${tienGon(k.hoc_phi)}</b><small>${k.so_buoi} buổi · ${tien(t.donGiaBuoi)}/buổi</small></div>
       <div class="o-so-the ${t.conNo > 0 ? 'canh' : ''}"><span>Đã đóng</span><b>${tienGon(t.daDong)}</b><small>${t.conNo > 0 ? 'Còn thiếu ' + tien(t.conNo) : t.conNo < 0 ? 'Dư ' + tien(-t.conNo) : 'Đủ ✓'}</small></div>
       <div class="o-so-the"><span>Doanh thu đã dạy</span><b>${tienGon(t.daThucHien)}</b><small>chưa thực hiện ${tienGon(t.chuaThucHien)}</small></div>
@@ -503,7 +504,7 @@ function vChiTietLop(id) {
   <section class="the-giay">
     <div class="dau-muc"><h2>Lịch sử khoá học</h2></div>
     <table class="bang gon"><thead><tr><th>Khoá</th><th>Bắt đầu</th><th>Giáo trình</th><th>Số buổi</th><th>Đã học</th><th class="phai">Học phí</th><th>Đóng</th><th></th></tr></thead>
-    <tbody>${ks.slice().reverse().map(x => { const y = tk(x); return `<tr><td class="ma">${x.ma}</td><td>${ngayVN(y.ngayDau || x.ngay_bat_dau)}</td><td>${esc(x.giao_trinh || '')}</td><td>${x.so_buoi}${x.buoi_chuyen_sang ? ` (${x.buoi_chuyen_sang > 0 ? '+' : ''}${x.buoi_chuyen_sang})` : ''}</td><td>${y.daHoc}/${y.tong}</td><td class="phai">${tien(x.hoc_phi)}</td><td>${y.conNo <= 0 ? '✓' : the('thiếu ' + tienGon(y.conNo), 'do')}</td><td class="phai"><button class="nut nho" data-act="chon-khoa-nut" data-lop="${L.id}" data-id="${x.id}">Xem</button></td></tr>`; }).join('')}</tbody></table>
+    <tbody>${ks.slice().reverse().map(x => { const y = tk(x); return `<tr><td class="ma">${x.ma}</td><td>${ngayVN(y.ngayDau || x.ngay_bat_dau)}</td><td>${esc(x.giao_trinh || '')}</td><td>${x.so_buoi}${x.buoi_chuyen_sang ? ` (${x.buoi_chuyen_sang > 0 ? '+' : ''}${x.buoi_chuyen_sang})` : ''}</td><td>${luongNgan(y, y.daHoc)}/${luongNgan(y, y.tong)}</td><td class="phai">${tien(x.hoc_phi)}</td><td>${y.conNo <= 0 ? '✓' : the('thiếu ' + tienGon(y.conNo), 'do')}</td><td class="phai"><button class="nut nho" data-act="chon-khoa-nut" data-lop="${L.id}" data-id="${x.id}">Xem</button></td></tr>`; }).join('')}</tbody></table>
   </section>`;
 }
 
@@ -601,23 +602,23 @@ function moGiaHan(lopId) {
   moHop({
     tieuDe: `${cu ? 'Gia hạn khoá mới' : 'Mở khoá học'} – ${esc(L.ten)}`,
     noiDung: `<div class="form luoi-form ba">
-      ${cu ? `<p class="ca-dong mo">Khoá hiện tại ${cu.ma}: đã học ${t.daHoc}/${t.tong} buổi, còn <b>${t.conLai}</b> buổi${t.conNo > 0 ? `, còn thiếu ${tien(t.conNo)}` : ''}.</p>` : ''}
+      ${cu ? `<p class="ca-dong mo">Khoá hiện tại ${cu.ma}: đã học ${luongNgan(t, t.daHoc)}/${luongNgan(t, t.tong)}${t.theoGio ? '' : ' buổi'}, còn <b>${luongChu(t, t.conLai)}</b>${t.conNo > 0 ? `, còn thiếu ${tien(t.conNo)}` : ''}.</p>` : ''}
       <label>Ngày bắt đầu<input type="date" name="ngay" value="${homNay()}"></label>
       <label>Số buổi đóng tiền<input type="number" name="so_buoi" value="${cu ? cu.so_buoi : 8}" min="1"></label>
       <label>Thời lượng / buổi (phút)<input type="number" name="tl" value="${cu ? cu.thoi_luong_phut || 90 : 90}" step="15"></label>
       <label class="hai-cot">Học phí khoá mới <small class="mo" id="goi-y-hp"></small><input data-so name="hoc_phi" value="${cu ? cu.hoc_phi : ''}"></label>
       <label class="hop-chon-dong"><input type="checkbox" name="da_dong"> Đã nhận học phí hôm nay</label>
-      ${cu && !cu.ket_thuc && chuyen !== 0 ? `<label class="ca-dong hop-chon-dong noi-bat"><input type="checkbox" name="chuyen" checked> ${chuyen > 0 ? `Chuyển <b>${chuyen} buổi còn lại</b> (trị giá ${tien(chuyen * t.donGiaBuoi)}) sang khoá mới` : `Khoá cũ đã học vượt <b>${-chuyen} buổi</b> – trừ vào khoá mới`}</label>` : ''}
+      ${cu && !cu.ket_thuc && chuyen !== 0 ? `<label class="ca-dong hop-chon-dong noi-bat"><input type="checkbox" name="chuyen" checked> ${chuyen > 0 ? `Chuyển <b>${luongChu(t, chuyen)} còn lại</b> (trị giá ${tien(chuyen * t.donGiaBuoi)}) sang khoá mới` : `Khoá cũ đã học vượt <b>${luongChu(t, -chuyen)}</b> – trừ vào khoá mới`}</label>` : ''}
       <label class="hai-cot">Giáo trình / tài liệu<input name="giao_trinh" value="${esc(cu ? cu.giao_trinh || '' : L.trinh_do || '')}"></label>
       <label>Lịch học<input name="lich_hoc" value="${esc(cu ? cu.lich_hoc || '' : '')}"></label>
       <label class="ca-dong">Mục tiêu khoá<input name="muc_tieu" value="${esc(cu ? cu.muc_tieu || '' : '')}"></label>
     </div>`,
     nut: [{ chu: 'Huỷ', bam: () => {} }, { chu: 'Tạo khoá', kieu: 'chinh', bam: async (n) => {
       const f = docForm(n);
-      const c = f.chuyen ? chuyen : 0;
-      const moi = await luu('khoa_hoc', { lop_id: L.id, ngay_bat_dau: f.ngay, so_buoi: f.so_buoi, thoi_luong_phut: f.tl, hoc_phi: f.hoc_phi || 0, don_gia_gio: bg ? bg.don_gia_gio : null, buoi_chuyen_sang: c, gia_tri_chuyen_sang: Math.round(c * (t ? t.donGiaBuoi : 0)), khoa_truoc_id: cu ? cu.id : null, giao_trinh: f.giao_trinh, lich_hoc: f.lich_hoc, muc_tieu: f.muc_tieu });
+      const c0 = f.chuyen ? chuyen : 0, c = t && t.theoGio && Number(f.tl) && Number(f.tl) !== t.tl ? lam2(c0 * t.tl / Number(f.tl)) : c0;
+      const moi = await luu('khoa_hoc', { lop_id: L.id, ngay_bat_dau: f.ngay, so_buoi: f.so_buoi, thoi_luong_phut: f.tl, hoc_phi: f.hoc_phi || 0, don_gia_gio: bg ? bg.don_gia_gio : null, buoi_chuyen_sang: c, gia_tri_chuyen_sang: Math.round(c0 * (t ? t.donGiaBuoi : 0)), khoa_truoc_id: cu ? cu.id : null, giao_trinh: f.giao_trinh, lich_hoc: f.lich_hoc, muc_tieu: f.muc_tieu });
       if (cu && !cu.ket_thuc) {
-        await luu('khoa_hoc', { ket_thuc: true, buoi_chuyen_di: c }, cu.id);
+        await luu('khoa_hoc', { ket_thuc: true, buoi_chuyen_di: c0 }, cu.id);
         for (const b of S.buoi_hoc.filter(b => b.khoa_id === cu.id && b.trang_thai === 'du_kien')) await luu('buoi_hoc', { khoa_id: moi.id }, b.id);
       }
       if (f.da_dong && f.hoc_phi) await luu('thanh_toan', { khoa_id: moi.id, lop_id: L.id, ngay: homNay(), so_tien: f.hoc_phi, hinh_thuc: 'Chuyển khoản' });
@@ -640,14 +641,14 @@ function moSuaKhoa(id) {
       <label>Số buổi đóng tiền<input type="number" name="so_buoi" value="${k.so_buoi}"></label>
       <label>Thời lượng / buổi (phút)<input type="number" name="thoi_luong_phut" value="${k.thoi_luong_phut || 90}" step="15"></label>
       <label>Học phí khoá<input data-so name="hoc_phi" value="${k.hoc_phi}"></label>
-      <label>Buổi chuyển từ khoá trước<input type="number" name="buoi_chuyen_sang" value="${k.buoi_chuyen_sang || 0}"></label>
+      <label>Buổi chuyển từ khoá trước<input type="number" step="any" name="buoi_chuyen_sang" value="${k.buoi_chuyen_sang || 0}"></label>
       <label>Giá trị buổi chuyển sang<input data-so name="gia_tri_chuyen_sang" value="${k.gia_tri_chuyen_sang || 0}"></label>
       <label class="hai-cot">Giáo trình<input name="giao_trinh" value="${esc(k.giao_trinh || '')}"></label>
       <label>Lịch học<input name="lich_hoc" value="${esc(k.lich_hoc || '')}"></label>
       <label class="ca-dong">Mục tiêu khoá<input name="muc_tieu" value="${esc(k.muc_tieu || '')}"></label>
       <label class="ca-dong">Ghi chú<input name="ghi_chu" value="${esc(k.ghi_chu || '')}"></label>
       <label class="hop-chon-dong ca-dong"><input type="checkbox" name="ket_thuc" ${k.ket_thuc ? 'checked' : ''}> Đã đóng khoá (không tính "chưa thực hiện", không nhắc nợ)</label>
-      <p class="ca-dong mo">Đã học ${t.daHoc}/${t.tong} · ${t.buoi.length} buổi trong nhật ký.</p>
+      <p class="ca-dong mo">Đã học ${luongNgan(t, t.daHoc)}/${luongNgan(t, t.tong)} · ${t.buoi.length} buổi trong nhật ký.</p>
     </div>`,
     nut: [
       { chu: 'Xoá khoá', kieu: 'nguy', trai: true, bam: async () => { if (!(await hoi(`Xoá khoá ${k.ma}? Các buổi học vẫn giữ nhưng không thuộc khoá nào.`, 'Xoá', 'nguy'))) return false; await DBX.remove('khoa_hoc', k.id); await taiLai(); toast('Đã xoá khoá'); } },

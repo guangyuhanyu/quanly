@@ -79,9 +79,9 @@ function soanTinGiaHan(L, k, o) {
   const noiDungCK = `${nhom ? L.ten : (hv[0] ? cachGoi(hv[0]).ten : L.ten)} ${trinhDoCua(L, k) || L.ten}`.trim();
   if (o.lang === 'zh') {
     const tienZ = n => new Intl.NumberFormat('en-US').format(n) + ' 越南盾';
-    return `${nhom ? '各位同学好！' : '您好！'}我是光余老师。\n${nhom ? '我们' : '您'}目前的课程${t.conLai > 0 ? `还剩 ${t.conLai} 次课` : '已经全部完成'}（已上 ${t.daHoc}/${t.tong} 次）。为了不中断学习，下期课程信息如下：\n· 课时：${o.so} 次 × ${o.tl} 分钟${carry > 0 ? `（另加本期剩余的 ${carry} 次课）` : carry < 0 ? `（扣除本期多上的 ${-carry} 次课）` : ''}\n· 学费：${tienZ(o.hp)}${nhom ? '（全组合计）' : ''}\n请在新课程第一次上课前完成转账，转账备注请写：学员姓名＋班级。\n· 账户：${TK_NGAN_HANG}\n感谢${nhom ? '大家' : '您'}一直以来的支持！`;
+    return `${nhom ? '各位同学好！' : '您好！'}我是光余老师。\n${nhom ? '我们' : '您'}目前的课程${t.conLai > 0 ? `还剩 ${luongChu(t, t.conLai, true)}` : '已经全部完成'}（已上 ${t.theoGio ? `${gioChu(t.daPhut, true)}／${gioChu(t.tong * t.tl, true)}` : `${t.daHoc}/${t.tong} 次`}）。为了不中断学习，下期课程信息如下：\n· 课时：${o.so} 次 × ${o.tl} 分钟${carry > 0 ? `（另加本期剩余的 ${luongChu(t, carry, true)}）` : carry < 0 ? `（扣除本期多上的 ${luongChu(t, -carry, true)}）` : ''}\n· 学费：${tienZ(o.hp)}${nhom ? '（全组合计）' : ''}\n请在新课程第一次上课前完成转账，转账备注请写：学员姓名＋班级。\n· 账户：${TK_NGAN_HANG}\n感谢${nhom ? '大家' : '您'}一直以来的支持！`;
   }
-  return `Chào ${g.goi}, Thầy Guangyu đây ạ 🌿\nKhoá học hiện tại của ${g.ngoi} ${t.conLai > 0 ? `còn ${t.conLai} buổi nữa là hoàn thành` : 'đã hoàn thành'} (đã học ${t.daHoc}/${t.tong} buổi). Để việc học không bị gián đoạn, Thầy gửi ${g.ngoi} thông tin khoá tiếp theo:\n• Số buổi: ${o.so} buổi × ${o.tl} phút${carry > 0 ? ` (cộng thêm ${carry} buổi còn lại của khoá này)` : carry < 0 ? ` (trừ ${-carry} buổi đã học vượt ở khoá này)` : ''}\n• Học phí: ${tien(o.hp)}${nhom ? ' (cả nhóm)' : ''}\n${hoaDau(g.ngoi)} vui lòng chuyển khoản trước buổi học đầu tiên của khoá mới giúp Thầy nhé.\n• Nội dung chuyển khoản: ${noiDungCK}\n• Tài khoản: ${TK_NGAN_HANG}\nCảm ơn ${g.ngoi} đã luôn đồng hành cùng Thầy!`;
+  return `Chào ${g.goi}, Thầy Guangyu đây ạ 🌿\nKhoá học hiện tại của ${g.ngoi} ${t.conLai > 0 ? `còn ${luongChu(t, t.conLai)} nữa là hoàn thành` : 'đã hoàn thành'} (đã học ${t.theoGio ? `${gioChu(t.daPhut)}/${gioChu(t.tong * t.tl)}` : `${t.daHoc}/${t.tong} buổi`}). Để việc học không bị gián đoạn, Thầy gửi ${g.ngoi} thông tin khoá tiếp theo:\n• Số buổi: ${o.so} buổi × ${o.tl} phút${carry > 0 ? ` (cộng thêm ${luongChu(t, carry)} còn lại của khoá này)` : carry < 0 ? ` (trừ ${luongChu(t, -carry)} đã học vượt ở khoá này)` : ''}\n• Học phí: ${tien(o.hp)}${nhom ? ' (cả nhóm)' : ''}\n${hoaDau(g.ngoi)} vui lòng chuyển khoản trước buổi học đầu tiên của khoá mới giúp Thầy nhé.\n• Nội dung chuyển khoản: ${noiDungCK}\n• Tài khoản: ${TK_NGAN_HANG}\nCảm ơn ${g.ngoi} đã luôn đồng hành cùng Thầy!`;
 }
 function moTinGiaHan(lopId) {
   const L = lopTheoId(lopId); const k = khoaHienTai(lopId);
@@ -95,7 +95,7 @@ function moTinGiaHan(lopId) {
     tieuDe: `✉ Gợi ý khoá tiếp theo · ${esc(L.ten)}`, rong: true,
     noiDung: `<div class="tin-gh">
       <aside class="form">
-        <p class="mo nho">Khoá ${k.ma}: đã học ${t.daHoc}/${t.tong} buổi, còn <b>${t.conLai}</b> buổi.</p>
+        <p class="mo nho">Khoá ${k.ma}: đã học ${luongNgan(t, t.daHoc)}/${luongNgan(t, t.tong)}${t.theoGio ? '' : ' buổi'}, còn <b>${luongChu(t, t.conLai)}</b>.</p>
         <label>Số buổi khoá mới<input type="number" name="so" value="${o.so}"></label>
         <label>Thời lượng (phút)<input type="number" name="tl" value="${o.tl}" step="15"></label>
         <label>Học phí khoá mới<input data-so name="hp" value="${o.hp}"></label>
@@ -103,7 +103,7 @@ function moTinGiaHan(lopId) {
           <button type="button" class="chip" data-hp="${k.hoc_phi}">Giữ như khoá này: ${tien(k.hoc_phi)}</button>
           ${giaBG && giaBG !== k.hoc_phi ? `<button type="button" class="chip" data-hp="${giaBG}">Theo bảng giá mới: ${tien(giaBG)}</button>` : ''}
         </div>
-        ${t.conLai !== 0 ? `<label class="hop-chon-dong"><input type="checkbox" name="chuyen" ${o.chuyen ? 'checked' : ''}> ${t.conLai > 0 ? `Nhắc cộng ${t.conLai} buổi còn lại` : `Nhắc trừ ${-t.conLai} buổi học vượt`}</label>` : ''}
+        ${t.conLai !== 0 ? `<label class="hop-chon-dong"><input type="checkbox" name="chuyen" ${o.chuyen ? 'checked' : ''}> ${t.conLai > 0 ? `Nhắc cộng ${luongChu(t, t.conLai)} còn lại` : `Nhắc trừ ${luongChu(t, -t.conLai)} học vượt`}</label>` : ''}
         <div class="phan-doan rong"><button type="button" data-l="vi">Tiếng Việt</button><button type="button" data-l="zh">中文</button></div>
       </aside>
       <div><textarea class="o-tin" rows="14"></textarea><p class="mo nho">Thầy sửa thẳng trong ô này được. Đổi số buổi / học phí bên trái thì tin nhắn tự cập nhật.</p></div>
@@ -190,7 +190,7 @@ function moTongKet(th) {
   nen.querySelector('.hop').classList.add('hop-bc');
 }
 async function luuAnhBaoCao() {
-  if (!window.modernScreenshot) await new Promise((ok, loi) => { const s = document.createElement('script'); s.src = 'vendor/modern-screenshot.js?v=6.6'; s.onload = ok; s.onerror = loi; document.head.appendChild(s); });
+  if (!window.modernScreenshot) await new Promise((ok, loi) => { const s = document.createElement('script'); s.src = 'vendor/modern-screenshot.js?v=6.8'; s.onload = ok; s.onerror = loi; document.head.appendChild(s); });
   const el = $('#bao-cao'); await document.fonts.ready;
   const opt = { scale: 2.5, backgroundColor: '#FBF6EA' };
   if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) await modernScreenshot.domToBlob(el, opt);

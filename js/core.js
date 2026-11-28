@@ -44,6 +44,20 @@ const khoaCuaLop = lopId => S.khoa_hoc.filter(k => k.lop_id === lopId).sort((a, 
 const buoiCuaKhoa = kid => S.buoi_hoc.filter(b => b.khoa_id === kid).sort(soBuoi);
 const soBuoi = (a, b) => a.ngay < b.ngay ? -1 : a.ngay > b.ngay ? 1 : (a.gio_bat_dau || '') < (b.gio_bat_dau || '') ? -1 : (a.gio_bat_dau || '') > (b.gio_bat_dau || '') ? 1 : a.id - b.id;
 const tinhBuoi = b => b.trang_thai === 'da_day' && b.tinh_phi !== false;
+/* ---------- tính theo giờ: lớp có buổi dài ngắn khác nhau (cai_dat 'lop_theo_gio' = [lopId]) ----------
+   Khoá vẫn mua theo "số buổi × thời lượng chuẩn"; mỗi buổi đã dạy trừ đúng số phút thực tế.
+   daHoc / conLai lúc đó là số buổi QUY ĐỔI (có thể lẻ), chỉ hiển thị ra giờ. */
+const lopTheoGio = id => (caiDat('lop_theo_gio', []) || []).includes(id);
+const lam2 = x => Math.round(x * 100) / 100;
+function gioChu(ph, zh) {
+  ph = Math.round(ph); const am = ph < 0, a = Math.abs(ph), h = Math.floor(a / 60), m = a % 60;
+  const s = zh ? ((h ? h + ' 小时' : '') + (m ? (h ? ' ' : '') + m + ' 分钟' : '') || '0 分钟') : ([h ? h + ' tiếng' : '', m ? m + ' phút' : ''].filter(Boolean).join(' ') || '0 phút');
+  return (am ? '−' : '') + s;
+}
+function gioNgan(ph) { ph = Math.round(ph); const a = Math.abs(ph), h = Math.floor(a / 60), m = a % 60; return (ph < 0 ? '−' : '') + (h ? h + 'h' + (m ? String(m).padStart(2, '0') : '') : m + 'p'); }
+/* n: số buổi (quy đổi) của khoá t → chữ: "3 buổi" hoặc "4 tiếng 30 phút" */
+function luongChu(t, n, zh) { return t && t.theoGio ? gioChu(n * t.tl, zh) : (zh ? `${n} 次课` : `${n} buổi`); }
+function luongNgan(t, n) { return t && t.theoGio ? gioNgan(n * t.tl) : String(n); }
 
 /* ---------- tính toán khoá học ---------- */
 function tk(k) {
@@ -55,13 +69,15 @@ function tk(k) {
   const giaTriGoc = (k.hoc_phi || 0) + (k.gia_tri_chuyen_sang || 0);
   const donGiaBuoi = goc > 0 ? giaTriGoc / goc : 0;
   const tong = goc - (k.buoi_chuyen_di || 0);
-  const daHoc = daDay.length;
-  const conLai = tong - daHoc;
+  const tl = k.thoi_luong_phut || 90, theoGio = lopTheoGio(k.lop_id);
+  const daPhut = daDay.reduce((s, b) => s + (b.thoi_luong_phut || tl), 0);
+  const daHoc = theoGio ? lam2(daPhut / tl) : daDay.length;
+  const conLai = lam2(tong - daHoc);
   const daDong = S.thanh_toan.filter(t => t.khoa_id === k.id).reduce((s, t) => s + (t.so_tien || 0), 0);
   const conNo = (k.hoc_phi || 0) - daDong;
   const duKien = buoi.filter(b => b.trang_thai === 'du_kien');
   const r = {
-    buoi, daDay, tong, daHoc, conLai, donGiaBuoi, daDong, conNo, duKien,
+    buoi, daDay, tong, daHoc, conLai, donGiaBuoi, daDong, conNo, duKien, theoGio, tl, daPhut, soBuoiDay: daDay.length,
     daThucHien: daHoc * donGiaBuoi,
     // chỉ tính phần ĐÃ ĐÓNG TIỀN mà chưa dạy (tiền khoá trước chuyển sang coi như đã đóng)
     chuaThucHien: k.ket_thuc ? 0 : Math.max(0, Math.min(Math.max(conLai, 0) * donGiaBuoi, daDong + (k.gia_tri_chuyen_sang || 0) - daHoc * donGiaBuoi)),
@@ -80,10 +96,10 @@ function khoaHienTai(lopId) {
 const nguongGiaHan = () => Number(caiDat('nguong_gia_han', 2));
 function tinhTrangLop(L) {
   const k = khoaHienTai(L.id); const t = tk(k);
-  if (!L.dang_hoat_dong) return { ma: 'tam_dung', chu: t && t.conLai > 0 && !k.ket_thuc ? `Bảo lưu ${t.conLai} buổi` : 'Tạm dừng' };
+  if (!L.dang_hoat_dong) return { ma: 'tam_dung', chu: t && t.conLai > 0 && !k.ket_thuc ? `Bảo lưu ${luongChu(t, t.conLai)}` : 'Tạm dừng' };
   if (!k) return { ma: 'moi', chu: 'Chưa có khoá' };
-  if (t.conLai <= 0) return { ma: 'het', chu: 'Hết buổi – cần gia hạn' };
-  if (t.conLai <= nguongGiaHan()) return { ma: 'sap_het', chu: `Còn ${t.conLai} buổi` };
+  if (t.conLai <= 0) return { ma: 'het', chu: `Hết ${t.theoGio ? 'giờ học' : 'buổi'} – cần gia hạn` };
+  if (t.conLai <= nguongGiaHan()) return { ma: 'sap_het', chu: `Còn ${luongChu(t, t.conLai)}` };
   return { ma: 'dang_hoc', chu: 'Đang học' };
 }
 function goiYHocPhi(bgId, thoiLuong, soBuoi) {

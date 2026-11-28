@@ -153,6 +153,12 @@ const HD = {
   'sua-lop': el => moFormLop(Number(el.dataset.lop)),
   'gia-han': el => moGiaHan(Number(el.dataset.lop)),
   'sua-khoa': el => moSuaKhoa(Number(el.dataset.id)),
+  'lop-theo-gio': async el => {
+    const id = Number(el.dataset.lop), ds = (caiDat('lop_theo_gio', []) || []).filter(x => x !== id), bat = !lopTheoGio(id);
+    if (bat) ds.push(id);
+    await luuCaiDat('lop_theo_gio', ds); lamMoi();
+    toast(bat ? 'Lớp này giờ trừ theo số phút thực tế của từng buổi ⏱' : 'Lớp này trở lại tính theo buổi'); ve();
+  },
   'chon-khoa-nut': el => { CHON_KHOA[Number(el.dataset.lop)] = Number(el.dataset.id); ve(); $('#main').scrollTop = 0; },
   'thanh-toan': el => moThanhToan({ lopId: Number(el.dataset.lop), khoaId: el.dataset.khoa ? Number(el.dataset.khoa) : null }),
   'sua-tt': el => moThanhToan({ id: Number(el.dataset.id) }),
@@ -243,22 +249,25 @@ function duLieuPNG(L, k, mau, opt) {
   if (t.conNo <= 0) { const cuoi = t.tt[t.tt.length - 1]; ttHocPhi = zh ? `已收齐 ✓${cuoi ? `（${ngayZh(cuoi.ngay)}）` : ''}` : `Đã nhận ✓${cuoi ? ` ngày ${ngayVN(cuoi.ngay)}` : ''}`; }
   else if (t.daDong > 0) ttHocPhi = zh ? `已收 ${money(t.daDong)}，尚欠 ${money(t.conNo)}` : `Đã nhận ${money(t.daDong)} – còn ${money(t.conNo)}`;
   else ttHocPhi = zh ? `待缴 ${money(k.hoc_phi)}` : `Chưa đóng (${money(k.hoc_phi)})`;
+  const cong = typeof congPNG === 'function' ? congPNG(L) : null;
   if (mau === '01') {
-    return {
+    return { cong,
       lop: L.ten, so_hv: zh ? `${Math.max(hv.length, 1)} 人` : `${Math.max(hv.length, 1)} học viên`,
       ngay_bd: k.ngay_bat_dau ? (zh ? ngayZh(k.ngay_bat_dau) : ngayVN(k.ngay_bat_dau)) : '',
-      so_buoi: zh ? `${t.tong} 次课 × ${k.thoi_luong_phut || 90} 分钟` : `${t.tong} buổi × ${k.thoi_luong_phut || 90} phút`,
+      so_buoi: (zh ? `${t.tong} 次课 × ${k.thoi_luong_phut || 90} 分钟` : `${t.tong} buổi × ${k.thoi_luong_phut || 90} phút`) + (t.theoGio ? (zh ? `（共 ${gioChu(t.tong * t.tl, true)}，按实际上课时长扣除）` : ` (tổng ${gioChu(t.tong * t.tl)}, trừ theo thời lượng thực tế từng buổi)`) : ''),
       lich: k.lich_hoc || '', tai_lieu: k.giao_trinh || trinhDo, muc_tieu: k.muc_tieu || '',
-      hoc_phi: money(k.hoc_phi) + (k.buoi_chuyen_sang > 0 ? (zh ? `（含上期转入 ${k.buoi_chuyen_sang} 次课）` : ` (cộng thêm ${k.buoi_chuyen_sang} buổi chuyển từ khoá trước)`) : ''),
+      hoc_phi: money(k.hoc_phi) + (k.buoi_chuyen_sang > 0 ? (zh ? `（含上期转入 ${luongChu(t, k.buoi_chuyen_sang, true)}）` : ` (cộng thêm ${luongChu(t, k.buoi_chuyen_sang)} chuyển từ khoá trước)`) : ''),
       tinh_trang: ttHocPhi,
     };
   }
   const daDay = t.daDay;
-  return {
-    lop: L.ten, trinh_do: trinhDo, tong: String(t.daHoc), con_lai: String(Math.max(t.conLai, 0)) + (t.conLai < 0 ? (zh ? `（超出 ${-t.conLai}）` : ` (vượt ${-t.conLai})`) : ''),
+  return { cong,
+    theo_gio: t.theoGio, lop: L.ten, trinh_do: trinhDo,
+    tong: t.theoGio ? gioChu(t.daPhut, zh) : String(t.daHoc),
+    con_lai: t.theoGio ? (t.conLai < 0 ? (zh ? `0（超出 ${gioChu(-t.conLai * t.tl, true)}）` : `0 (vượt ${gioChu(-t.conLai * t.tl)})`) : gioChu(t.conLai * t.tl, zh)) : String(Math.max(t.conLai, 0)) + (t.conLai < 0 ? (zh ? `（超出 ${-t.conLai}）` : ` (vượt ${-t.conLai})`) : ''),
     hoc_phi: money(k.hoc_phi),
-    ngay_list: daDay.map(b => zh ? `${Number(b.ngay.slice(5, 7))}月${Number(b.ngay.slice(8))}日` : ngayNgan(b.ngay)).join(zh ? '、' : ', '),
-    buoi: daDay.map((b, i) => ({ stt: i + 1, ngay: zh ? `${Number(b.ngay.slice(5, 7))}月${Number(b.ngay.slice(8))}日（${TEN_THU_ZH[s2d(b.ngay).getDay()]}）` : `${THU_NGAN[s2d(b.ngay).getDay()]} ${ngayVN(b.ngay)}`, noi_dung: b.noi_dung || '', tl: b.thoi_luong_phut !== (k.thoi_luong_phut || 90) ? (zh ? `${b.thoi_luong_phut}分钟` : thoiLuongChu(b.thoi_luong_phut)) : '' })),
+    ngay_list: daDay.map(b => (zh ? `${Number(b.ngay.slice(5, 7))}月${Number(b.ngay.slice(8))}日` : ngayNgan(b.ngay)) + (t.theoGio ? (zh ? `（${gioNgan(b.thoi_luong_phut || t.tl)}）` : ` (${gioNgan(b.thoi_luong_phut || t.tl)})`) : '')).join(zh ? '、' : ', '),
+    buoi: daDay.map((b, i) => ({ stt: i + 1, ngay: zh ? `${Number(b.ngay.slice(5, 7))}月${Number(b.ngay.slice(8))}日（${TEN_THU_ZH[s2d(b.ngay).getDay()]}）` : `${THU_NGAN[s2d(b.ngay).getDay()]} ${ngayVN(b.ngay)}`, noi_dung: b.noi_dung || '', tl: t.theoGio || b.thoi_luong_phut !== (k.thoi_luong_phut || 90) ? (zh ? `${b.thoi_luong_phut}分钟` : thoiLuongChu(b.thoi_luong_phut)) : '' })),
     hien_noi_dung: opt.noiDung, tinh_trang: ttHocPhi,
     khoa_sau: opt.khoaSau ? (zh ? `${opt.soBuoiSau} 次课：${money(opt.hpSau)}` : `${opt.soBuoiSau} buổi: ${money(opt.hpSau)}`) : '',
   };
@@ -275,7 +284,7 @@ function moXuatPNG(lopId, mau) {
       <aside class="xp-ben">
         <div class="phan-doan rong"><button data-xp="mau" data-v="01">PNG 01 · Thông tin lớp</button><button data-xp="mau" data-v="02">PNG 02 · Buổi học & học phí</button></div>
         <div class="phan-doan rong"><button data-xp="lang" data-v="vi">Tiếng Việt</button><button data-xp="lang" data-v="zh">中文</button></div>
-        <label>Khoá<select data-xp-in="khoa">${ks.map(k => `<option value="${k.id}" ${k.id === k0.id ? 'selected' : ''}>${k.ma} · ${tk(k).daHoc}/${tk(k).tong} buổi</option>`).join('')}</select></label>
+        <label>Khoá<select data-xp-in="khoa">${ks.map(k => `<option value="${k.id}" ${k.id === k0.id ? 'selected' : ''}>${k.ma} · ${luongNgan(tk(k), tk(k).daHoc)}/${luongNgan(tk(k), tk(k).tong)}${tk(k).theoGio ? '' : ' buổi'}</option>`).join('')}</select></label>
         <div data-chi="02">
           <label class="hop-chon-dong"><input type="checkbox" data-xp-in="khoaSau" ${st.khoaSau ? 'checked' : ''}> Báo học phí khoá tiếp theo</label>
           <div class="luoi-form" data-khoa-sau><label>Số buổi<input type="number" data-xp-in="soBuoiSau" value="${st.soBuoiSau}"></label><label>Học phí<input data-so data-xp-in="hpSau" value="${st.hpSau}"></label></div>
@@ -294,7 +303,7 @@ function moXuatPNG(lopId, mau) {
         $$('[data-xp=lang]', n).forEach(b => b.classList.toggle('on', b.dataset.v === st.lang));
         $('[data-chi="02"]', n).style.display = st.mau === '02' ? '' : 'none';
         $('[data-khoa-sau]', n).style.display = st.khoaSau ? '' : 'none';
-        const src = `templates/png${st.mau}.html?v=6.6`;
+        const src = `templates/png${st.mau}.html?v=6.8`;
         const dien = () => { const w = khung.contentWindow; if (!w.dien) return setTimeout(dien, 60); w.dien(duLieuPNG(L, khoaTheoId(st.khoa), st.mau, st), st.lang); setTimeout(() => { khung.style.height = w.document.documentElement.scrollHeight + 'px'; }, 120); };
         if (!khung.src.endsWith(src)) { khung.onload = dien; khung.src = src; } else dien();
       };
