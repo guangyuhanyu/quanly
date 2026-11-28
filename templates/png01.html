@@ -6,7 +6,7 @@
 <title>PNG 01 · Thông tin lớp học</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="fonts.css?v=6.6">
+<link rel="stylesheet" href="fonts.css?v=6.8">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -493,8 +493,10 @@
   </div>
 </div>
 
-<script src="../vendor/modern-screenshot.js?v=6.6"></script>
-<script src="chup.js?v=6.6"></script>
+<script src="../vendor/modern-screenshot.js?v=6.8"></script>
+<script src="chup.js?v=6.8"></script>
+<script src="../vendor/qrcode.js?v=6.8"></script>
+<script src="cong-png.js?v=6.8"></script>
 <script>
 const VI_LIST = "\n          <li><span class=\"note-num\">1</span><span>Lớp học được tổ chức trực tuyến qua ứng dụng Zoom. Anh/chị/bạn vui lòng cài đặt sẵn ứng dụng trên thiết bị của mình. Link tham gia buổi học sẽ được Thầy gửi qua Zalo trước mỗi buổi học.</span></li>\n          <li><span class=\"note-num\">2</span><span>Xin chuẩn bị đầy đủ giáo trình, vở ghi chép, đồng thời cố gắng hoàn thành bài tập và ghi nhớ từ vựng sau mỗi buổi học, để việc tiếp thu kiến thức đạt hiệu quả tốt nhất.</span></li>\n          <li><span class=\"note-num\">3</span><span>Trong trường hợp cần xin nghỉ hoặc dời lịch học, mong anh/chị/bạn nhắn trước cho Thầy ít nhất 4 tiếng đồng hồ để tiện sắp xếp lại lịch học phù hợp. Trường hợp báo nghỉ quá sát giờ (trừ trường hợp bất khả kháng), thời lượng buổi đó sẽ được chia nhỏ và cộng thêm vào các buổi học tiếp theo.</span></li>\n          <li><span class=\"note-num\">4</span><span>Nếu Thầy bận đột xuất, buổi học sẽ được dạy bù sau theo lịch thống nhất giữa Thầy và học viên.</span></li>\n          <li><span class=\"note-num\">5</span><span>Với lớp nhóm, nếu có bạn vắng mặt, lớp vẫn học bình thường và Thầy sẽ ghi lại màn hình buổi học, gửi cho bạn đó xem lại.</span></li>\n          <li><span class=\"note-num\">6</span><span>Học phí được đóng vào đầu mỗi khoá học, theo hình thức chuyển khoản (thông tin đính kèm bên dưới), nội dung chuyển khoản xin ghi <b>Tên học viên + Lớp</b>. Sau khi chuyển khoản, mong anh/chị/bạn vui lòng chụp lại lịch sử giao dịch và gửi giúp Thầy. Thầy sẽ gửi lại phiếu này với dòng \"Tình trạng học phí\" đã xác nhận.</span></li>\n          <li><span class=\"note-num\">7</span><span>Trường hợp cần dừng học giữa khoá, anh/chị/bạn được bảo lưu số buổi còn lại trong vòng 6–12 tháng. Học phí đã đóng không được hoàn lại.</span></li>\n        ";
 const CHU = {
@@ -526,6 +528,7 @@ window.dien = function (d, lang) {
     `<div class="info-row"><span class="info-label">${C.nhan[k]}</span><span class="info-fill" contenteditable="true">${escH(d[k])}</span></div>`).join('');
   document.getElementById('notes-list').innerHTML = lang === 'zh'
     ? C.list.map((t, i) => `<li><span class="note-num">${i + 1}</span><span>${t}</span></li>`).join('') : VI_LIST;
+  if (window.veCong) veCong(d.cong, lang);
 };
 </script>
 </body>

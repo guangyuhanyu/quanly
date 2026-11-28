@@ -6,7 +6,7 @@
 <title>PNG 02 · Theo dõi buổi học & học phí</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="fonts.css?v=6.6">
+<link rel="stylesheet" href="fonts.css?v=6.8">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -554,8 +554,10 @@
   </div>
 </div>
 
-<script src="../vendor/modern-screenshot.js?v=6.6"></script>
-<script src="chup.js?v=6.6"></script>
+<script src="../vendor/modern-screenshot.js?v=6.8"></script>
+<script src="chup.js?v=6.8"></script>
+<script src="../vendor/qrcode.js?v=6.8"></script>
+<script src="cong-png.js?v=6.8"></script>
 <script>
 const CHU = {
   vi: {
@@ -582,7 +584,9 @@ window.dien = function (d, lang) {
   datChu('#t-intro', C.intro); datChu('#t-sec1', C.sec1); datChu('#t-sec2', C.sec2); datChu('#t-sec3', C.sec3);
   datChu('#t-notes', C.notes); datChu('#l-tt', C.tt); datChu('#t-qr1', C.qr1); datChu('#t-qr2', C.qr2);
   const coBang = d.hien_noi_dung && d.buoi.length;
-  const cot = coBang ? C.cot.filter((_, i) => i !== 2) : C.cot;
+  const G = lang === 'zh' ? [['已上时长'], ['剩余时长']] : [['Thời lượng đã học', '已上时长'], ['Thời lượng còn lại', '剩余时长']];
+  const cotGoc = d.theo_gio ? C.cot.map((c, i) => i === 3 ? G[0] : i === 4 ? G[1] : c) : C.cot;
+  const cot = coBang ? cotGoc.filter((_, i) => i !== 2) : cotGoc;
   document.getElementById('sum-head').innerHTML = cot.map(th).join('');
   const giaTri = [d.lop, d.trinh_do, d.ngay_list, d.tong, d.con_lai, d.hoc_phi];
   document.getElementById('sum-body').innerHTML = (coBang ? giaTri.filter((_, i) => i !== 2) : giaTri).map((v, i) => td(v, !coBang && i === 2 ? 'min-width:150px' : '')).join('');
@@ -592,6 +596,7 @@ window.dien = function (d, lang) {
   datChu('#v-tt', d.tinh_trang);
   document.getElementById('row-next').style.display = d.khoa_sau ? '' : 'none';
   datChu('#l-next', C.next); datChu('#v-next', d.khoa_sau);
+  if (window.veCong) veCong(d.cong, lang);
 };
 </script>
 </body>
