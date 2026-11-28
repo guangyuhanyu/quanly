@@ -85,6 +85,7 @@ function vHomNay() {
 
     <div class="nhom-nut">${typeof nutMuaNhanh === 'function' ? nutMuaNhanh() : ''}<button class="nut" data-act="them-viec">＋ Việc</button><button class="nut chinh" data-act="them-buoi" data-ngay="${hn}">＋ Đặt buổi học</button></div>
   </header>
+  ${typeof nhacToiHomNay === 'function' ? nhacToiHomNay() : ''}
   ${theDemNguoc()}
     <section class="the-giay lich-hom-nay">
       <div class="dau-muc"><h2 class="co-icon">${ICON.lich}Lịch dạy hôm nay</h2><a href="#/lich">Mở lịch →</a></div>

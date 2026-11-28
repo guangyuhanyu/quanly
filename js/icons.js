@@ -51,7 +51,7 @@ const ICON = {
 };
 
 /* ===== Bộ icon pastel (bản 4.8) — ảnh màu thay cho icon nét ===== */
-const _a = n => `<img class="ic ic-anh" src="assets/icons/${n}.webp?v=6.9" alt="" aria-hidden="true" draggable="false">`;
+const _a = n => `<img class="ic ic-anh" src="assets/icons/${n}.webp?v=7.0" alt="" aria-hidden="true" draggable="false">`;
 Object.assign(ICON, {
   'hom-nay': _a('positive'), 'lich': _a('schedule'), 'lop': _a('study'), 'hoc-vien': _a('mood'),
   'tai-chinh': _a('progress'), 'cong-viec': _a('todo'), 'cai-dat': _a('notes'), 'den-long': _a('ideas'),
