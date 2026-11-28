@@ -97,11 +97,11 @@ function ve() {
 window.addEventListener('hashchange', ve);
 
 const HD = {
-  'them-buoi': el => moBuoi({ ngay: el.dataset.ngay, lopId: el.dataset.lop ? Number(el.dataset.lop) : null, dat: el.dataset.dat }),
+  'them-buoi': el => moBuoi({ ngay: el.dataset.ngay, gio: el.dataset.gio || undefined, lopId: el.dataset.lop ? Number(el.dataset.lop) : null, dat: el.dataset.dat }),
   'mo-buoi': el => moBuoi({ id: Number(el.dataset.id), dat: el.dataset.dat }),
   'lich-kieu': el => { LICH.kieu = el.dataset.v; ve(); },
-  'lich-lui': () => { LICH.moc = LICH.kieu === 'tuan' ? congNgay(LICH.moc, -7) : dichKy('thang', LICH.moc, -1); ve(); },
-  'lich-toi': () => { LICH.moc = LICH.kieu === 'tuan' ? congNgay(LICH.moc, 7) : dichKy('thang', LICH.moc, 1); ve(); },
+  'lich-lui': () => { LICH.moc = LICH.kieu !== 'thang' ? congNgay(LICH.moc, -7) : dichKy('thang', LICH.moc, -1); ve(); },
+  'lich-toi': () => { LICH.moc = LICH.kieu !== 'thang' ? congNgay(LICH.moc, 7) : dichKy('thang', LICH.moc, 1); ve(); },
   'lich-nay': () => { LICH.moc = homNay(); ve(); },
   'lich-den': el => { LICH.moc = el.dataset.ngay; LICH.kieu = 'tuan'; ve(); },
   'lich-apple': () => { location.hash = '#/cai-dat'; },
@@ -188,7 +188,7 @@ const HD = {
 };
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el) return;
-  const f = HD[el.dataset.act] || HD_L79[el.dataset.act] || HD_MT[el.dataset.act] || HD_ST[el.dataset.act] || HD_QY[el.dataset.act] || HD_TK[el.dataset.act] || HD_KN[el.dataset.act] || HD_DN[el.dataset.act] || HD_FC[el.dataset.act] || HD_MF[el.dataset.act] || HD_LH[el.dataset.act] || (typeof HD_MUA !== 'undefined' && HD_MUA[el.dataset.act]) || (typeof HD_CONG !== 'undefined' && HD_CONG[el.dataset.act]); if (!f) return;
+  const f = HD[el.dataset.act] || HD_L79[el.dataset.act] || HD_MT[el.dataset.act] || HD_ST[el.dataset.act] || HD_QY[el.dataset.act] || HD_TK[el.dataset.act] || HD_KN[el.dataset.act] || HD_DN[el.dataset.act] || HD_FC[el.dataset.act] || HD_MF[el.dataset.act] || HD_LH[el.dataset.act] || (typeof HD_MUA !== 'undefined' && HD_MUA[el.dataset.act]) || (typeof HD_CONG !== 'undefined' && HD_CONG[el.dataset.act]) || (typeof HD_KT !== 'undefined' && HD_KT[el.dataset.act]); if (!f) return;
   const chay = async () => {
     try {
       if (CHI_DOC && !/^(mo-|st-tab|l79-xem|tk-|mt-tuan|mt-nam|mt-chon|kn-mo|kn-loc|st-loc|mp-loc|st-dip|sk-buoi|chi-tiet|giao-dien)/.test(el.dataset.act)) { toast('Đang mất mạng, chỉ xem được. Có mạng lại Thầy thao tác tiếp nhé.', 'canh'); return; }
@@ -204,6 +204,7 @@ document.addEventListener('change', e => {
   if (el.dataset.actChange === 'chon-khoa') { CHON_KHOA[Number(el.dataset.lop)] = Number(el.value); ve(); }
   if (el.dataset.change === 'khoi-phuc' && el.files[0]) khoiPhuc(el.files[0]);
   if (typeof HD_CONG_DOI !== 'undefined' && HD_CONG_DOI[el.dataset.actChange]) HD_CONG_DOI[el.dataset.actChange](el);
+  if (typeof HD_KT_DOI !== 'undefined' && HD_KT_DOI[el.dataset.actChange]) HD_KT_DOI[el.dataset.actChange](el);
   if (el.dataset.actChange === 'tq-chon') { TQ.chon = Number(el.value); ve(); }
   if (el.dataset.actChange === 'l79-start') l79DoiNgayBatDau(el.value);
   if (el.dataset.actChange === 'kn-nam') { KN.nam = el.value; ve(); }
@@ -251,10 +252,10 @@ function duLieuPNG(L, k, mau, opt) {
   else ttHocPhi = zh ? `待缴 ${money(k.hoc_phi)}` : `Chưa đóng (${money(k.hoc_phi)})`;
   const cong = typeof congPNG === 'function' ? congPNG(L) : null;
   if (mau === '01') {
-    return { cong,
+    return { cong, theo_gio: t.theoGio,
       lop: L.ten, so_hv: zh ? `${Math.max(hv.length, 1)} 人` : `${Math.max(hv.length, 1)} học viên`,
       ngay_bd: k.ngay_bat_dau ? (zh ? ngayZh(k.ngay_bat_dau) : ngayVN(k.ngay_bat_dau)) : '',
-      so_buoi: (zh ? `${t.tong} 次课 × ${k.thoi_luong_phut || 90} 分钟` : `${t.tong} buổi × ${k.thoi_luong_phut || 90} phút`) + (t.theoGio ? (zh ? `（共 ${gioChu(t.tong * t.tl, true)}，按实际上课时长扣除）` : ` (tổng ${gioChu(t.tong * t.tl)}, trừ theo thời lượng thực tế từng buổi)`) : ''),
+      so_buoi: t.theoGio ? (zh ? `共 ${gioChu(t.tong * t.tl, true)}（按每次实际上课时长扣除）` : `Tổng ${gioChu(t.tong * t.tl)} (trừ theo thời lượng thực tế từng buổi)`) : (zh ? `${t.tong} 次课 × ${k.thoi_luong_phut || 90} 分钟` : `${t.tong} buổi × ${k.thoi_luong_phut || 90} phút`),
       lich: k.lich_hoc || '', tai_lieu: k.giao_trinh || trinhDo, muc_tieu: k.muc_tieu || '',
       hoc_phi: money(k.hoc_phi) + (k.buoi_chuyen_sang > 0 ? (zh ? `（含上期转入 ${luongChu(t, k.buoi_chuyen_sang, true)}）` : ` (cộng thêm ${luongChu(t, k.buoi_chuyen_sang)} chuyển từ khoá trước)`) : ''),
       tinh_trang: ttHocPhi,
@@ -269,7 +270,7 @@ function duLieuPNG(L, k, mau, opt) {
     ngay_list: daDay.map(b => (zh ? `${Number(b.ngay.slice(5, 7))}月${Number(b.ngay.slice(8))}日` : ngayNgan(b.ngay)) + (t.theoGio ? (zh ? `（${gioNgan(b.thoi_luong_phut || t.tl)}）` : ` (${gioNgan(b.thoi_luong_phut || t.tl)})`) : '')).join(zh ? '、' : ', '),
     buoi: daDay.map((b, i) => ({ stt: i + 1, ngay: zh ? `${Number(b.ngay.slice(5, 7))}月${Number(b.ngay.slice(8))}日（${TEN_THU_ZH[s2d(b.ngay).getDay()]}）` : `${THU_NGAN[s2d(b.ngay).getDay()]} ${ngayVN(b.ngay)}`, noi_dung: b.noi_dung || '', tl: t.theoGio || b.thoi_luong_phut !== (k.thoi_luong_phut || 90) ? (zh ? `${b.thoi_luong_phut}分钟` : thoiLuongChu(b.thoi_luong_phut)) : '' })),
     hien_noi_dung: opt.noiDung, tinh_trang: ttHocPhi,
-    khoa_sau: opt.khoaSau ? (zh ? `${opt.soBuoiSau} 次课：${money(opt.hpSau)}` : `${opt.soBuoiSau} buổi: ${money(opt.hpSau)}`) : '',
+    khoa_sau: opt.khoaSau ? (t.theoGio ? `${gioChu(opt.soBuoiSau * t.tl, zh)}${zh ? '：' : ': '}${money(opt.hpSau)}` : zh ? `${opt.soBuoiSau} 次课：${money(opt.hpSau)}` : `${opt.soBuoiSau} buổi: ${money(opt.hpSau)}`) : '',
   };
 }
 function moXuatPNG(lopId, mau) {
@@ -287,7 +288,7 @@ function moXuatPNG(lopId, mau) {
         <label>Khoá<select data-xp-in="khoa">${ks.map(k => `<option value="${k.id}" ${k.id === k0.id ? 'selected' : ''}>${k.ma} · ${luongNgan(tk(k), tk(k).daHoc)}/${luongNgan(tk(k), tk(k).tong)}${tk(k).theoGio ? '' : ' buổi'}</option>`).join('')}</select></label>
         <div data-chi="02">
           <label class="hop-chon-dong"><input type="checkbox" data-xp-in="khoaSau" ${st.khoaSau ? 'checked' : ''}> Báo học phí khoá tiếp theo</label>
-          <div class="luoi-form" data-khoa-sau><label>Số buổi<input type="number" data-xp-in="soBuoiSau" value="${st.soBuoiSau}"></label><label>Học phí<input data-so data-xp-in="hpSau" value="${st.hpSau}"></label></div>
+          <div class="luoi-form" data-khoa-sau>${t0.theoGio ? `<label>Số giờ<input data-xp-in="gioSau" inputmode="decimal" value="${gioO(st.soBuoiSau * t0.tl)}"></label>` : `<label>Số buổi<input type="number" data-xp-in="soBuoiSau" value="${st.soBuoiSau}"></label>`}<label>Học phí<input data-so data-xp-in="hpSau" value="${st.hpSau}"></label></div>
         </div>
         <p class="mo nho">Có thể bấm thẳng vào ảnh bên phải để sửa chữ trước khi tải.</p>
         <button class="nut chinh rong" data-xp="tai">⤓ Tải ảnh PNG</button>
@@ -303,7 +304,7 @@ function moXuatPNG(lopId, mau) {
         $$('[data-xp=lang]', n).forEach(b => b.classList.toggle('on', b.dataset.v === st.lang));
         $('[data-chi="02"]', n).style.display = st.mau === '02' ? '' : 'none';
         $('[data-khoa-sau]', n).style.display = st.khoaSau ? '' : 'none';
-        const src = `templates/png${st.mau}.html?v=6.8`;
+        const src = `templates/png${st.mau}.html?v=6.9`;
         const dien = () => { const w = khung.contentWindow; if (!w.dien) return setTimeout(dien, 60); w.dien(duLieuPNG(L, khoaTheoId(st.khoa), st.mau, st), st.lang); setTimeout(() => { khung.style.height = w.document.documentElement.scrollHeight + 'px'; }, 120); };
         if (!khung.src.endsWith(src)) { khung.onload = dien; khung.src = src; } else dien();
       };
@@ -327,8 +328,9 @@ function moXuatPNG(lopId, mau) {
       });
       $$('[data-xp-in]', n).forEach(inp => inp.addEventListener(inp.type === 'checkbox' ? 'change' : 'input', () => {
         const k = inp.dataset.xpIn;
+        if (k === 'gioSau') { const g = docGio(inp.value), kk = khoaTheoId(st.khoa); if (g > 0) st.soBuoiSau = g / (kk.thoi_luong_phut || 90); nap(); return; }
         st[k] = inp.type === 'checkbox' ? inp.checked : inp.dataset.so != null ? Number(inp.value.replace(/\D/g, '')) : Number(inp.value);
-        if (k === 'khoa') { const kk = khoaTheoId(st.khoa); st.soBuoiSau = kk.so_buoi; st.hpSau = kk.hoc_phi; $('[data-xp-in=soBuoiSau]', n).value = kk.so_buoi; $('[data-xp-in=hpSau]', n).value = NF.format(kk.hoc_phi); }
+        if (k === 'khoa') { const kk = khoaTheoId(st.khoa); st.soBuoiSau = kk.so_buoi; st.hpSau = kk.hoc_phi; const os = $('[data-xp-in=soBuoiSau]', n), og = $('[data-xp-in=gioSau]', n); if (os) os.value = kk.so_buoi; if (og) og.value = gioO(kk.so_buoi * (kk.thoi_luong_phut || 90)); $('[data-xp-in=hpSau]', n).value = NF.format(kk.hoc_phi); }
         nap();
       }));
       ganOTien(n);

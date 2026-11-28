@@ -54,9 +54,34 @@ function gioChu(ph, zh) {
   const s = zh ? ((h ? h + ' 小时' : '') + (m ? (h ? ' ' : '') + m + ' 分钟' : '') || '0 分钟') : ([h ? h + ' tiếng' : '', m ? m + ' phút' : ''].filter(Boolean).join(' ') || '0 phút');
   return (am ? '−' : '') + s;
 }
-function gioNgan(ph) { ph = Math.round(ph); const a = Math.abs(ph), h = Math.floor(a / 60), m = a % 60; return (ph < 0 ? '−' : '') + (h ? h + 'h' + (m ? String(m).padStart(2, '0') : '') : m + 'p'); }
+function gioNgan(ph) { ph = Math.round(ph); const a = Math.abs(ph), h = Math.floor(a / 60), m = a % 60; return (ph < 0 ? '−' : '') + (h ? h + 'h' + (m ? String(m).padStart(2, '0') : '') : m ? m + 'p' : '0h'); }
 /* n: số buổi (quy đổi) của khoá t → chữ: "3 buổi" hoặc "4 tiếng 30 phút" */
 function luongChu(t, n, zh) { return t && t.theoGio ? gioChu(n * t.tl, zh) : (zh ? `${n} 次课` : `${n} buổi`); }
+/* đọc ô nhập giờ: "12", "12,5", "1h30", "1:30", "90p", "-1h" → số phút (NaN nếu sai) */
+function docGio(v) {
+  v = String(v == null ? '' : v).trim().toLowerCase().replace(/\s+/g, '').replace('−', '-'); if (!v) return 0;
+  const am = v.startsWith('-') ? -1 : 1; v = v.replace(/^[-+]/, ''); let m;
+  if ((m = v.match(/^(\d+)(?:h|:|g|giờ|gio|tiếng|tieng)(\d{1,2})?(?:p|ph|phút|phut)?$/))) return am * (Number(m[1]) * 60 + Number(m[2] || 0));
+  if ((m = v.match(/^(\d+)(?:p|ph|phút|phut)$/))) return am * Number(m[1]);
+  const n = Number(v.replace(',', '.')); return isNaN(n) ? NaN : am * Math.round(n * 60);
+}
+/* số phút → chữ điền sẵn vào ô giờ: 750 → "12h30", 720 → "12" */
+function gioO(ph) { ph = Math.round(ph || 0); const am = ph < 0 ? '-' : '', a = Math.abs(ph), h = Math.floor(a / 60), m = a % 60; return am + (m ? `${h}h${String(m).padStart(2, '0')}` : `${h}`); }
+async function datTheoGio(lopId, bat) {
+  if (bat === lopTheoGio(lopId)) return;
+  const ds = (caiDat('lop_theo_gio', []) || []).filter(x => x !== lopId); if (bat) ds.push(lopId);
+  await luuCaiDat('lop_theo_gio', ds); lamMoi();
+}
+/* nút chọn Theo buổi / Theo giờ trong form khoá */
+function chonCheDo(gio) {
+  return `<div class="ca-dong che-tinh"><span class="mo nho">Tính khoá học:</span><div class="phan-doan"><button type="button" data-che="buoi" class="${gio ? '' : 'on'}">Theo buổi</button><button type="button" data-che="gio" class="${gio ? 'on' : ''}">Theo giờ</button></div>
+    <input type="hidden" name="_che" value="${gio ? 'gio' : 'buoi'}"><small class="mo nho" data-chi="gio">Mỗi buổi trừ đúng số phút thực tế · gõ giờ kiểu 12 · 12,5 · 1h30</small></div>`;
+}
+function ganCheDo(n, khiDoi) {
+  const ap = v => { $('[name=_che]', n).value = v; $$('[data-che]', n).forEach(b => b.classList.toggle('on', b.dataset.che === v)); $$('[data-chi]', n).forEach(e => { e.style.display = e.dataset.chi === v ? '' : 'none'; }); if (khiDoi) khiDoi(v); };
+  $$('[data-che]', n).forEach(b => b.onclick = () => ap(b.dataset.che)); ap($('[name=_che]', n).value);
+}
+const boKhoaTam = f => { Object.keys(f).forEach(k => { if (k.startsWith('_')) delete f[k]; }); return f; };
 function luongNgan(t, n) { return t && t.theoGio ? gioNgan(n * t.tl) : String(n); }
 
 /* ---------- tính toán khoá học ---------- */

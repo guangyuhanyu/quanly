@@ -131,7 +131,7 @@ function theBuoiHomNay(b) {
 const GIO_DAU = 7 * 60, GIO_CUOI = 23 * 60, O = 22; // 1 ô = 30 phút
 function vLich() {
   const thang = Number(LICH.moc.slice(5, 7)), nam = LICH.moc.slice(0, 4);
-  const tieuDe = LICH.kieu === 'tuan'
+  const tieuDe = LICH.kieu !== 'thang'
     ? (() => { const a = dauTuan(LICH.moc), b = congNgay(a, 6); return `${ngayNgan(a)} – ${ngayVN(b)}`; })()
     : `Tháng ${thang}, ${nam}`;
   const Lloc = LICH.loc ? lopTheoId(LICH.loc) : null;
@@ -142,16 +142,16 @@ function vLich() {
         <h1>${tieuDe}</h1>
         <div class="nhom-nut">
           <div class="phan-doan">${[['buoi', 'Buổi học'], ['viec', 'Công việc'], ['tat_ca', 'Tất cả']].map(([v, c]) => `<button data-act="lich-loai" data-v="${v}" class="${LICH.loai === v ? 'on' : ''}">${c}</button>`).join('')}</div>
-          <div class="vien-thang"><button class="nut-tron" data-act="lich-lui" aria-label="Trước">${ICON.trai}</button><span>${LICH.kieu === 'tuan' ? 'Tuần ' + ngayNgan(dauTuan(LICH.moc)) : 'Tháng ' + thang}</span><button class="nut-tron" data-act="lich-toi" aria-label="Sau">${ICON.phai}</button></div>
+          <div class="vien-thang"><button class="nut-tron" data-act="lich-lui" aria-label="Trước">${ICON.trai}</button><span>${LICH.kieu !== 'thang' ? 'Tuần ' + ngayNgan(dauTuan(LICH.moc)) : 'Tháng ' + thang}</span><button class="nut-tron" data-act="lich-toi" aria-label="Sau">${ICON.phai}</button></div>
           <button class="nut" data-act="lich-nay">Hôm nay</button>
-          <div class="phan-doan"><button data-act="lich-kieu" data-v="tuan" class="${LICH.kieu === 'tuan' ? 'on' : ''}">Tuần</button><button data-act="lich-kieu" data-v="thang" class="${LICH.kieu === 'thang' ? 'on' : ''}">Tháng</button></div>
+          <div class="phan-doan"><button data-act="lich-kieu" data-v="tuan" class="${LICH.kieu === 'tuan' ? 'on' : ''}">Tuần</button><button data-act="lich-kieu" data-v="thang" class="${LICH.kieu === 'thang' ? 'on' : ''}">Tháng</button><button data-act="lich-kieu" data-v="trong" class="${LICH.kieu === 'trong' ? 'on' : ''}">Giờ trống</button></div>
           <button class="nut" data-act="ngay-off" data-ngay="${LICH.kieu === 'tuan' ? homNay() : LICH.moc}">🏮 Ngày off</button>
           <button class="nut-tron vien" data-act="lich-apple" title="Lịch Apple & cài đặt">${ICON['cai-dat']}</button>
           <button class="nut chinh" data-act="them-buoi" data-ngay="${LICH.kieu === 'tuan' ? homNay() : LICH.moc}" data-lop="${LICH.loc || ''}">${ICON.cong} Đặt buổi</button>
         </div>
       </div>
       ${Lloc ? `<div class="dang-loc">${ICON.loc} Đang xem riêng lớp ${chamMau(Lloc)}<b>${esc(Lloc.ten)}</b><button data-act="lich-bo-loc">Bỏ lọc ×</button></div>` : ''}
-      ${LICH.kieu === 'tuan' ? lichTuan() : lichThang()}
+      ${LICH.kieu === 'trong' && typeof lichTrong === 'function' ? lichTrong() : LICH.kieu === 'tuan' ? lichTuan() : lichThang()}
     </div>
   </div>`;
 }
@@ -468,7 +468,7 @@ function vChiTietLop(id) {
     <div class="o-so nho">
       <div class="o-so-the"><span>Đã học</span><b>${luongNgan(t, t.daHoc)}<small>/${luongNgan(t, t.tong)}</small></b>${thanhTienDo(t)}</div>
       <div class="o-so-the ${t.conLai <= nguongGiaHan() ? 'canh' : ''}"><span>Còn lại</span><b>${luongNgan(t, t.conLai)}</b><small>${t.theoGio ? `${t.soBuoiDay} buổi đã dạy · ≈ ${String(lam2(Math.max(t.conLai, 0))).replace(".", ",")} buổi ${thoiLuongChu(t.tl)}` : k.buoi_chuyen_sang ? `gồm ${k.buoi_chuyen_sang > 0 ? '+' : ''}${k.buoi_chuyen_sang} buổi từ khoá trước` : thoiLuongChu(k.thoi_luong_phut) + '/buổi'}</small></div>
-      <div class="o-so-the"><span>Học phí khoá</span><b>${tienGon(k.hoc_phi)}</b><small>${k.so_buoi} buổi · ${tien(t.donGiaBuoi)}/buổi</small></div>
+      <div class="o-so-the"><span>Học phí khoá</span><b>${tienGon(k.hoc_phi)}</b><small>${t.theoGio ? `${gioChu(k.so_buoi * t.tl)} · ${tien(Math.round(t.donGiaBuoi / t.tl * 60))}/giờ` : `${k.so_buoi} buổi · ${tien(t.donGiaBuoi)}/buổi`}</small></div>
       <div class="o-so-the ${t.conNo > 0 ? 'canh' : ''}"><span>Đã đóng</span><b>${tienGon(t.daDong)}</b><small>${t.conNo > 0 ? 'Còn thiếu ' + tien(t.conNo) : t.conNo < 0 ? 'Dư ' + tien(-t.conNo) : 'Đủ ✓'}</small></div>
       <div class="o-so-the"><span>Doanh thu đã dạy</span><b>${tienGon(t.daThucHien)}</b><small>chưa thực hiện ${tienGon(t.chuaThucHien)}</small></div>
     </div>
@@ -604,8 +604,10 @@ function moGiaHan(lopId) {
     noiDung: `<div class="form luoi-form ba">
       ${cu ? `<p class="ca-dong mo">Khoá hiện tại ${cu.ma}: đã học ${luongNgan(t, t.daHoc)}/${luongNgan(t, t.tong)}${t.theoGio ? '' : ' buổi'}, còn <b>${luongChu(t, t.conLai)}</b>${t.conNo > 0 ? `, còn thiếu ${tien(t.conNo)}` : ''}.</p>` : ''}
       <label>Ngày bắt đầu<input type="date" name="ngay" value="${homNay()}"></label>
-      <label>Số buổi đóng tiền<input type="number" name="so_buoi" value="${cu ? cu.so_buoi : 8}" min="1"></label>
-      <label>Thời lượng / buổi (phút)<input type="number" name="tl" value="${cu ? cu.thoi_luong_phut || 90 : 90}" step="15"></label>
+      ${chonCheDo(lopTheoGio(L.id))}
+      <label data-chi="buoi">Số buổi đóng tiền<input type="number" name="so_buoi" value="${cu ? Math.round(cu.so_buoi) : 8}" min="1"></label>
+      <label data-chi="gio">Tổng số giờ khoá mới<input name="_gio_tong" inputmode="decimal" value="${gioO(cu ? cu.so_buoi * (cu.thoi_luong_phut || 90) : 720)}"></label>
+      <label><span data-chi="buoi">Thời lượng / buổi (phút)</span><span data-chi="gio">Buổi thường học (phút)</span><input type="number" name="tl" value="${cu ? cu.thoi_luong_phut || 90 : 90}" step="15"></label>
       <label class="hai-cot">Học phí khoá mới <small class="mo" id="goi-y-hp"></small><input data-so name="hoc_phi" value="${cu ? cu.hoc_phi : ''}"></label>
       <label class="hop-chon-dong"><input type="checkbox" name="da_dong"> Đã nhận học phí hôm nay</label>
       ${cu && !cu.ket_thuc && chuyen !== 0 ? `<label class="ca-dong hop-chon-dong noi-bat"><input type="checkbox" name="chuyen" checked> ${chuyen > 0 ? `Chuyển <b>${luongChu(t, chuyen)} còn lại</b> (trị giá ${tien(chuyen * t.donGiaBuoi)}) sang khoá mới` : `Khoá cũ đã học vượt <b>${luongChu(t, -chuyen)}</b> – trừ vào khoá mới`}</label>` : ''}
@@ -614,8 +616,9 @@ function moGiaHan(lopId) {
       <label class="ca-dong">Mục tiêu khoá<input name="muc_tieu" value="${esc(cu ? cu.muc_tieu || '' : '')}"></label>
     </div>`,
     nut: [{ chu: 'Huỷ', bam: () => {} }, { chu: 'Tạo khoá', kieu: 'chinh', bam: async (n) => {
-      const f = docForm(n);
-      const c0 = f.chuyen ? chuyen : 0, c = t && t.theoGio && Number(f.tl) && Number(f.tl) !== t.tl ? lam2(c0 * t.tl / Number(f.tl)) : c0;
+      const f = docForm(n), gio = f._che === 'gio';
+      if (gio) { const tong = docGio(f._gio_tong); if (!(tong > 0)) { toast('Tổng số giờ chưa đúng – VD: 12 · 12,5 · 12h30', 'canh'); return false; } f.so_buoi = lam2(tong / (Number(f.tl) || 90)); }
+      const c0 = f.chuyen ? chuyen : 0, c = t && gio && Number(f.tl) && Number(f.tl) !== t.tl ? lam2(c0 * t.tl / Number(f.tl)) : c0;
       const moi = await luu('khoa_hoc', { lop_id: L.id, ngay_bat_dau: f.ngay, so_buoi: f.so_buoi, thoi_luong_phut: f.tl, hoc_phi: f.hoc_phi || 0, don_gia_gio: bg ? bg.don_gia_gio : null, buoi_chuyen_sang: c, gia_tri_chuyen_sang: Math.round(c0 * (t ? t.donGiaBuoi : 0)), khoa_truoc_id: cu ? cu.id : null, giao_trinh: f.giao_trinh, lich_hoc: f.lich_hoc, muc_tieu: f.muc_tieu });
       if (cu && !cu.ket_thuc) {
         await luu('khoa_hoc', { ket_thuc: true, buoi_chuyen_di: c0 }, cu.id);
@@ -623,12 +626,12 @@ function moGiaHan(lopId) {
       }
       if (f.da_dong && f.hoc_phi) await luu('thanh_toan', { khoa_id: moi.id, lop_id: L.id, ngay: homNay(), so_tien: f.hoc_phi, hinh_thuc: 'Chuyển khoản' });
       if (!L.dang_hoat_dong) await luu('lop', { dang_hoat_dong: true }, L.id);
-      CHON_KHOA[L.id] = moi.id; toast(`Đã tạo khoá ${moi.ma} ✓`); location.hash = '#/lop/' + L.id; ve(); setTimeout(() => goiYXepSauGiaHan(L.id), 500);
+      await datTheoGio(L.id, gio); CHON_KHOA[L.id] = moi.id; toast(`Đã tạo khoá ${moi.ma} ✓`); location.hash = '#/lop/' + L.id; ve(); setTimeout(() => goiYXepSauGiaHan(L.id), 500);
     } }],
     khiMo: n => {
       ganOTien(n);
-      const cap = () => { const g = goiYHocPhi(L.bang_gia_id, Number($('[name=tl]', n).value) || 90, Number($('[name=so_buoi]', n).value) || 8); $('#goi-y-hp', n).textContent = g && L.loai !== 'nhom' ? `bảng giá: ${tien(g)}` : ''; };
-      ['tl', 'so_buoi'].forEach(x => $(`[name=${x}]`, n).addEventListener('input', cap)); cap();
+      const cap = () => { const tl = Number($('[name=tl]', n).value) || 90, gio = $('[name=_che]', n).value === 'gio', so = gio ? (docGio($('[name=_gio_tong]', n).value) || 0) / tl : Number($('[name=so_buoi]', n).value) || 8; const g = so > 0 ? goiYHocPhi(L.bang_gia_id, tl, so) : 0; $('#goi-y-hp', n).textContent = g && L.loai !== 'nhom' ? `bảng giá: ${tien(Math.round(g))}` : ''; };
+      ['tl', 'so_buoi', '_gio_tong'].forEach(x => $(`[name=${x}]`, n).addEventListener('input', cap)); ganCheDo(n, cap);
     },
   });
 }
@@ -638,11 +641,14 @@ function moSuaKhoa(id) {
     tieuDe: `Sửa khoá ${k.ma} – ${esc(L.ten)}`,
     noiDung: `<div class="form luoi-form ba">
       <label>Ngày bắt đầu<input type="date" name="ngay_bat_dau" value="${esc(k.ngay_bat_dau || '')}"></label>
-      <label>Số buổi đóng tiền<input type="number" name="so_buoi" value="${k.so_buoi}"></label>
-      <label>Thời lượng / buổi (phút)<input type="number" name="thoi_luong_phut" value="${k.thoi_luong_phut || 90}" step="15"></label>
+      ${chonCheDo(t.theoGio)}
+      <label data-chi="buoi">Số buổi đóng tiền<input type="number" name="_so_buoi" value="${Number.isInteger(Number(k.so_buoi)) ? k.so_buoi : Math.round(k.so_buoi)}"></label>
+      <label data-chi="gio">Tổng số giờ đóng tiền<input name="_gio_tong" inputmode="decimal" value="${gioO((k.so_buoi || 0) * (k.thoi_luong_phut || 90))}"></label>
+      <label><span data-chi="buoi">Thời lượng / buổi (phút)</span><span data-chi="gio">Buổi thường học (phút)</span><input type="number" name="thoi_luong_phut" value="${k.thoi_luong_phut || 90}" step="15"></label>
       <label>Học phí khoá<input data-so name="hoc_phi" value="${k.hoc_phi}"></label>
-      <label>Buổi chuyển từ khoá trước<input type="number" step="any" name="buoi_chuyen_sang" value="${k.buoi_chuyen_sang || 0}"></label>
-      <label>Giá trị buổi chuyển sang<input data-so name="gia_tri_chuyen_sang" value="${k.gia_tri_chuyen_sang || 0}"></label>
+      <label data-chi="buoi">Buổi chuyển từ khoá trước<input name="_cs_buoi" inputmode="decimal" value="${String(k.buoi_chuyen_sang || 0).replace('.', ',')}"></label>
+      <label data-chi="gio">Giờ chuyển từ khoá trước<input name="_cs_gio" inputmode="decimal" value="${gioO((k.buoi_chuyen_sang || 0) * (k.thoi_luong_phut || 90))}"></label>
+      <label>Giá trị phần chuyển sang<input data-so name="gia_tri_chuyen_sang" value="${k.gia_tri_chuyen_sang || 0}"></label>
       <label class="hai-cot">Giáo trình<input name="giao_trinh" value="${esc(k.giao_trinh || '')}"></label>
       <label>Lịch học<input name="lich_hoc" value="${esc(k.lich_hoc || '')}"></label>
       <label class="ca-dong">Mục tiêu khoá<input name="muc_tieu" value="${esc(k.muc_tieu || '')}"></label>
@@ -653,8 +659,21 @@ function moSuaKhoa(id) {
     nut: [
       { chu: 'Xoá khoá', kieu: 'nguy', trai: true, bam: async () => { if (!(await hoi(`Xoá khoá ${k.ma}? Các buổi học vẫn giữ nhưng không thuộc khoá nào.`, 'Xoá', 'nguy'))) return false; await DBX.remove('khoa_hoc', k.id); await taiLai(); toast('Đã xoá khoá'); } },
       { chu: 'Huỷ', bam: () => {} },
-      { chu: 'Lưu', kieu: 'chinh', bam: async n => { const f = docForm(n); await luu('khoa_hoc', f, k.id); toast('Đã lưu khoá'); ve(); } }],
-    khiMo: ganOTien,
+      { chu: 'Lưu', kieu: 'chinh', bam: async n => {
+        const f = docForm(n), gio = f._che === 'gio', tl = Number(f.thoi_luong_phut) || 90;
+        if (gio) {
+          const tong = docGio(f._gio_tong), cs = docGio(f._cs_gio);
+          if (!(tong > 0)) { toast('Tổng số giờ chưa đúng – VD: 12 · 12,5 · 12h30', 'canh'); return false; }
+          if (isNaN(cs)) { toast('Giờ chuyển sang chưa đúng', 'canh'); return false; }
+          f.so_buoi = lam2(tong / tl); f.buoi_chuyen_sang = lam2(cs / tl);
+        } else {
+          f.so_buoi = f._so_buoi; const cs = Number(String(f._cs_buoi == null ? 0 : f._cs_buoi).replace(',', '.'));
+          if (isNaN(cs)) { toast('Số buổi chuyển sang chưa đúng', 'canh'); return false; }
+          f.buoi_chuyen_sang = cs;
+        }
+        boKhoaTam(f); await luu('khoa_hoc', f, k.id); await datTheoGio(L.id, gio); toast('Đã lưu khoá'); ve();
+      } }],
+    khiMo: n => { ganOTien(n); ganCheDo(n); },
   });
 }
 

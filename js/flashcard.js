@@ -1,7 +1,7 @@
 /* FLASHCARD HSK 7–9 — mở file flashcard/hsk79.html của Thầy ngay trong app (không sửa file).
    Tiến độ của file nằm ở localStorage 'gy-fc-hsk79'; app gộp & đồng bộ lên cai_dat 'flashcard_hsk79'
    để Mac và iPhone dùng chung. Ôn hết thẻ hôm nay (màn "Hôm nay xong rồi!") → tự tick bài Flashcard trong lộ trình. */
-const FC_KEY = 'gy-fc-hsk79', FC_DB = 'flashcard_hsk79', FC_FILE = 'flashcard/hsk79.html?v=6.8';
+const FC_KEY = 'gy-fc-hsk79', FC_DB = 'flashcard_hsk79', FC_FILE = 'flashcard/hsk79.html?v=6.9';
 const FC = { mo: false, hen: null, guiCuoi: '' };
 
 function fcDocLocal() { try { return JSON.parse(localStorage.getItem(FC_KEY) || 'null'); } catch (e) { return null; } }
